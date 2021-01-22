@@ -1,0 +1,15 @@
+
+# Editors
+.vscode
+
+# Build files
+.o
+.a
+.lib
+.dll
+.so
+.dylib
+
+# Build folders
+build
+

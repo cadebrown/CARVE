@@ -1,0 +1,167 @@
+---
+layout: default
+title: CARVE
+desc: Main page
+---
+<!-- Include the compiled Emscripten module -->
+<script src="/lib/libcarve.js"></script>
+
+<!-- ACE text editor -->
+<script src="https://pagecdn.io/lib/ace/1.4.12/ace.min.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<!-- Include the driver code for the main application -->
+<script>
+
+var libcarve = null;
+var editor = null;
+var state = null;
+
+loadlibcarve().then(function (_libcarve) {
+    // Initialize the editor
+    editor = ace.edit("editor", {
+        selectionStyle: "text"
+    });
+    ace.config.set('basePath', '/')
+    editor.setTheme('ace/theme/monokai')
+    //editor.getSession().setMode('ace/mode/riscv')
+
+    libcarve = _libcarve;
+
+    // Add hooks to libcarve to print console output
+    libcarve._write_stdout.push(function (text) {
+        console.log('[stdout]', text)
+    })
+    libcarve._write_stderr.push(function (text) {
+        console.warn('[stderr]', text)
+    })
+
+    // Initialize the library before any more calls
+    libcarve._carve_init();
+
+    state = libcarve._carve_state_new()
+    
+    $(document).ready( function () {
+        // Now, we are updating the state
+        update_registers(state)
+    })
+})
+
+
+/* Update the view with a given register */
+function update_registers(s) {
+    var dptr;
+    for (var i = 0; i < 15; ++i) {
+        dptr = libcarve._carve_state_sri(s, i, 16)
+        $('#ir' + i.toString() + '-16').text(libcarve.UTF8ToString(dptr))
+        libcarve._free(dptr)
+        dptr = libcarve._carve_state_sri(s, i, 10)
+        $('#ir' + i.toString() + '-10').text(libcarve.UTF8ToString(dptr))
+        libcarve._free(dptr)
+    }
+}
+
+
+</script>
+
+</script>
+
+<div class="main row">
+    <div class="col-editor" id="editor">
+        # t0 = 0
+        li      t0, 0
+        li      t2, 10
+        loop_head:
+        bge     t0, t2, loop_end
+        # Repeated code goes here
+        addi    t0, t0, 1
+        j		loop_head
+        loop_end:
+    </div>
+    <div class="col" id="info">
+        <table class="title">
+            <tr>
+              <th>Register</th>
+              <th>Value (base-16)</th>
+              <th>Value (base-10)</th>
+            </tr>
+            <tr>
+              <td>x0</td>
+              <td id="ir0-16"></td>
+              <td id="ir0-10"></td>
+            </tr>
+            <tr>
+              <td>x1</td>
+              <td id="ir1-16"></td>
+              <td id="ir1-10"></td>
+            </tr>
+            <tr>
+              <td>x2</td>
+              <td id="ir2-16"></td>
+              <td id="ir2-10"></td>
+            </tr>
+            <tr>
+              <td>x3</td>
+              <td id="ir3-16"></td>
+              <td id="ir3-10"></td>
+            </tr>
+            <tr>
+              <td>x4</td>
+              <td id="ir4-16"></td>
+              <td id="ir4-10"></td>
+            </tr>
+            <tr>
+              <td>x5</td>
+              <td id="ir5-16"></td>
+              <td id="ir5-10"></td>
+            </tr>
+            <tr>
+              <td>x6</td>
+              <td id="ir6-16"></td>
+              <td id="ir6-10"></td>
+            </tr>
+            <tr>
+              <td>x7</td>
+              <td id="ir7-16"></td>
+              <td id="ir7-10"></td>
+            </tr>
+            <tr>
+              <td>x8</td>
+              <td id="ir8-16"></td>
+              <td id="ir8-10"></td>
+            </tr>
+            <tr>
+              <td>x9</td>
+              <td id="ir9-16"></td>
+              <td id="ir9-10"></td>
+            </tr>
+            <tr>
+              <td>x10</td>
+              <td id="ir10-16"></td>
+              <td id="ir10-10"></td>
+            </tr>
+            <tr>
+              <td>x11</td>
+              <td id="ir11-16"></td>
+              <td id="ir11-10"></td>
+            </tr>
+            <tr>
+              <td>x12</td>
+              <td id="ir12-16"></td>
+              <td id="ir12-10"></td>
+            </tr>
+            <tr>
+              <td>x13</td>
+              <td id="ir13-16"></td>
+              <td id="ir13-10"></td>
+            </tr>
+            <tr>
+              <td>x14</td>
+              <td id="ir14-16"></td>
+              <td id="ir14-10"></td>
+            </tr>
+          </table>
+    </div>
+</div>
+

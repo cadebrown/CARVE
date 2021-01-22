@@ -1,0 +1,41 @@
+/* site.css - CARVE site CSS
+ *
+ *
+ */
+
+:root {
+}
+
+body {
+    margin: 0;
+    height: 100%;
+}
+#editor { 
+    height: 100%;
+}
+
+.main {
+    height: 100%;
+    position: absolute;
+}
+
+.row {
+    display: flex;
+}
+
+.col {
+    flex: 50%;
+    min-width: 25vw;
+}
+
+.col-editor {
+    flex: 50%;
+    width: 70vw;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
+}
+

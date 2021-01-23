@@ -9,14 +9,13 @@
 body {
     margin: 0;
     height: 100%;
-}
-#editor { 
-    height: 100%;
+    overflow-x: hidden;
 }
 
 .main {
-    height: 100%;
-    position: absolute;
+    height: calc(100vh - 1.9em - 20vh - 18px);
+    width: 100%;
+    position: relative;
 }
 
 .row {
@@ -24,18 +23,59 @@ body {
 }
 
 .col {
-    flex: 50%;
-    min-width: 25vw;
+    flex: auto;
 }
 
-.col-editor {
-    flex: 50%;
-    width: 70vw;
+.menu {
+    width: 100%;
+    font-size: 1.2em;
+    padding: 0.2em 0.2em 0.2em 0.2em;
+
+    background-color: red;
 }
 
 table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
+    padding: 2px 2px 2px 2px;
     font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
 }
 
+#reg_table {
+    width: 100%;
+}
+
+#registers {
+    overflow-y: scroll;
+}
+
+#editor { 
+    height: 100%;
+    resize: horizontal;
+    min-width: 5vw;
+}
+
+#console {
+    width: 100%;
+    min-width: 100%;
+    height: 20vh;
+    max-width: 50%;
+}
+
+#resize-tabedit {
+    flex: none;
+    width: 6px;
+    background-color: lightgray;
+    cursor: col-resize;
+}
+
+#resize-console {
+    width: 100%;
+    height: 6px;
+    background-color: lightgray;
+    cursor: row-resize;
+}
+
+#menu_bar {
+
+}

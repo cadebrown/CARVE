@@ -15,8 +15,12 @@ desc: Main page
 <!-- carve editor -->
 <script src="/js/carve.js"></script>
 
+<div class="menu" id="menu_bar">
+  Here are some settings
+</div>
+
 <div class="main row">
-    <div class="col-editor" id="editor">
+    <div class="col" id="editor">
         # t0 = 0
         li      t0, 0
         li      t2, 10
@@ -27,9 +31,16 @@ desc: Main page
         j		loop_head
         loop_end:
     </div>
-      <div class="col" id="registers">
-        <script>genregtable("registers")</script>
-      </div>
+
+    <div class="col" id="resize-tabedit"></div>
+
+    <div class="col" id="registers">
+      <script>genregtable("registers")</script>
     </div>
 </div>
+
+<div id="resize-console"></div>
+<textarea id="console" name="paragraph_text" readonly>
+Here do be some output
+</textarea>
 

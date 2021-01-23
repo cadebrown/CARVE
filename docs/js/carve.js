@@ -46,17 +46,50 @@ function update_registers(s) {
     }
 }
 
+/* Generate the register table with appropriate IDs */
 function genregtable(id) {
     const genrow = (reg, abi, desc, saver) => {
         return '<tr id='+reg+'_row><td>'+reg+'</td><td>'+abi+'</td><td id='+reg+'_val>0</td></tr>';
     }
 
     let regs = [
-        ["zero", "Hard-wired zero", "--"    ],
-        ["ra",   "Return address ", "Caller"],
+        ["zero",  "Hard-wired zero",                   "--"    ],
+        ["ra",    "Return address ",                   "Caller"],
+        ["sp",    "Stack pointer",                     "Callee"],
+        ["gp",    "Global pointer",                    "--"],
+        ["tp",    "Thread pointer",                    "--"],
+        ["t0",    "Temporary/alternate link register", "Caller"],
+        ["t1",    "Temporary register",                "Caller"],
+        ["t2",    "Temporary register",                "Caller"],
+        ["s0/fp", "Saved register/frame pointer",      "Callee"],
+        ["s1",    "Saved register",                    "Callee"],
+        ["a0",    "Function argument/return value",    "Caller"],
+        ["a1",    "Function argument/return value",    "Caller"],
+        ["a2",    "Function argument",                 "Caller"],
+        ["a3",    "Function argument",                 "Caller"],
+        ["a4",    "Function argument",                 "Caller"],
+        ["a5",    "Function argument",                 "Caller"],
+        ["a6",    "Function argument",                 "Caller"],
+        ["a7",    "Function argument",                 "Caller"],
+        ["s2",    "Saved register",                    "Callee"],
+        ["s3",    "Saved register",                    "Callee"],
+        ["s4",    "Saved register",                    "Callee"],
+        ["s5",    "Saved register",                    "Callee"],
+        ["s6",    "Saved register",                    "Callee"],
+        ["s7",    "Saved register",                    "Callee"],
+        ["s8",    "Saved register",                    "Callee"],
+        ["s9",    "Saved register",                    "Callee"],
+        ["s10",   "Saved register",                    "Callee"],
+        ["s11",   "Saved register",                    "Callee"],
+        ["t3",    "Temporary register",                "Caller"],
+        ["t4",    "Temporary register",                "Caller"],
+        ["t5",    "Temporary register",                "Caller"],
+        ["t6",    "Temporary register",                "Caller"],
     ];
 
-    let out = "<table>";
+    let out = "<table id='reg_table'>";
+
+    out += '<tr><td>Register</td><td>ABI Name</td><td>Value</td></tr>'
 
     for (let i = 0; i < regs.length; i++) {
         out += genrow("x" + i, ...regs[i]);

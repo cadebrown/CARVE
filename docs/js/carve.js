@@ -9,9 +9,9 @@ loadlibcarve().then(function (_libcarve) {
     editor = ace.edit("editor", {
         selectionStyle: "text"
     });
-    ace.config.set('basePath', '/')
+    ace.config.set('basePath', '/js')
     editor.setTheme('ace/theme/monokai')
-    //editor.getSession().setMode('ace/mode/riscv')
+    editor.getSession().setMode('ace/mode/riscv')
 
     // Creates a terminal with a callback for some text
     var term = $('#console').terminal(function(cmd, term) {
@@ -21,7 +21,6 @@ loadlibcarve().then(function (_libcarve) {
         name: 'carve-console',
         greetings: '',
         prompt: '',
-        height: 128,
     })
 
     // write to stdout

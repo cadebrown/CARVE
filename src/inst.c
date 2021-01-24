@@ -66,6 +66,22 @@ carve_inst carve_makeJ(carve_inst opcode, carve_inst rd, carve_inst imm_19_12, c
         | CARVE_FIELD(_20, 31, 32)
     ;
 }
+carve_inst carve_makeRr(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst funct7, carve_inst rs1, carve_inst rs2) {
+
+}
+carve_inst carve_makeIr(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst rs1, carve_inst imm) {
+
+}
+carve_inst carve_makeUr(carve_inst opcode, carve_inst rd, carve_inst imm);
+carve_inst carve_makeSr(carve_inst opcode, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm) {
+
+}
+carve_inst carve_makeBr(carve_inst opcode, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm) {
+
+}
+carve_inst carve_makeJr(carve_inst opcode, carve_inst rd, carve_inst imm) {
+    return carve_makeJ(opcode, rd, (CARVE_MASK(12, 20) & imm) >> 12, (CARVE_MASK(11, 12) & imm) >> 11, (CARVE_MASK(1, 11) & imm) >> 1, (CARVE_MASK(20, 21) & imm) >> 20);
+}
 
 carve_inst carve_get_opcode(carve_inst inst) {
     return inst & CARVE_MASK(0, 7);

@@ -4343,13 +4343,7 @@ var asm = createWasm();
 var ___wasm_call_ctors = Module["___wasm_call_ctors"] = createExportWrapper("__wasm_call_ctors");
 
 /** @type {function(...*):?} */
-var _carve_state_new = Module["_carve_state_new"] = createExportWrapper("carve_state_new");
-
-/** @type {function(...*):?} */
-var _malloc = Module["_malloc"] = createExportWrapper("malloc");
-
-/** @type {function(...*):?} */
-var _carve_state_sri = Module["_carve_state_sri"] = createExportWrapper("carve_state_sri");
+var _carve_exec = Module["_carve_exec"] = createExportWrapper("carve_exec");
 
 /** @type {function(...*):?} */
 var _carve_makeR = Module["_carve_makeR"] = createExportWrapper("carve_makeR");
@@ -4370,10 +4364,34 @@ var _carve_makeB = Module["_carve_makeB"] = createExportWrapper("carve_makeB");
 var _carve_makeJ = Module["_carve_makeJ"] = createExportWrapper("carve_makeJ");
 
 /** @type {function(...*):?} */
+var _carve_makeRr = Module["_carve_makeRr"] = createExportWrapper("carve_makeRr");
+
+/** @type {function(...*):?} */
+var _carve_makeIr = Module["_carve_makeIr"] = createExportWrapper("carve_makeIr");
+
+/** @type {function(...*):?} */
+var _carve_makeSr = Module["_carve_makeSr"] = createExportWrapper("carve_makeSr");
+
+/** @type {function(...*):?} */
+var _carve_makeBr = Module["_carve_makeBr"] = createExportWrapper("carve_makeBr");
+
+/** @type {function(...*):?} */
+var _carve_makeJr = Module["_carve_makeJr"] = createExportWrapper("carve_makeJr");
+
+/** @type {function(...*):?} */
 var _carve_get_opcode = Module["_carve_get_opcode"] = createExportWrapper("carve_get_opcode");
 
 /** @type {function(...*):?} */
 var _carve_init = Module["_carve_init"] = createExportWrapper("carve_init");
+
+/** @type {function(...*):?} */
+var _carve_state_new = Module["_carve_state_new"] = createExportWrapper("carve_state_new");
+
+/** @type {function(...*):?} */
+var _malloc = Module["_malloc"] = createExportWrapper("malloc");
+
+/** @type {function(...*):?} */
+var _carve_state_sri = Module["_carve_state_sri"] = createExportWrapper("carve_state_sri");
 
 /** @type {function(...*):?} */
 var _carve_prog_new = Module["_carve_prog_new"] = createExportWrapper("carve_prog_new");

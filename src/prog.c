@@ -77,7 +77,11 @@ carve_prog carve_prog_new(const char* src) {
     self->nhtlr = 0;
     self->htl = NULL;
 
-    carve_prog_add(self, carve_makeU(0x37, 0x01, 0xCADE));
+    carve_prog_add(self, carve_makeI(0x13, 1, 0x0, 0, 0));
+    carve_prog_add(self, carve_makeI(0x13, 2, 0x0, 0, 10));
+    carve_prog_add(self, carve_makeB(0x63, 0, (2 * 4) >> 1, 0x5, 1, 2, 0, 0));
+    carve_prog_add(self, carve_makeI(0x13, 1, 0x0, 1, 1));
+    carve_prog_add(self, carve_makeJr(0x6F, 0, -12));
 
     return self;
 }

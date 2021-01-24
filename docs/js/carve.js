@@ -189,7 +189,7 @@ function vert_drag(drag, top, bottom) {
         old_y = e.clientY;
         console.log(top);
         top.css('height', 'calc(75vh + ' + ((-1 * adjust) - 45) + 'px)');
-        bottom.css('height', 'calc(25vh + ' + (adjust) + 'px)');
+        bottom.css('height', 'calc(25vh + ' + (adjust + 6) + 'px)');
       }
 
     function closeDragElement() {

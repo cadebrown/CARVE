@@ -11,12 +11,14 @@ body {
     height: 100%;
     overflow-x: hidden;
     overflow-y: hidden;
+    background-color: black;
 }
 
 .main {
     height: calc(75vh - 40px);
     min-height: 15vh;
-    max-height: 90vh;
+    max-height: 85vh;
+
     width: 100%;
     position: relative;
 }
@@ -51,7 +53,9 @@ table, th, td {
 }
 
 #registers {
+    padding: 4px;
     overflow-y: scroll;
+    background-color: white;
 }
 
 #editor { 
@@ -62,8 +66,8 @@ table, th, td {
 }
 
 #console {
-    height: 25vh;
-    min-height: 10vh;
+    height: 25.1vh;
+    min-height: 12vh;
 
     font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
 

@@ -3,6 +3,8 @@ var editor = null;
 var state = null;
 
 loadlibcarve().then(function (_libcarve) {
+    libcarve = _libcarve;
+
     // Initialize the editor
     editor = ace.edit("editor", {
         selectionStyle: "text"
@@ -11,9 +13,26 @@ loadlibcarve().then(function (_libcarve) {
     editor.setTheme('ace/theme/monokai')
     //editor.getSession().setMode('ace/mode/riscv')
 
-    libcarve = _libcarve;
+    // Creates a terminal with a callback for some text
+    var term = $('#console').terminal(function(cmd, term) {
+        // Write to stdin
+        libcarve._buf_stdin += cmd + '\n';
+    }, {
+        name: 'carve-console',
+        greetings: '',
+        prompt: '',
+    })
 
-    // Add hooks to libcarve to print console output
+    // write to stdout
+    libcarve._write_stdout.push(function (text) {
+        term.echo("[[;#BBBBBB;]" + text + "]")
+    })
+    // write to stderr
+    libcarve._write_stderr.push(function (text) {
+        term.echo("[[;#EA6452;]" + text + "]")
+    })
+
+    // Add hooks to libcarve to print console output as well as to the on screen terminal
     libcarve._write_stdout.push(function (text) {
         console.log('[stdout]', text)
     })
@@ -26,22 +45,23 @@ loadlibcarve().then(function (_libcarve) {
 
     state = libcarve._carve_state_new()
     
-    $(document).ready( function () {
+    $(document).ready(function () {
         // Now, we are updating the state
         update_registers(state)
     })
+        
 })
 
 
-/* Update the view with a given register */
+/* Update the view with a given state */
 function update_registers(s) {
     var dptr;
-    for (var i = 0; i < 15; ++i) {
+    for (var i = 0; i <= 31; ++i) {
         dptr = libcarve._carve_state_sri(s, i, 16)
-        $('#ir' + i.toString() + '-16').text(libcarve.UTF8ToString(dptr))
+        $('#reg_x' + i.toString() + '_hex').text(libcarve.UTF8ToString(dptr))
         libcarve._free(dptr)
         dptr = libcarve._carve_state_sri(s, i, 10)
-        $('#ir' + i.toString() + '-10').text(libcarve.UTF8ToString(dptr))
+        $('#reg_x' + i.toString() + '_dec').text(libcarve.UTF8ToString(dptr))
         libcarve._free(dptr)
     }
 }
@@ -49,50 +69,50 @@ function update_registers(s) {
 /* Generate the register table with appropriate IDs */
 function genregtable(id) {
     const genrow = (reg, abi, desc, saver) => {
-        return '<tr id='+reg+'_row><td>'+reg+'</td><td>'+abi+'</td><td id='+reg+'_val>0</td></tr>';
+        return '<tr"><td class="reg_id">'+reg+'</td><td class="reg_name">'+abi+'</td><td class="reg_hex" id="reg_' + reg + '_hex">0</td><td class="reg_dec" id="reg_' + reg + '_dec">0</td></tr>';
     }
 
     let regs = [
-        ["zero",  "Hard-wired zero",                   "--"    ],
-        ["ra",    "Return address ",                   "Caller"],
-        ["sp",    "Stack pointer",                     "Callee"],
-        ["gp",    "Global pointer",                    "--"],
-        ["tp",    "Thread pointer",                    "--"],
-        ["t0",    "Temporary/alternate link register", "Caller"],
-        ["t1",    "Temporary register",                "Caller"],
-        ["t2",    "Temporary register",                "Caller"],
-        ["s0/fp", "Saved register/frame pointer",      "Callee"],
-        ["s1",    "Saved register",                    "Callee"],
-        ["a0",    "Function argument/return value",    "Caller"],
-        ["a1",    "Function argument/return value",    "Caller"],
-        ["a2",    "Function argument",                 "Caller"],
-        ["a3",    "Function argument",                 "Caller"],
-        ["a4",    "Function argument",                 "Caller"],
-        ["a5",    "Function argument",                 "Caller"],
-        ["a6",    "Function argument",                 "Caller"],
-        ["a7",    "Function argument",                 "Caller"],
-        ["s2",    "Saved register",                    "Callee"],
-        ["s3",    "Saved register",                    "Callee"],
-        ["s4",    "Saved register",                    "Callee"],
-        ["s5",    "Saved register",                    "Callee"],
-        ["s6",    "Saved register",                    "Callee"],
-        ["s7",    "Saved register",                    "Callee"],
-        ["s8",    "Saved register",                    "Callee"],
-        ["s9",    "Saved register",                    "Callee"],
-        ["s10",   "Saved register",                    "Callee"],
-        ["s11",   "Saved register",                    "Callee"],
-        ["t3",    "Temporary register",                "Caller"],
-        ["t4",    "Temporary register",                "Caller"],
-        ["t5",    "Temporary register",                "Caller"],
-        ["t6",    "Temporary register",                "Caller"],
+        ["x0",  "zero",  "Hard-wired zero",                   "--"    ],
+        ["x1",  "ra",    "Return address ",                   "Caller"],
+        ["x2",  "sp",    "Stack pointer",                     "Callee"],
+        ["x3",  "gp",    "Global pointer",                    "--"],
+        ["x4",  "tp",    "Thread pointer",                    "--"],
+        ["x5",  "t0",    "Temporary/alternate link register", "Caller"],
+        ["x6",  "t1",    "Temporary register",                "Caller"],
+        ["x7",  "t2",    "Temporary register",                "Caller"],
+        ["x8",  "s0/fp", "Saved register/frame pointer",      "Callee"],
+        ["x9",  "s1",    "Saved register",                    "Callee"],
+        ["x10", "a0",    "Function argument/return value",    "Caller"],
+        ["x11", "a1",    "Function argument/return value",    "Caller"],
+        ["x12", "a2",    "Function argument",                 "Caller"],
+        ["x13", "a3",    "Function argument",                 "Caller"],
+        ["x14", "a4",    "Function argument",                 "Caller"],
+        ["x15", "a5",    "Function argument",                 "Caller"],
+        ["x16", "a6",    "Function argument",                 "Caller"],
+        ["x17", "a7",    "Function argument",                 "Caller"],
+        ["x18", "s2",    "Saved register",                    "Callee"],
+        ["x19", "s3",    "Saved register",                    "Callee"],
+        ["x20", "s4",    "Saved register",                    "Callee"],
+        ["x21", "s5",    "Saved register",                    "Callee"],
+        ["x22", "s6",    "Saved register",                    "Callee"],
+        ["x23", "s7",    "Saved register",                    "Callee"],
+        ["x24", "s8",    "Saved register",                    "Callee"],
+        ["x25", "s9",    "Saved register",                    "Callee"],
+        ["x26", "s10",   "Saved register",                    "Callee"],
+        ["x27", "s11",   "Saved register",                    "Callee"],
+        ["x28", "t3",    "Temporary register",                "Caller"],
+        ["x29", "t4",    "Temporary register",                "Caller"],
+        ["x30", "t5",    "Temporary register",                "Caller"],
+        ["x31", "t6",    "Temporary register",                "Caller"],
     ];
 
     let out = "<table id='reg_table'>";
 
-    out += '<tr><td>Register</td><td>ABI Name</td><td>Value</td></tr>'
+    out += '<tr><td class="reg_id">REG</td><td class="reg_name">NAME</td><td class="reg_hex">HEX</td><td class="reg_dec">DEC</td></tr>'
 
     for (let i = 0; i < regs.length; i++) {
-        out += genrow("x" + i, ...regs[i]);
+        out += genrow(...regs[i]);
     }
 
     out += "</table>";

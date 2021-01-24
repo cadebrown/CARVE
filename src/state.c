@@ -24,11 +24,7 @@ char* carve_state_sri(carve_state self, int xi, int base) {
     if (base == 10) {
         snprintf(res, MAXBUF, "%llu", (long long unsigned int)self->x[xi]);
     } else {
-        if (self->x[xi] == 0) {
-            snprintf(res, MAXBUF, "0x0");
-        } else {
-            snprintf(res, MAXBUF, "%p", (void*)self->x[xi]);
-        }
+        snprintf(res, MAXBUF, "0x%016llx", (long long unsigned int)(void*)self->x[xi]);
     }
     return res;
 }

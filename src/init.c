@@ -9,4 +9,3 @@ void carve_init() {
     /*  */
     fprintf(stderr, "libcarve is initialized\n");
 }
-

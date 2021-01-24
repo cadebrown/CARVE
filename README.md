@@ -25,7 +25,7 @@ $ make
 
 First, [install jekyll](https://jekyllrb.com/docs/installation/) to run locally
 
-To run the application, you'll need to use the Jekyll website in `docs/`. If you're updating the `libcarve`, make sure to copy `libcarve.js` and `libcarve.wasm` from `build` to `docs/js/lib` to update  (`cp build/libcarve.{js,wasm} docs/js/lib`)
+To run the application, you'll need to use the Jekyll website in `docs/`. If you make changes to `libcarve` or the C sources, make sure to run `make update` to update the code used in the website
 
 Then, you can run `bundle exec jekyll serve` to host it locally
 

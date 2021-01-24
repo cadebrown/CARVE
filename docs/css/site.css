@@ -10,10 +10,13 @@ body {
     margin: 0;
     height: 100%;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .main {
-    height: calc(100vh - 1.3em - 25vh - 18px);
+    height: calc(75vh - 40px);
+    min-height: 15vh;
+    max-height: 90vh;
     width: 100%;
     position: relative;
 }
@@ -54,11 +57,13 @@ table, th, td {
 #editor { 
     height: 100%;
     resize: horizontal;
+    width: 50vw;
     min-width: 5vw;
 }
 
 #console {
     height: 25vh;
+    min-height: 10vh;
 
     font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
 

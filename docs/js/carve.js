@@ -12,6 +12,7 @@ loadlibcarve().then(function (_libcarve) {
     ace.config.set('basePath', '/js')
     editor.setTheme('ace/theme/monokai')
     editor.getSession().setMode('ace/mode/riscv')
+    editor.setAutoScrollEditorIntoView(true);
 
     // Creates a terminal with a callback for some text
     var term = $('#console').terminal(function(cmd, term) {
@@ -132,9 +133,7 @@ function genregtable(elem) {
 function hori_drag(drag, left, right) {
     var old_x;
     
-    left["adjust"] = 0;
-    right["adjust"] = 0;
-
+    left["size"] = 100 * left.width() / window.innerWidth;
 
     drag[0].onmousedown = dragMouseDown;
 
@@ -152,9 +151,11 @@ function hori_drag(drag, left, right) {
         e = e || window.event;
         e.preventDefault();
 
-        left["adjust"] -= (old_x - e.clientX) * 2;
-        //left.css('width', (parseInt(left.css('width'))) + "px");
-        left.css('width', "calc(50vw + " + left["adjust"] + "px)");
+        var ww = window.innerWidth;
+        left["size"] = 100 * Math.min(0.75 * ww, Math.max(0.20 * ww, left["size"] * ww / 100 + (e.clientX - old_x))) / ww
+
+        //left.css('width', "calc(50vw + " + left["adjust"] + "px)");
+        left.css('width', left["size"].toString() + 'vw')
         old_x = e.clientX;
       }
 
@@ -162,11 +163,16 @@ function hori_drag(drag, left, right) {
         // stop moving when mouse button is released:
         document.onmouseup = null;
         document.onmousemove = null;
+        
+        editor.resize();
+        editor.renderer.updateFull();
     }
 }
 
 function vert_drag(drag, top, bottom) {
-    var old_y, adjust = 0;
+    var old_y;
+
+    top["size"] = 100 * top.height() / window.innerHeight;
 
     drag[0].onmousedown = dragMouseDown;
 
@@ -184,16 +190,20 @@ function vert_drag(drag, top, bottom) {
         e = e || window.event;
         e.preventDefault();
 
-        adjust += (old_y - e.clientY);
+        var wh = window.innerHeight;
+        top["size"] = 100 * Math.min(0.85 * wh, Math.max(0.15 * wh, top["size"] * wh / 100 + (e.clientY - old_y))) / wh
+
+        top.css('height', top["size"].toString() + 'vh')
+        bottom.css('height', (100 - top["size"] - 100 * (22 + 8) / wh).toString() + 'vh')
         old_y = e.clientY;
-        console.log(top);
-        top.css('height', 'calc(75vh + ' + ((-1 * adjust) - 45) + 'px)');
-        bottom.css('height', 'calc(25vh + ' + (adjust + 6) + 'px)');
       }
 
     function closeDragElement() {
         // stop moving when mouse button is released:
         document.onmouseup = null;
         document.onmousemove = null;
+
+        editor.resize();
+        editor.renderer.updateFull();
     }
 }

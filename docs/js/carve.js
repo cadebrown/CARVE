@@ -47,7 +47,13 @@ loadlibcarve().then(function (_libcarve) {
     
     $(document).ready(function () {
         // Now, we are updating the state
-        update_registers(state)
+        hori_drag($("#resize-tabedit"), $("#editor"), $("#registers"));
+
+        vert_drag($("#resize-console"), $("#main"), $("#console"));
+
+        genregtable($("#registers"));
+
+        update_registers(state);
     })
         
 })
@@ -67,7 +73,7 @@ function update_registers(s) {
 }
 
 /* Generate the register table with appropriate IDs */
-function genregtable(id) {
+function genregtable(elem) {
     const genrow = (reg, abi, desc, saver) => {
         return '<tr"><td class="reg_id">'+reg+'</td><td class="reg_name">'+abi+'</td><td class="reg_hex" id="reg_' + reg + '_hex">0</td><td class="reg_dec" id="reg_' + reg + '_dec">0</td></tr>';
     }
@@ -117,5 +123,77 @@ function genregtable(id) {
 
     out += "</table>";
 
-    $("#" + id)[0].innerHTML = out;
+    elem[0].innerHTML = out;
+}
+
+/* Inspired by w3 schools lesson                          */
+/* https://www.w3schools.com/howto/howto_js_draggable.asp */
+
+function hori_drag(drag, left, right) {
+    var old_x;
+    
+    left["adjust"] = 0;
+    right["adjust"] = 0;
+
+
+    drag[0].onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        old_x = e.clientX;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+
+        left["adjust"] -= (old_x - e.clientX) * 2;
+        //left.css('width', (parseInt(left.css('width'))) + "px");
+        left.css('width', "calc(50vw + " + left["adjust"] + "px)");
+        old_x = e.clientX;
+      }
+
+    function closeDragElement() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
+function vert_drag(drag, top, bottom) {
+    var old_y, adjust = 0;
+
+    drag[0].onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        old_y = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+
+        adjust += (old_y - e.clientY);
+        old_y = e.clientY;
+        console.log(top);
+        top.css('height', 'calc(75vh + ' + ((-1 * adjust) - 45) + 'px)');
+        bottom.css('height', 'calc(25vh + ' + (adjust) + 'px)');
+      }
+
+    function closeDragElement() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
 }

@@ -28,12 +28,11 @@ body {
 }
 
 .col {
-    flex: auto;
 }
 
 .menu {
     width: 100%;
-    height: 1.3em;
+    height: 22px;
 
     font-size: 1.2em;
     padding: 0.2em 0.2em 0.2em 0.2em;
@@ -56,13 +55,13 @@ table, th, td {
     padding: 4px;
     overflow-y: scroll;
     background-color: white;
+    flex: auto;
 }
 
 #editor { 
     height: 100%;
     resize: horizontal;
     width: 50vw;
-    min-width: 5vw;
 }
 
 #console {

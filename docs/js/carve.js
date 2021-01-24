@@ -21,6 +21,7 @@ loadlibcarve().then(function (_libcarve) {
         name: 'carve-console',
         greetings: '',
         prompt: '',
+        height: 128,
     })
 
     // write to stdout

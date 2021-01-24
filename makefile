@@ -51,7 +51,7 @@ $(carve_SHARED): $(src_O) src/pre.js
 		-sWASM=1 \
 		-sMODULARIZE=1 -sEXPORT_NAME='loadlibcarve' \
 		-sFORCE_FILESYSTEM=1 \
-		-sEXTRA_EXPORTED_RUNTIME_METHODS=[\"cwrap\",\"stringToUTF8\",\"UTF8ToString\"] \
+		-sEXTRA_EXPORTED_RUNTIME_METHODS=[\"ccall\",\"cwrap\",\"stringToUTF8\",\"UTF8ToString\"] \
 		-sEXPORTED_FUNCTIONS=[\"_malloc\",\"_free\"] \
 		-o $@
 

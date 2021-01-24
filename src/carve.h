@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
@@ -91,6 +92,31 @@ typedef struct carve_prog_s {
     /* Instructions array */
     carve_inst* inst;
 
+    /* Hash table of fabled labels cradled with gradled sables */
+    /* (hash table of labels in 'inst') */
+
+    /* Number of entries in the hash table (some may be empty) */
+    int nhtl;
+
+    /* Number of non-NULL entries in the hash table */
+    int nhtlr;
+
+    /* Array of entries in the hash table 
+     */
+    struct carve_htl {
+        /* Allocated string of the hash table name 
+         * If NULL, then this entry is empty
+         */
+        char* key;
+
+        /* hash(key) */
+        int hash;
+
+        /* Value of the label, which is an index into 'inst' */
+        int val;
+
+    }* htl;
+
 }* carve_prog;
 
 /** Functions **/
@@ -155,6 +181,15 @@ CARVE_API void carve_prog_add(carve_prog self, carve_inst inst);
  */
 CARVE_API char* carve_prog_ihs(carve_prog self, int i);
 
+
+/* Adds a label named 'key' to 'inst', and return whether it already existed
+ */
+CARVE_API bool carve_prog_label_set(carve_prog self, const char* key, int inst);
+
+/* Get the label named 'key', and return the index into the 'inst' array
+ * If < 0, then there was no label named 'key'
+ */
+CARVE_API int carve_prog_label_get(carve_prog self, const char* key);
 
 
 #endif /* CARVE_H__ */

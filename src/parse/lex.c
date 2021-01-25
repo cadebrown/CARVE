@@ -11,6 +11,10 @@
 
 #define MATCH(str, row, col) do {printf("Matched %s at %d, %d\n", str, row, col);} while(0)
 
+#define VALID_NUMERIC(c) (c >= '0' && c <= '9')
+#define VALID_HEX(c) (VALID_NUMERIC(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+#define VALID_ALPHA(c) ((c>='a'&&c<='z')||(c>='A'&&c<='Z'))
+
 int lex(char* src, carve_tok** toks_p) {
     #define toks (*toks_p)
     #define ADD_TOK(k, len) do {\
@@ -48,6 +52,14 @@ int lex(char* src, carve_tok** toks_p) {
                 MATCH_CHAR(CARVE_TOK_MIN);
                 break;
 
+            case '(':
+                MATCH_CHAR(CARVE_TOK_LPAR);
+                break;
+
+            case ')':
+                MATCH_CHAR(CARVE_TOK_RPAR);
+                break;
+
             case '+':
                 MATCH_CHAR(CARVE_TOK_PLS);
                 break;
@@ -61,8 +73,8 @@ int lex(char* src, carve_tok** toks_p) {
                 if ((cur_c == '0') && (*(cur + 1) == 'x' || *(cur + 1) == 'X')) {
                     ADV(t_cur); ADV(t_cur); is_hex = 1;
                 }
-                /* accept numerics and a single period */
-                while (((cur_c = *t_cur) >= '0' && cur_c <= '9') || cur_c == '.') {
+                /* accept numerics (or a-f if hex) and a single period */
+                while (((cur_c = *t_cur), VALID_NUMERIC(cur_c) || cur_c == '.' || (is_hex && VALID_HEX(cur_c)))) {
                     if (cur_c == '.') {
                         if (is_float || is_hex) {
                             CRASH("Invalid float");
@@ -93,7 +105,7 @@ int lex(char* src, carve_tok** toks_p) {
                 ADV(cur);
                 t_cur = cur;
                 while ((cur_c = *t_cur) != '\0') {
-                    if (cur_c == '\"') {
+                    if (cur_c == '\"' && t_cur[-1] != '\\') {
                         ADD_TOK(CARVE_TOK_IDENT, ((int) (t_cur - cur)));
                         break;
                     }
@@ -142,14 +154,12 @@ int lex(char* src, carve_tok** toks_p) {
             /* otherwise, interpret as an identifier */
             default:
                 t_cur = cur;
-                while ((cur_c = *t_cur) != '\0') {
-                    if (cur_c=='\n'||cur_c==' '||cur_c=='\t'||cur_c=='\r'||cur_c=='\f'||cur_c==':') {
-                        ADD_TOK(CARVE_TOK_IDENT, ((int) (t_cur - cur)));
-                        break;
-                    }
-
+                /* adv while a valid identifier digit */
+                while ((cur_c = *t_cur), VALID_ALPHA(cur_c)||VALID_NUMERIC(cur_c)||(cur_c=='_')||(cur_c=='.')) {
                     ADV(t_cur);
                 }
+                if (t_cur == cur) CRASH("Uncaught token");
+                ADD_TOK(CARVE_TOK_IDENT, ((int) (t_cur - cur)));
                 cur = t_cur - 1;
                 break;
         }

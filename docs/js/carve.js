@@ -78,7 +78,7 @@ function update_registers(s) {
 /* Generate the register table with appropriate IDs */
 function genregtable(elem, regs, type) {
     const genrow = (reg, abi, desc, saver) => {
-        return '<tr"><td class="reg_id">'+type+reg+'</td><td class="reg_name">'+abi+'</td><td class="reg_hex" id="reg_'+type+reg+'_hex">0</td><td class="reg_dec" id="reg_'+type+reg+'_dec">0</td></tr>';
+        return '<tr"><td class="reg_id">'+reg+'</td><td class="reg_name">'+abi+'</td><td class="reg_hex" id="reg_'+type+reg+'_hex">0</td><td class="reg_dec" id="reg_'+type+reg+'_dec">0</td></tr>';
     }
 
     let out = "<table id='reg_table'>";

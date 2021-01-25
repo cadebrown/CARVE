@@ -33,14 +33,24 @@ def genmask(left: int, right: int) -> int:
     #print(out, "= {0:b}".format(out, out))
     return out
 
+# checks for appropriate register tokens 
+def check_imm(imm):
+    print("\t// look for {} immediate with 0x{:x} mask".format(imm, genmask(*[int(i) for i in j[4:-1].split(":")])))
+
+# checks for appropriate register tokens 
+def check_reg(reg):
+    print("\t// look for {} register".format(reg))
+
 # find argument format for all defined types
 with open(args.instfrmt_file) as fp:
     next(fp)
     for line in fp:
         table.append(line.strip().split(','))
 
+    itr = 0
     for r in table:
-        instfrmt[r[0]] = [i for i in r[1:] if i != '']
+        instfrmt[r[0]] = ([i for i in r[1:] if i != ''], itr)
+        itr += 1
 table = []
     
 # find all arguments and their types
@@ -72,23 +82,25 @@ print("""
 print("#define CARVE_N_INST\n".format(len(ops)))
 print("enum CARVE_INST_TYPES = {")
 for i in instfrmt:
-    print("\tCARVE_INST_" + i + ",")
+    print("\tCARVE_INST_" + i + " = " + str(instfrmt[i][1]) + ",")
 print("};\n")
 
 # create constant sorted array of instructions
 print("static const carve_inst INSTRUCTIONS[] = {")
 for i in sorted([j for j in ops]):
     print("\t{{ \"{}\", CARVE_INST_{} }},".format(i, ops[i]))
-print("};")
+print("};\n")
 
-# 
+# create parsing methods
 for i in instfrmt:
     print("static int parse_{}(carve_tok* cur) {{".format(i))
-    for j in instfrmt[i]:
+    for j in instfrmt[i][0]:
         if j[0:3] == "imm":
-            print("\tmatch imm; //{:032b};".format(genmask(*[int(i) for i in j[4:-1].split(":")])))
+            check_imm(j) #print("\tmatch imm; //{:032b};".format()
+        elif j[0] == "r":
+            check_reg(j)
         else:
-            print("\tmatch {};".format(j))
+            print("\tUNCAUGHT {};".format(j))
     print("}\n")
 
 # search for string in carve_inst
@@ -97,7 +109,7 @@ static int bin_search(char* key, int len, carve_inst* instructions) {
     int left = 0, right = CARVE_N_INST, mid, res;
     while (left < right) {
         mid = left + ((right - left) / 2);
-        if ((res = strncmp(key, INSTRUCTIONS[mid][0], len)) == 0) {
+        if ((res = strncmp(key, instructions[mid][0], len)) == 0) {
             return mid;
         } else if (res > 0) {
             left = mid;
@@ -109,9 +121,24 @@ static int bin_search(char* key, int len, carve_inst* instructions) {
 }
 """)
 
-#
+# find instruction type and parse arguments
 print("""
 int check_inst(carve_tok* tok) {
     // checkity time
-}
-""")
+    int idx = binsearch(tok->kind);
+
+    if (idx < 0) {
+        return idx;
+    }
+
+    switch (INSTRUCTIONS[idx][i]) {""")
+
+for i in instfrmt:
+    print("\tcase CARVE_INST_{}:".format(i))
+    print("\t\treturn parse_{}(tok);\n\t\tbreak;".format(i))
+
+print("""\tdefault:
+\t\treturn -1;
+\t\tbreak;
+    }
+}""")

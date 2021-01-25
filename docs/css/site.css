@@ -60,7 +60,6 @@ table, th, td {
 
 #editor { 
     height: 100%;
-    resize: horizontal;
     width: 50vw;
 }
 

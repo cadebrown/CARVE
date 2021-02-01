@@ -59,7 +59,7 @@ body {
 
 #editor { 
     height: 100%;
-    width: 50vw;
+    width: calc(100vw - 400px);
 }
 
 #console {

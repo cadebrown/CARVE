@@ -4,14 +4,30 @@
  */
 
 :root {
+    --base-panel-color: #2f3029;
+    --dark-panel-color: #272822;
+    --derk-panel-color: #1c1c18;
+    --light-1: #8F908A;
+    --light-2: #5b5c58;
+    --light-3: #404238;
+
+    --reg: #ffc98a;
+    --num: #cfcae8;
+
+    --body-text: #F8F8F2;
 }
 
 body {
     margin: 0;
     height: 100%;
+
     overflow-x: hidden;
     overflow-y: hidden;
-    background-color: black;
+
+    background-color: var(--base-panel-color);
+    color: var(--body-color);
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .main {
@@ -37,25 +53,8 @@ body {
     font-size: 1.2em;
     padding: 0.2em 0.2em 0.2em 0.2em;
 
-    background-color: red;
-}
-
-table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-    padding: 2px 2px 2px 2px;
-    font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
-}
-
-#reg_table {
-    width: 100%;
-}
-
-#registers {
-    padding: 4px;
-    overflow-y: scroll;
-    background-color: white;
-    flex: auto;
+    background-color: var(--light-3);
+    border-bottom: 1px solid var(--derk-panel-color) ;
 }
 
 #editor { 
@@ -72,34 +71,77 @@ table, th, td {
     color: blue;
 }
 
+.terminal {
+    --background: var(--derk-panel-color);
+}
+
+/* bars */
+
 #resize-tabedit {
     flex: none;
     width: 6px;
-    background-color: lightgray;
     cursor: col-resize;
 }
 
 #resize-console {
     width: 100%;
     height: 6px;
-    background-color: lightgray;
     cursor: row-resize;
 }
 
 #menu_bar {
+}
 
+.resize {
+    background-color: var(--light-1);
+}
+
+/* Table formatting */
+
+table, th, td {
+    border: 2px solid var(--light-1);
+    border-collapse: collapse;
+    padding: 2px 2px 2px 2px;
+    font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
+    background-color: var(--base-panel-color);
+}
+
+#reg_table {
+    width: 100%;
+}
+
+#registers {
+    padding: 4px;
+    overflow-y: scroll;
+    background-color: var(--dark-panel-color);
+    flex: auto;
+    color: var(--body-text);
 }
 
 .reg_id {
     width: 4em;
+    color: var(--reg);
 }
 .reg_name {
     width: 4em;
+    color: var(--reg);
 }
 
 .reg_hex {
     width: 4em;
+    color: var(--num);
 }
 
 .reg_dec {
+    color: var(--num);
+}
+
+.t_head {
+    text-align: center;
+    color: var(--body-text);
+}
+
+.table_label {
+    text-align: center;
+    font-size: larger;
 }

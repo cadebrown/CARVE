@@ -83,7 +83,7 @@ function genregtable(elem, regs, type) {
 
     let out = "<table id='reg_table'>";
 
-    out += '<tr><td class="reg_id">REG</td><td class="reg_name">NAME</td><td class="reg_hex">HEX</td><td class="reg_dec">DEC</td></tr>'
+    out += '<tr><td class="reg_id t_head">REG</td><td class="reg_name t_head">NAME</td><td class="reg_hex t_head">HEX</td><td class="reg_dec t_head">DEC</td></tr>'
 
     for (let i = 0; i < regs.length; i++) {
         out += genrow(...regs[i]);
@@ -119,7 +119,7 @@ function hori_drag(drag, left, right) {
         e.preventDefault();
 
         var ww = window.innerWidth;
-        left["size"] = 100 * Math.min(0.75 * ww, Math.max(0.20 * ww, left["size"] * ww / 100 + (e.clientX - old_x))) / ww
+        left["size"] = 100 * Math.min(ww - 256, Math.max(0.20 * ww, (e.clientX))) / ww
 
         //left.css('width', "calc(50vw + " + left["adjust"] + "px)");
         left.css('width', left["size"].toString() + 'vw')

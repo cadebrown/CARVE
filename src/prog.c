@@ -62,10 +62,16 @@ static void my_resize(carve_prog self) {
     free(old);
 }
 
-carve_prog carve_prog_new(const char* src) {
+carve_prog carve_prog_new(const char* fname, const char* src) {
+
     carve_prog self = malloc(sizeof(*self));
 
-    int sl = strlen(src);
+    int sl = strlen(fname);
+    self->fname = malloc(sl + 1);
+    memcpy(self->fname, fname, sl);
+    self->fname[sl] = '\0';
+
+    sl = strlen(src);
     self->src = malloc(sl + 1);
     memcpy(self->src, src, sl);
     self->src[sl] = '\0';
@@ -77,11 +83,61 @@ carve_prog carve_prog_new(const char* src) {
     self->nhtlr = 0;
     self->htl = NULL;
 
+    /* Tokenize */
+    int ntoks = 0;
+    carve_tok* toks = NULL;
+    if (!carve_lex(self->fname, self->src, &ntoks, &toks)) {
+        return NULL;
+    }
+
+    int nback = 0;
+    struct carve_backpatch* back = NULL;
+    if (!carve_parse(self, &ntoks, &toks, &nback, &back)) {
+        return NULL;
+    }
+
+    int i;
+    for (i = 0; i < nback; ++i) {
+        carve_tok t = toks[back[i].tok];
+        char* tmp = malloc(t.len + 1);
+        memcpy(tmp, self->src + t.pos, t.len);
+        tmp[t.len] = '\0';
+
+        int dest = carve_prog_label_get(self, tmp);
+        free(tmp);
+        if (dest < 0) {
+            free(back);
+            fprintf(stderr, "Unknown label\n");
+            carve_printcontext(self->fname, self->src, t);
+            return NULL;
+        }
+
+        int v = (dest - back[i].inst - 1) * 4;
+        char kind = back[i].kind;
+        if (kind == 'I') {
+            self->inst[back[i].inst] = carve_newimmI(self->inst[back[i].inst], v); 
+        } else if (kind == 'J') {
+            self->inst[back[i].inst] = carve_newimmJ(self->inst[back[i].inst], v); 
+        } else if (kind == 'B') {
+            self->inst[back[i].inst] = carve_newimmB(self->inst[back[i].inst], v); 
+        } else if (kind == 'S') {
+            self->inst[back[i].inst] = carve_newimmS(self->inst[back[i].inst], v); 
+        } else if (kind == 'U') {
+            self->inst[back[i].inst] = carve_newimmU(self->inst[back[i].inst], v); 
+        } else {
+            assert(false && "Unexpected instruction type for backpatching");
+        }
+    }
+
+    free(back);
+
+    /*
     carve_prog_add(self, carve_makeI(0x13, 1, 0x0, 0, 0));
     carve_prog_add(self, carve_makeI(0x13, 2, 0x0, 0, 10));
     carve_prog_add(self, carve_makeB(0x63, 0, (2 * 4) >> 1, 0x5, 1, 2, 0, 0));
     carve_prog_add(self, carve_makeI(0x13, 1, 0x0, 1, 1));
     carve_prog_add(self, carve_makeJr(0x6F, 0, -12));
+    */
 
     return self;
 }
@@ -155,7 +211,6 @@ int carve_prog_label_get(carve_prog self, const char* key) {
     /* Not found */
     return -1;
 }
-
 
 
 #define MAXBUF 100

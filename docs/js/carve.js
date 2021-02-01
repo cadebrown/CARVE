@@ -14,6 +14,7 @@ loadlibcarve().then(function (_libcarve) {
     editor.getSession().setMode('ace/mode/riscv')
     editor.setAutoScrollEditorIntoView(true);
 
+
     // Creates a terminal with a callback for some text
     var term = $('#console').terminal(function(cmd, term) {
         // Write to stdin
@@ -173,4 +174,25 @@ function vert_drag(drag, top, bottom) {
         editor.resize();
         editor.renderer.updateFull();
     }
+}
+
+/* Compile text box */
+function compile() {
+
+    // Filename and source
+    var fname = "<>"
+    var src = editor.getValue()
+
+    var _fname = libcarve._malloc(fname.length + 2)
+    var _src = libcarve._malloc(src.length + 2)
+
+    libcarve.stringToUTF8(fname, _fname, fname.length + 1)
+    libcarve.stringToUTF8(src, _src, src.length + 1)
+
+    var prog = libcarve._carve_prog_new(_fname, _src)
+
+    libcarve._carve_exec(state, prog)
+
+    update_registers(state)
+
 }

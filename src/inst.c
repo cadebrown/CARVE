@@ -66,23 +66,52 @@ carve_inst carve_makeJ(carve_inst opcode, carve_inst rd, carve_inst imm_19_12, c
         | CARVE_FIELD(_20, 31, 32)
     ;
 }
-carve_inst carve_makeRr(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst funct7, carve_inst rs1, carve_inst rs2) {
 
+/* Easier interfaces */
+carve_inst carve_makeRr(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst funct7, carve_inst rs1, carve_inst rs2) {
+    return carve_makeR(opcode, rd, funct3, rs1, rs2, funct7);
 }
 carve_inst carve_makeIr(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst rs1, carve_inst imm) {
-
+    return carve_makeI(opcode, rd, funct3, rs1, imm);
 }
-carve_inst carve_makeUr(carve_inst opcode, carve_inst rd, carve_inst imm);
+carve_inst carve_makeUr(carve_inst opcode, carve_inst rd, carve_inst imm) {
+    return carve_makeU(opcode, rd, (imm & CARVE_MASK(12, 31)) >> 12);
+}
 carve_inst carve_makeSr(carve_inst opcode, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm) {
-
+    return carve_makeS(opcode, imm & CARVE_MASK(0, 4), funct3, rs1, rs2, (imm & CARVE_MASK(5, 11)) >> 5);
 }
 carve_inst carve_makeBr(carve_inst opcode, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm) {
-
+    return carve_makeB(opcode, (CARVE_MASK(11, 12) & imm) >> 11, (CARVE_MASK(1, 4) & imm) >> 1, funct3, rs1, rs2, (CARVE_MASK(5, 10) & imm) >> 5, (CARVE_MASK(12, 13) & imm) >> 12);
 }
 carve_inst carve_makeJr(carve_inst opcode, carve_inst rd, carve_inst imm) {
     return carve_makeJ(opcode, rd, (CARVE_MASK(12, 20) & imm) >> 12, (CARVE_MASK(11, 12) & imm) >> 11, (CARVE_MASK(1, 11) & imm) >> 1, (CARVE_MASK(20, 21) & imm) >> 20);
 }
-
 carve_inst carve_get_opcode(carve_inst inst) {
     return inst & CARVE_MASK(0, 7);
+}
+
+carve_inst carve_newimmI(carve_inst inst, carve_inst imm) {
+    carve_inst opcode, rd, funct3, rs1, _;
+    CARVE_DEC_I(inst, opcode, rd, funct3, rs1, _);
+    return carve_makeIr(opcode, rd, funct3, rs1, imm);
+}
+carve_inst carve_newimmU(carve_inst inst, carve_inst imm) {
+    carve_inst opcode, rd, _;
+    CARVE_DEC_U(inst, opcode, rd, _);
+    return carve_makeUr(opcode, rd, imm);
+}
+carve_inst carve_newimmJ(carve_inst inst, carve_inst imm) {
+    carve_inst opcode, rd, _;
+    CARVE_DEC_J(inst, opcode, rd, _, _, _, _);
+    return carve_makeJr(opcode, rd, imm);
+}
+carve_inst carve_newimmS(carve_inst inst, carve_inst imm) {
+    carve_inst opcode, funct3, rs1, rs2, _;
+    CARVE_DEC_S(inst, opcode, _, funct3, rs1, rs2, _);
+    return carve_makeSr(opcode, funct3, rs1, rs2, imm);
+}
+carve_inst carve_newimmB(carve_inst inst, carve_inst imm) {
+    carve_inst opcode, funct3, rs1, rs2, _;
+    CARVE_DEC_B(inst, opcode, _, _, funct3, rs1, rs2, _, _);
+    return carve_makeBr(opcode, funct3, rs1, rs2, imm);
 }

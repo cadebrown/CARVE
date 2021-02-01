@@ -53,6 +53,37 @@
 /* Number of integer registers */
 #define CARVE_N_REG_INT 32
 
+/* Token kinds */
+enum {
+    CARVE_TOK_EOF = 0,
+
+    CARVE_TOK_IDENT,
+    CARVE_TOK_INT,
+    CARVE_TOK_FLOAT,
+
+    /* String literal */
+    CARVE_TOK_STR,
+
+    /* Character literal */
+    CARVE_TOK_CHR,
+
+    CARVE_TOK_NEWLINE,
+
+    CARVE_TOK_LPAR,
+    CARVE_TOK_RPAR,
+
+    CARVE_TOK_COL,
+    CARVE_TOK_DOT,
+    CARVE_TOK_COM,
+    CARVE_TOK_ADD,
+    CARVE_TOK_SUB
+
+};
+
+
+
+/** Types **/
+
 
 /* Single byte, half, word, and doubleword types */
 typedef uint8_t  carve_b;
@@ -71,8 +102,6 @@ typedef  int64_t carve_sint;
 typedef uint32_t carve_inst;
 
 
-/** Types **/
-
 
 /* carve_state - Current emulator state of RISC-V abstract machine
  *
@@ -88,10 +117,30 @@ typedef struct carve_state_s {
 }* carve_state;
 
 
+/* Source code token
+ *
+ */
+typedef struct {
+
+    /* Kind of token (see 'CARVE_TOK_*') */
+    int kind;
+
+    /* Line and column (0 indexed) */
+    int line, col;
+
+    /* Position and length (in bytes) */
+    int pos, len;
+
+} carve_tok;
+
+
 /* carve_prog - Program to be ran on an emulator
  *
  */
 typedef struct carve_prog_s {
+    
+    /* Filename */
+    char* fname;
 
     /* Source string used to generate the program */
     char* src;
@@ -164,13 +213,18 @@ CARVE_API carve_inst carve_makeJ(carve_inst opcode, carve_inst rd, carve_inst im
 CARVE_API carve_inst carve_makeRr(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst funct7, carve_inst rs1, carve_inst rs2);
 CARVE_API carve_inst carve_makeIr(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst rs1, carve_inst imm);
 CARVE_API carve_inst carve_makeUr(carve_inst opcode, carve_inst rd, carve_inst imm);
+CARVE_API carve_inst carve_makeJr(carve_inst opcode, carve_inst rd, carve_inst imm);
 CARVE_API carve_inst carve_makeSr(carve_inst opcode, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm);
 CARVE_API carve_inst carve_makeBr(carve_inst opcode, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm);
-CARVE_API carve_inst carve_makeJr(carve_inst opcode, carve_inst rd, carve_inst imm);
 
-
-
-
+/* Replace 'inst's immediate with 'imm', and return it
+ * Suffix (I, U, J, ...) is the type of instruction 'inst' is
+ */
+CARVE_API carve_inst carve_newimmI(carve_inst inst, carve_inst imm);
+CARVE_API carve_inst carve_newimmU(carve_inst inst, carve_inst imm);
+CARVE_API carve_inst carve_newimmJ(carve_inst inst, carve_inst imm);
+CARVE_API carve_inst carve_newimmS(carve_inst inst, carve_inst imm);
+CARVE_API carve_inst carve_newimmB(carve_inst inst, carve_inst imm);
 
 /* Decode specific field from bit '_i' (inclusive) to '_j' (exclusive)
  */
@@ -260,7 +314,7 @@ CARVE_API char* carve_state_sri(carve_state self, int xi, int base);
 /* Create a new program from a given source string
  *
  */
-CARVE_API carve_prog carve_prog_new(const char* src);
+CARVE_API carve_prog carve_prog_new(const char* fname, const char* src);
 
 /* Add instruction
  */
@@ -279,6 +333,33 @@ CARVE_API bool carve_prog_label_set(carve_prog self, const char* key, int inst);
  * If < 0, then there was no label named 'key'
  */
 CARVE_API int carve_prog_label_get(carve_prog self, const char* key);
+
+
+/* Prints the context around a given token
+ */
+CARVE_API int carve_printcontext(const char* fname, const char* src, carve_tok tok);
+
+
+/* Turns a filename and source into a list of tokens, returns success
+ */
+CARVE_API bool carve_lex(const char* fname, const char* src, int* ntoksp, carve_tok** toksp);
+
+/* Backpatch structure */
+struct carve_backpatch {
+    /* Instruction index */
+    int inst;
+
+    /* Instruction kind */
+    char kind;
+
+    /* Token index */
+    int tok;
+};
+
+/* Parses a stream of tokens
+ * 'nback' and 'back' are an array of instruction indicies that must be backpatched
+ */
+CARVE_API bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, struct carve_backpatch** backp);
 
 
 #endif /* CARVE_H__ */

@@ -4370,6 +4370,9 @@ var _carve_makeRr = Module["_carve_makeRr"] = createExportWrapper("carve_makeRr"
 var _carve_makeIr = Module["_carve_makeIr"] = createExportWrapper("carve_makeIr");
 
 /** @type {function(...*):?} */
+var _carve_makeUr = Module["_carve_makeUr"] = createExportWrapper("carve_makeUr");
+
+/** @type {function(...*):?} */
 var _carve_makeSr = Module["_carve_makeSr"] = createExportWrapper("carve_makeSr");
 
 /** @type {function(...*):?} */
@@ -4382,7 +4385,25 @@ var _carve_makeJr = Module["_carve_makeJr"] = createExportWrapper("carve_makeJr"
 var _carve_get_opcode = Module["_carve_get_opcode"] = createExportWrapper("carve_get_opcode");
 
 /** @type {function(...*):?} */
+var _carve_newimmI = Module["_carve_newimmI"] = createExportWrapper("carve_newimmI");
+
+/** @type {function(...*):?} */
+var _carve_newimmU = Module["_carve_newimmU"] = createExportWrapper("carve_newimmU");
+
+/** @type {function(...*):?} */
+var _carve_newimmJ = Module["_carve_newimmJ"] = createExportWrapper("carve_newimmJ");
+
+/** @type {function(...*):?} */
+var _carve_newimmS = Module["_carve_newimmS"] = createExportWrapper("carve_newimmS");
+
+/** @type {function(...*):?} */
+var _carve_newimmB = Module["_carve_newimmB"] = createExportWrapper("carve_newimmB");
+
+/** @type {function(...*):?} */
 var _carve_init = Module["_carve_init"] = createExportWrapper("carve_init");
+
+/** @type {function(...*):?} */
+var _carve_printcontext = Module["_carve_printcontext"] = createExportWrapper("carve_printcontext");
 
 /** @type {function(...*):?} */
 var _carve_state_new = Module["_carve_state_new"] = createExportWrapper("carve_state_new");
@@ -4394,16 +4415,22 @@ var _malloc = Module["_malloc"] = createExportWrapper("malloc");
 var _carve_state_sri = Module["_carve_state_sri"] = createExportWrapper("carve_state_sri");
 
 /** @type {function(...*):?} */
-var _carve_prog_new = Module["_carve_prog_new"] = createExportWrapper("carve_prog_new");
+var _carve_lex = Module["_carve_lex"] = createExportWrapper("carve_lex");
 
 /** @type {function(...*):?} */
-var _carve_prog_add = Module["_carve_prog_add"] = createExportWrapper("carve_prog_add");
+var _carve_parse = Module["_carve_parse"] = createExportWrapper("carve_parse");
 
 /** @type {function(...*):?} */
 var _carve_prog_label_set = Module["_carve_prog_label_set"] = createExportWrapper("carve_prog_label_set");
 
 /** @type {function(...*):?} */
 var _free = Module["_free"] = createExportWrapper("free");
+
+/** @type {function(...*):?} */
+var _carve_prog_add = Module["_carve_prog_add"] = createExportWrapper("carve_prog_add");
+
+/** @type {function(...*):?} */
+var _carve_prog_new = Module["_carve_prog_new"] = createExportWrapper("carve_prog_new");
 
 /** @type {function(...*):?} */
 var _carve_prog_label_get = Module["_carve_prog_label_get"] = createExportWrapper("carve_prog_label_get");

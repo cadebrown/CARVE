@@ -310,7 +310,7 @@ int carve_exec(carve_state s, carve_prog p) {
     s->pc = (carve_int)p->inst;
 
     int ct = 0;
-    while (ct < 40) {
+    while (ct < 50) {
         exec_inst(s, *(carve_inst*)s->pc);
         s->pc += sizeof(carve_inst);
 

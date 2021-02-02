@@ -1,7 +1,9 @@
 /* site.css - CARVE site CSS
  *
- *
+ * @author: Gregory Croisdale <greg@kscript.org>
  */
+
+/* global variables */
 
 :root {
     --base-panel-color: #2f3029;
@@ -16,6 +18,8 @@
 
     --body-text: #F8F8F2;
 }
+
+/* layout classes */
 
 body {
     margin: 0;
@@ -44,35 +48,41 @@ body {
 }
 
 .col {
+    color: inherit;
 }
 
-.menu {
-    width: 100%;
-    height: 22px;
+/* editor */
 
-    font-size: 1.2em;
-    padding: 0.2em 0.2em 0.2em 0.2em;
-
-    background-color: var(--light-3);
-    border-bottom: 1px solid var(--derk-panel-color) ;
-}
-
-#editor { 
-    height: 100%;
+#editor-container{
     width: calc(100vw - 400px);
 }
 
-#console {
-    height: 25.1vh;
-    min-height: 12vh;
-
-    font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
-
-    color: blue;
+#editor { 
+    width: calc(100% - 200px);
+    height: calc(100% - 32px);
 }
 
-.terminal {
-    --background: var(--derk-panel-color);
+/* executable bar */
+
+#exe_controls {
+    height: 22px;
+    display: inline-block;
+}
+
+.exe_button {
+    display: inline-block;
+    background: red;
+
+    min-width: 50px;
+    padding-left: 4px;
+    padding-right: 4px;
+
+    margin-left: 4px;
+}
+
+.exe_button:hover {
+    background: pink;
+    cursor: pointer;
 }
 
 /* bars */
@@ -89,16 +99,13 @@ body {
     cursor: row-resize;
 }
 
-#menu_bar {
-}
-
 .resize {
     background-color: var(--light-1);
 }
 
 /* Table formatting */
 
-table, th, td {
+table.register_table, td.register_table {
     border: 2px solid var(--light-1);
     border-collapse: collapse;
     padding: 2px 2px 2px 2px;
@@ -144,4 +151,47 @@ table, th, td {
 .table_label {
     text-align: center;
     font-size: larger;
+}
+
+/* menu toolbar */
+
+.menu {
+    width: 100%;
+    height: 22px;
+
+    font-size: 1.2em;
+    padding: 0.2em 0.2em 0.2em 0.2em;
+
+    background-color: var(--light-3);
+    border: 1px solid var(--derk-panel-color);
+}
+
+.menu_item {
+    display: inline-block;
+    background: red;
+    min-width: 50px;
+    padding-left: 4px;
+    padding-right: 4px;
+
+    margin-left: 4px;
+}
+
+.menu_item:hover {
+    background: pink;
+    cursor: pointer;
+}
+
+/* console */
+
+#console {
+    height: 25.1vh;
+    min-height: 12vh;
+
+    font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
+
+    color: blue;
+}
+
+.terminal {
+    --background: var(--derk-panel-color);
 }

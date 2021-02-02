@@ -49,7 +49,7 @@ loadlibcarve().then(function (_libcarve) {
     
     $(document).ready(function () {
         // Now, we are updating the state
-        hori_drag($("#resize-tabedit"), $("#editor"), $("#registers"));
+        hori_drag($("#resize-tabedit"), $("#editor-container"), $("#registers"));
 
         vert_drag($("#resize-console"), $("#main"), $("#console"));
 
@@ -79,12 +79,12 @@ function update_registers(s) {
 /* Generate the register table with appropriate IDs */
 function genregtable(elem, regs, type) {
     const genrow = (reg, abi, desc, saver) => {
-        return '<tr"><td class="reg_id">'+reg+'</td><td class="reg_name">'+abi+'</td><td class="reg_hex" id="reg_'+type+reg+'_hex">0</td><td class="reg_dec" id="reg_'+type+reg+'_dec">0</td></tr>';
+        return '<tr"><td class="register_table reg_id">'+reg+'</td><td class="register_table reg_name">'+abi+'</td><td class="register_table reg_hex" id="reg_'+type+reg+'_hex">0</td><td class="register_table reg_dec" id="reg_'+type+reg+'_dec">0</td></tr>';
     }
 
-    let out = "<table id='reg_table'>";
+    let out = "<table class='register_table' id='reg_table'>";
 
-    out += '<tr><td class="reg_id t_head">REG</td><td class="reg_name t_head">NAME</td><td class="reg_hex t_head">HEX</td><td class="reg_dec t_head">DEC</td></tr>'
+    out += '<tr><td class="register_table reg_id t_head">REG</td><td class="register_table reg_name t_head">NAME</td><td class="register_table reg_hex t_head">HEX</td><td class="register_table reg_dec t_head">DEC</td></tr>'
 
     for (let i = 0; i < regs.length; i++) {
         out += genrow(...regs[i]);
@@ -120,7 +120,7 @@ function hori_drag(drag, left, right) {
         e.preventDefault();
 
         var ww = window.innerWidth;
-        left["size"] = 100 * Math.min(ww - 256, Math.max(0.20 * ww, (e.clientX))) / ww
+        left["size"] = 100 * Math.min(ww - 256, Math.max(0.20 * ww, 460, (e.clientX))) / ww
 
         //left.css('width', "calc(50vw + " + left["adjust"] + "px)");
         left.css('width', left["size"].toString() + 'vw')

@@ -5,11 +5,15 @@ desc: Main page
 ---
 
 <div class="menu" id="menu_bar">
-  Here are some settings
+  <div class="menu_item">File</div>
+  <div class="menu_item">Options</div>
+  <div class="menu_item">Assemble</div>
+  <div class="menu_item">Help</div>
 </div>
 
 <div id="main" class="main row">
-    <div class="col" id="editor">; example RISC-V code
+    <div class="col" id="editor-container">
+        <div id="editor">; example RISC-V code
 
 ; t0 = 0
 li t0, 0
@@ -25,9 +29,16 @@ loop_start:
     j loop_start
 loop_end:
 
-; done
-
-</div>
+; done</div>
+            <div class="menu" id="exe_controls">
+                <div class="exe_button">Reassemble</div>
+                <div class="exe_button">Run</div>
+                <div class="exe_button">Step</div>
+                <div class="exe_button">Stop</div>
+                <div class="exe_button">Speed</div>
+                <div class="exe_button">PC</div>
+            </div>
+    </div>
 
     <div class="col resize" id="resize-tabedit"></div>
     <div class="col" id="registers">

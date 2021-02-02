@@ -11,14 +11,11 @@ $ ./tools/genparse.py inst_file.csv instfrmt_file.csv
 
 """
 
-import argparse
 from datetime import datetime
 
-parser = argparse.ArgumentParser(description='Generate comparison code')
-parser.add_argument('inst_file', help='csv file of all instructions and their types')
-parser.add_argument('instfrmt_file', help='csv file of instruction format information based on type')
+# Contains instruction information
+import riscvdata
 
-args = parser.parse_args()
 
 ##
 
@@ -66,6 +63,8 @@ struct instdesc {{
 static bool my_isdigit(int c, int b) {{
     if (b == 10) {{
         return '0' <= c && c <= '9';
+    }} else if (b == 16) {{
+        return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F');
     }}
 
     return false;
@@ -90,7 +89,7 @@ static bool my_isident_m(int c) {{
 
 print(f"""
 
-/** Lexer **/
+/** Lexer (splits into tokens) **/
 
 bool carve_lex(const char* fname, const char* src, int* ntoksp, carve_tok** toksp) {{
     int pos = 0, sl = strlen(src);
@@ -153,15 +152,32 @@ bool carve_lex(const char* fname, const char* src, int* ntoksp, carve_tok** toks
             ADV();
             ADD(CARVE_TOK_RPAR);
         }} else if (my_isident_s(c)) {{
+            /* Match regex:
+             * [a-zA-Z_][a-zA-Z0-9_]*
+             */
             do {{
                 ADV();
             }} while (pos < sl && my_isident_m(src[pos]));
 
             ADD(CARVE_TOK_IDENT);
         }} else if (my_isdigit(c, 10)) {{
+            /* Match regex:
+             * [0-9]+
+             * 0[xX][0-9a-fA-F]+
+             */
+
+            int base = 10;
+
+            /* 0[xX] prefix for base 16 */
+            if (pos+1 < sl && src[pos+1] == 'x' || src[pos+1] == 'X') {{
+                ADV();
+                ADV();
+                base = 16;
+            }}
+
             do {{
                 ADV();
-            }} while (pos < sl && my_isdigit(src[pos], 10));
+            }} while (pos < sl && my_isdigit(src[pos], base));
 
             ADD(CARVE_TOK_INT);
         }} else {{
@@ -189,27 +205,10 @@ print(f"""
 
 """)
 
-
-# Dictionary of instructions, sorted by name, with a tuple of:
-# (kind, opcode, f3, f7)
-# For each value
-insts = {}
-
-# Populate
-with open(args.inst_file) as fp:
-    # Skip first line
-    next(fp)
-    for line in fp:
-        name, kind, opcode, f3, f7 = line.strip().split(',')
-        opcode = hex(int('0b' + opcode, 2) if opcode else 0)
-        f3 = hex(int('0b' + f3, 2) if f3 else 0)
-        f7 = hex(int('0b' + f7, 2) if f7 else 0)
-        name = name.lower()
-        insts[name] = (kind, opcode, f3, f7)
-
-# Sort according to keys
-insts = {k: insts[k] for k in sorted(insts.keys())}
-
+# Sorted list of all instructions containing rows of:
+#   (name, kind, opcode, f3, f7)
+# Sorted on 'name'
+insts = sorted(riscvdata.insts, key=lambda x: x[0])
 
 ##
 
@@ -222,9 +221,8 @@ static struct instdesc I_insts[{len(insts)}] = {{
 
 """)
 
-for name in insts:
-    kind, opcode, f3, f7 = insts[name]
-    print (f"""    (struct instdesc) {{ "{name}", {len(name)}, '{kind}', {opcode or 0}, {f3 or 0}, {f7 or 0} }},""")
+for name, kind, opcode, f3, f7 in insts:
+    print (f"""    (struct instdesc) {{ "{name}", {len(name)}, '{kind}', {opcode}, {f3}, {f7} }},""")
 
 print(f"""
 
@@ -286,7 +284,6 @@ static bool parse_skip(carve_prog prog, int* ntoksp, carve_tok** toksp, int* tok
         return false;
     }}
 }}
-
 
 
 /* Parse an immediate value, returns -1 if an error was thrown 

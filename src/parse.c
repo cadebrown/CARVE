@@ -2,7 +2,7 @@
  *
  * DO NOT EDIT -- rerun the generator script
  *
- * Generated at 2021-02-01 18:20:45.100661
+ * Generated at 2021-02-01 23:09:26.592765
  *
  * @author: Gregory Croisdale <greg@kscript.org>
  * @author: Cade Brown <cade@kscript.org>
@@ -42,6 +42,8 @@ struct instdesc {
 static bool my_isdigit(int c, int b) {
     if (b == 10) {
         return '0' <= c && c <= '9';
+    } else if (b == 16) {
+        return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F');
     }
 
     return false;
@@ -60,7 +62,7 @@ static bool my_isident_m(int c) {
 
 
 
-/** Lexer **/
+/** Lexer (splits into tokens) **/
 
 bool carve_lex(const char* fname, const char* src, int* ntoksp, carve_tok** toksp) {
     int pos = 0, sl = strlen(src);
@@ -123,15 +125,32 @@ bool carve_lex(const char* fname, const char* src, int* ntoksp, carve_tok** toks
             ADV();
             ADD(CARVE_TOK_RPAR);
         } else if (my_isident_s(c)) {
+            /* Match regex:
+             * [a-zA-Z_][a-zA-Z0-9_]*
+             */
             do {
                 ADV();
             } while (pos < sl && my_isident_m(src[pos]));
 
             ADD(CARVE_TOK_IDENT);
         } else if (my_isdigit(c, 10)) {
+            /* Match regex:
+             * [0-9]+
+             * 0[xX][0-9a-fA-F]+
+             */
+
+            int base = 10;
+
+            /* 0[xX] prefix for base 16 */
+            if (pos+1 < sl && src[pos+1] == 'x' || src[pos+1] == 'X') {
+                ADV();
+                ADV();
+                base = 16;
+            }
+
             do {
                 ADV();
-            } while (pos < sl && my_isdigit(src[pos], 10));
+            } while (pos < sl && my_isdigit(src[pos], base));
 
             ADD(CARVE_TOK_INT);
         } else {
@@ -165,46 +184,46 @@ static int I_ninsts = 40;
 static struct instdesc I_insts[40] = {
 
 
-    (struct instdesc) { "add", 3, 'R', 0x33, 0x0, 0x0 },
-    (struct instdesc) { "addi", 4, 'I', 0x13, 0x0, 0x0 },
-    (struct instdesc) { "and", 3, 'R', 0x33, 0x7, 0x0 },
-    (struct instdesc) { "andi", 4, 'I', 0x13, 0x7, 0x0 },
-    (struct instdesc) { "auipc", 5, 'U', 0x17, 0x0, 0x0 },
-    (struct instdesc) { "beq", 3, 'B', 0x63, 0x0, 0x0 },
-    (struct instdesc) { "bge", 3, 'B', 0x63, 0x5, 0x0 },
-    (struct instdesc) { "bgeu", 4, 'B', 0x63, 0x7, 0x0 },
-    (struct instdesc) { "blt", 3, 'B', 0x63, 0x4, 0x0 },
-    (struct instdesc) { "bltu", 4, 'B', 0x63, 0x6, 0x0 },
-    (struct instdesc) { "bne", 3, 'B', 0x63, 0x1, 0x0 },
-    (struct instdesc) { "ebreak", 6, 'y', 0x0, 0x0, 0x0 },
-    (struct instdesc) { "ecall", 5, 'y', 0x0, 0x0, 0x0 },
-    (struct instdesc) { "fence", 5, 'y', 0x0, 0x0, 0x0 },
-    (struct instdesc) { "jal", 3, 'J', 0x6f, 0x0, 0x0 },
-    (struct instdesc) { "jalr", 4, 'I', 0x67, 0x0, 0x0 },
-    (struct instdesc) { "lb", 2, 'I', 0x3, 0x0, 0x0 },
-    (struct instdesc) { "lbu", 3, 'I', 0x3, 0x4, 0x0 },
-    (struct instdesc) { "lh", 2, 'I', 0x3, 0x1, 0x0 },
-    (struct instdesc) { "lhu", 3, 'I', 0x3, 0x5, 0x0 },
-    (struct instdesc) { "lui", 3, 'U', 0x37, 0x0, 0x0 },
-    (struct instdesc) { "lw", 2, 'I', 0x3, 0x2, 0x0 },
-    (struct instdesc) { "or", 2, 'R', 0x33, 0x6, 0x0 },
-    (struct instdesc) { "ori", 3, 'I', 0x13, 0x6, 0x0 },
-    (struct instdesc) { "sb", 2, 'S', 0x23, 0x0, 0x0 },
-    (struct instdesc) { "sh", 2, 'S', 0x23, 0x1, 0x0 },
-    (struct instdesc) { "sll", 3, 'R', 0x33, 0x1, 0x0 },
-    (struct instdesc) { "slli", 4, 'I', 0x13, 0x1, 0x0 },
-    (struct instdesc) { "slt", 3, 'R', 0x33, 0x2, 0x0 },
-    (struct instdesc) { "slti", 4, 'I', 0x13, 0x2, 0x0 },
-    (struct instdesc) { "sltiu", 5, 'I', 0x13, 0x3, 0x0 },
-    (struct instdesc) { "sltu", 4, 'R', 0x33, 0x3, 0x0 },
-    (struct instdesc) { "sra", 3, 'R', 0x33, 0x5, 0x10 },
-    (struct instdesc) { "srai", 4, 'I', 0x93, 0x5, 0x0 },
-    (struct instdesc) { "srl", 3, 'R', 0x33, 0x5, 0x0 },
-    (struct instdesc) { "srli", 4, 'R', 0x13, 0x5, 0x0 },
-    (struct instdesc) { "sub", 3, 'R', 0x33, 0x0, 0x20 },
-    (struct instdesc) { "sw", 2, 'S', 0x23, 0x2, 0x0 },
-    (struct instdesc) { "xor", 3, 'R', 0x33, 0x4, 0x0 },
-    (struct instdesc) { "xori", 4, 'I', 0x13, 0x4, 0x0 },
+    (struct instdesc) { "add", 3, 'R', 51, 0, 0 },
+    (struct instdesc) { "addi", 4, 'I', 19, 0, 0 },
+    (struct instdesc) { "and", 3, 'R', 51, 7, 0 },
+    (struct instdesc) { "andi", 4, 'I', 19, 7, 0 },
+    (struct instdesc) { "auipc", 5, 'U', 55, 0, 0 },
+    (struct instdesc) { "beq", 3, 'B', 99, 0, 0 },
+    (struct instdesc) { "bge", 3, 'B', 99, 5, 0 },
+    (struct instdesc) { "bgeu", 4, 'B', 99, 7, 0 },
+    (struct instdesc) { "blt", 3, 'B', 99, 4, 0 },
+    (struct instdesc) { "bltu", 4, 'B', 99, 6, 0 },
+    (struct instdesc) { "bne", 3, 'B', 99, 1, 0 },
+    (struct instdesc) { "ebreak", 6, 'y', 0, 0, 0 },
+    (struct instdesc) { "ecall", 5, 'y', 0, 0, 0 },
+    (struct instdesc) { "fence", 5, 'y', 0, 0, 0 },
+    (struct instdesc) { "jal", 3, 'J', 111, 0, 0 },
+    (struct instdesc) { "jalr", 4, 'I', 103, 0, 0 },
+    (struct instdesc) { "lb", 2, 'I', 3, 0, 0 },
+    (struct instdesc) { "lbu", 3, 'I', 3, 4, 0 },
+    (struct instdesc) { "lh", 2, 'I', 3, 1, 0 },
+    (struct instdesc) { "lhu", 3, 'I', 3, 5, 0 },
+    (struct instdesc) { "lui", 3, 'U', 55, 0, 0 },
+    (struct instdesc) { "lw", 2, 'I', 3, 2, 0 },
+    (struct instdesc) { "or", 2, 'R', 51, 6, 0 },
+    (struct instdesc) { "ori", 3, 'I', 19, 6, 0 },
+    (struct instdesc) { "sb", 2, 'S', 35, 0, 0 },
+    (struct instdesc) { "sh", 2, 'S', 35, 1, 0 },
+    (struct instdesc) { "sll", 3, 'R', 51, 1, 0 },
+    (struct instdesc) { "slli", 4, 'I', 19, 1, 0 },
+    (struct instdesc) { "slt", 3, 'R', 51, 2, 0 },
+    (struct instdesc) { "slti", 4, 'I', 19, 2, 0 },
+    (struct instdesc) { "sltiu", 5, 'I', 19, 3, 0 },
+    (struct instdesc) { "sltu", 4, 'R', 51, 3, 0 },
+    (struct instdesc) { "sra", 3, 'R', 51, 5, 16 },
+    (struct instdesc) { "srai", 4, 'I', 19, 5, 0 },
+    (struct instdesc) { "srl", 3, 'R', 51, 5, 0 },
+    (struct instdesc) { "srli", 4, 'I', 19, 5, 0 },
+    (struct instdesc) { "sub", 3, 'R', 51, 0, 32 },
+    (struct instdesc) { "sw", 2, 'S', 35, 2, 0 },
+    (struct instdesc) { "xor", 3, 'R', 51, 4, 0 },
+    (struct instdesc) { "xori", 4, 'I', 19, 4, 0 },
 
 
 };
@@ -261,7 +280,6 @@ static bool parse_skip(carve_prog prog, int* ntoksp, carve_tok** toksp, int* tok
         return false;
     }
 }
-
 
 
 /* Parse an immediate value, returns -1 if an error was thrown 

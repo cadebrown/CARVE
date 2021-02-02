@@ -1,8 +1,0 @@
-Type,arg1,arg2,arg3
-R,rd,rs1,rs2
-I,rd,rs1,imm[11:0]
-S,rs2,imm[11:0],rs1
-B,rs1,rs2,imm[12:1]
-U,rd,imm[32:12],
-J,rd,imm[20:1],
-y,,,

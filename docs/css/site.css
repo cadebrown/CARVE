@@ -34,6 +34,10 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+a, a:visited {
+    color:rgb(25, 187, 160);
+}
+
 .main {
     height: calc(75vh - 40px);
     min-height: 15vh;
@@ -49,6 +53,15 @@ body {
 
 .col {
     color: inherit;
+}
+
+.pane {
+    padding: 0.4em 1em;
+    margin: 2em 10em;
+    color: #EEE;
+    border-radius: 0.8em;
+    background-color:rgb(70, 70, 70)
+
 }
 
 /* editor */

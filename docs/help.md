@@ -7,7 +7,7 @@ permalink: /help
 
 # CARVE Help Page
 
-This is the help page for [CARVE]({{ site.baseurl }}).
+This is the help page for [CARVE](..).
 
 (WIP: We need to take screenshots of the final layout to help people understand)
 

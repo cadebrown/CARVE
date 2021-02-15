@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """ genexec.ks - Generate execution code for CSV description of instructions
 
-Download this as CSV: https://docs.google.com/spreadsheets/d/1qsFr-ZnfAd3_Hjj07Y0Iku6Z6y6NC2hjKmN0Ar4kTpk/edit?usp=sharing
+$ ./tools/genexec.py
 
-Then run:
-
-$ ./tools/genexec.py file.csv
+You can copy that and put it in 'src/exec.c'
 
 @author: Cade Brown <cade@kscript.org>
 

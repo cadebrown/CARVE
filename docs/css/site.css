@@ -91,6 +91,12 @@ a, a:visited {
     padding-right: 4px;
 
     margin-left: 4px;
+
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
 }
 
 .exe_button:hover {

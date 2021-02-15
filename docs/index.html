@@ -30,11 +30,15 @@ addi t0, zero, 10
 
     <div class="col resize" id="resize-tabedit"></div>
     <div class="col" id="registers">
-        <div class="table_label">Integer Registers:</div>
-        <div id="intreg-table"></div>
-        <br>
-        <div class="table_label">Floating Point Registers:</div>
-        <div id="fltreg-table"></div>
+        <div class="table_label">
+            <select id="tab_type_sel">
+                <option value="int">Integer Registers</option>
+                <option value="flt">Float Registers</option>
+                <option value="stack">Stack Explorer</option>
+            </select>
+        </div>
+
+        <div id="reg-table"></div>
     </div>
 
 </div>

@@ -1,6 +1,7 @@
 var libcarve = null;
 var editor = null;
 var state = null;
+var reg_table = null;
 
 loadlibcarve().then(function (_libcarve) {
     libcarve = _libcarve;
@@ -53,9 +54,16 @@ loadlibcarve().then(function (_libcarve) {
 
         vert_drag($("#resize-console"), $("#main"), $("#console"));
 
-        genregtable($("#intreg-table"), CARVE_INTREG, "int");
+        reg_table = $("#reg-table");
 
-        genregtable($("#fltreg-table"), CARVE_FLTREG, "float");
+        $("#tab_type_sel").change(
+            function() {
+                genregtable(reg_table, REG_TAB[this.value], this.value);
+                update_registers(state);
+            }
+        )
+
+        $("#tab_type_sel").change();
 
         update_registers(state);
     })
@@ -92,7 +100,11 @@ function genregtable(elem, regs, type) {
 
     out += "</table>";
 
-    elem[0].innerHTML += out;
+    elem[0].innerHTML = out;
+}
+
+function selregtable(elem, val) {
+    genregtable(elem, REG_TAB[val], val)
 }
 
 /* Inspired by w3 schools lesson                          */

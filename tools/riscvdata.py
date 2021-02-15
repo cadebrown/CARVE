@@ -7,10 +7,19 @@ Used in the generator
 
 """
 
+# Returns instruction kind, from instruction name
+def get_kind(name):
+    for i in insts:
+        if i[0] == name:
+            return i[1]
+
+    raise KeyError(name)
+
+
 insts = [
-    # (name, kind, opcode, funct3, funct7)
+    # (name, kind, opcode, f3, f7)
     ('lui',    'U',  0b0110111,  0b000,  0b0000000),
-    ('auipc',  'U',  0b0110111,  0b000,  0b0000000),
+    ('auipc',  'U',  0b0010111,  0b000,  0b0000000),
     ('jal',    'J',  0b1101111,  0b000,  0b0000000),
     ('jalr',   'I',  0b1100111,  0b000,  0b0000000),
     ('beq',    'B',  0b1100011,  0b000,  0b0000000),
@@ -34,8 +43,8 @@ insts = [
     ('ori',    'I',  0b0010011,  0b110,  0b0000000),
     ('andi',   'I',  0b0010011,  0b111,  0b0000000),
     ('slli',   'I',  0b0010011,  0b001,  0b0000000),
-    ('srli',   'I',  0b0010011,  0b101,  0b0000000),
-    ('srai',   'I',  0b0010011,  0b101,  0b0000000), # TODO: see https://stackoverflow.com/questions/39489318/risc-v-implementing-slli-srli-and-srai
+    ('srli',   'I',  0b0010011,  0b101,  0b0000000), # 'srli' and 'srai' are encoded the same, but the immediate value differs. Therefore, we only include 'srli' in the table, and the executor and encoder must solve that problem. SEE: https://stackoverflow.com/questions/39489318/risc-v-implementing-slli-srli-and-srai
+    #('srai',   'I',  0b0010011,  0b101,  0b0000000),
     ('add',    'R',  0b0110011,  0b000,  0b0000000),
     ('sub',    'R',  0b0110011,  0b000,  0b0100000),
     ('sll',    'R',  0b0110011,  0b001,  0b0000000),
@@ -46,8 +55,8 @@ insts = [
     ('sra',    'R',  0b0110011,  0b101,  0b0010000),
     ('or',     'R',  0b0110011,  0b110,  0b0000000),
     ('and',    'R',  0b0110011,  0b111,  0b0000000),
-    ('fence',  'y',  0b0000000,  0b000,  0b0000000),
-    ('ecall',  'y',  0b0000000,  0b000,  0b0000000),
-    ('ebreak', 'y',  0b0000000,  0b000,  0b0000000),
+    #('fence',  'y',  0b0000000,  0b000,  0b0000000),
+    #('ecall',  'y',  0b0000000,  0b000,  0b0000000),
+    #('ebreak', 'y',  0b0000000,  0b000,  0b0000000),
 ]
 

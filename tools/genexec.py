@@ -12,145 +12,170 @@ $ ./tools/genexec.py file.csv
 """
 
 import argparse
-parser = argparse.ArgumentParser(description='Generate execution code')
 
-parser.add_argument('src', help='an integer for the accumulator')
-
-args = parser.parse_args()
-
-table = []
-
-fp = open(args.src)
-next(fp)
-for line in fp:
-    table.append(line.strip().split(','))
-
-fp.close()
+# Contains instruction information
+import riscvdata
 
 
-seenop = set()
+""" Strategy:
 
-macros = ''
+Find a tree that is keyed on:
 
-ind = '    '
-print(ind * 0 + f"static inline void exec_inst(carve_state s, carve_inst inst) {{")
+ opcode -> f3 -> f7
+ (f3 and f7 only used on instruction types which require them)
 
-print(ind * 1 + "carve_inst opcode, rd, f3, rs1, rs2, f7, imm_11_0, imm_31_12, imm_4_0, imm_11_5, _11, imm_4_1, imm_10_5, _12, imm_19_12, imm_10_1, _20, tmp0, tmp1, tmp2;")
-print(ind * 1 + "switch (opcode = inst & 0x7F) {")
-
-for n, k, o, f3, f7 in table:
-    if o and o not in seenop:
-        seenop.add(o)
-        print(ind * 2 + f"case {hex(int('0b'+o, 2))}:")
-
-        if k == 'R':
-            # Has f3 and f7
-            print(ind * 3 + f"CARVE_DEC_R(inst, opcode, rd, f3, rs1, rs2, f7); ")
-            print(ind * 3 + f"switch (f3) {{")
-            
-            seenf3 = set()
-            for _n, _k, _o, _f3, _f7 in table:
-                if k == _k and o == _o and not _f3 in seenf3:
-                    seenf3.add(_f3)
-                    seenf7 = set()
-
-                    print(ind * 4 + f"case {hex(int('0b'+_f3, 2))}:")
-
-                    print(ind * 5 + f"switch (f7) {{")
-
-                    for __n, __k, __o, __f3, __f7 in table:
-                        if o == __o and __f3 == _f3 and __f7 not in seenf7:
-                            seenf7.add(__f7)
-                            print(ind * 6 + f"case {hex(int('0b'+__f7, 2))}:")
-                            print(ind * 7 + f"/* {__n} */")
-                            print(ind * 7 + f"CARVE_DO_{__n}(rd, rs1, rs2);")
-                            print(ind * 7 + f"break;")
-                            macros += f'#define CARVE_DO_{__n}(_rd, _rs1, _rs2)\n'
-
-                    print(ind * 5 + f"}}")
-            print(ind * 3 + f"}}")
-
-        elif k == 'I':
-            # Has f3
-            print(ind * 3 + f"CARVE_DEC_I(inst, opcode, rd, f3, rs1, imm_11_0);")
-            print(ind * 3 + f"switch (f3) {{")
-            
-            seenf3 = set()
-            for _n, _k, _o, _f3, _f7 in table:
-                if k == _k and o == _o and _f3 not in seenf3:
-                    seenf3.add(_f3)
-                    seenf7 = set()
-
-                    print(ind * 4 + f"case {hex(int('0b'+_f3, 2))}:")
-                    print(ind * 5 + f"/* {_n} */")
-                    print(ind * 5 + f"tmp0 = imm_11_0 << 0; ")
-                    print(ind * 5 + f"CARVE_DO_{_n}(rd, rs1, tmp0);")
-                    print(ind * 5 + f"break;")
-                    macros += f'#define CARVE_DO_{_n}(_rd, _rs1, _imm)\n'
-
-            print(ind * 3 + f"}}")
-        elif k == 'U':
-            # Neither
-            print(ind * 3 + f"CARVE_DEC_U(inst, opcode, rd, imm_31_12);")
-            print(ind * 3 + f"/* {n} */")
-            print(ind * 3 + f"tmp0 = (imm_31_12 << 12);")
-            print(ind * 3 + f"CARVE_DO_{n}(rd, tmp0);")
-            macros += f'#define CARVE_DO_{n}(_rd, _imm)\n'
-
-        elif k == 'S':
-            # Has f3
-            print(ind * 3 + f"CARVE_DEC_S(inst, opcode, imm_4_0, f3, rs1, rs2, imm_11_5);")
-            print(ind * 3 + f"switch (f3) {{")
-            seenf3 = set()
-            for _n, _k, _o, _f3, _f7 in table:
-                if k == _k and o == _o and _f3 not in seenf3:
-                    seenf3.add(_f3)
-                    seenf7 = set()
-
-                    print(ind * 4 + f"case {hex(int('0b'+_f3, 2))}:")
-                    print(ind * 5 + f"/* {_n} */")
-                    print(ind * 5 + f"tmp0 = (imm_4_0 << 0) | (imm_11_5 << 5);")
-                    print(ind * 5 + f"CARVE_DO_{_n}(rs1, rs2, tmp0);")
-                    print(ind * 5 + f"break;")
-                    macros += f'#define CARVE_DO_{_n}(_rs1, _rs2, _imm)\n'
-
-            print(ind * 3 + f"}}")
-        elif k == 'B':
-            # Has f3
-            print(ind * 3 + f"CARVE_DEC_B(inst, opcode, _11, imm_4_1, f3, rs1, rs2, imm_10_5, _12);")
-            print(ind * 3 + f"switch (f3) {{")
-
-            seenf3 = set()
-            for _n, _k, _o, _f3, _f7 in table:
-                if k == _k and o == _o and _f3 not in seenf3:
-                    seenf3.add(_f3)
-                    seenf7 = set()
-
-                    print(ind * 4 + f"case {hex(int('0b'+_f3, 2))}:")
-                    print(ind * 5 + f"/* {_n} */")
-                    print(ind * 5 + f"tmp0 = (imm_4_1 << 1) | (imm_10_5 << 5) | (_11 << 11) | (_12 << 12);")
-                    print(ind * 5 + f"CARVE_DO_{_n}(rs1, rs2, tmp0);")
-                    print(ind * 5 + f"break;")
-                    macros += f'#define CARVE_DO_{_n}(_rs1, _rs2, _imm)\n'
-
-            print(ind * 3 + f"}}")
-        elif k == 'J':
-            # Has neither
-            print(ind * 3 + f"CARVE_DEC_J(inst, opcode, rd, imm_19_12, _11, imm_10_1, _20);")
-            print(ind * 3 + f"/* {n} */")
-            print(ind * 3 + f"tmp0 = (imm_10_1 << 1) | (_11 << 11) | (imm_19_12 << 12) | (_20 << 20);")
-            print(ind * 3 + f"CARVE_DO_{n}(rd, tmp0);")
-            macros += f'#define CARVE_DO_{n}(_rd, _imm)\n'
-
-        else:
-            raise Exception('Unknown kind ' + repr(k))
-        
-        print(ind * 3 + f"break;")
-
-print(ind * 1 + f"}}")
-print(ind * 0 + f"}}")
-
-print (macros)
+And then generate a nested switch/case
 
 
+"""
+
+
+# Tree showing how to decode instructions
+tree = {}
+# Opcode to kinds
+kinds = {}
+for (name, kind, opcode, f3, f7) in riscvdata.insts:
+    if opcode not in tree:
+        # May be reset to just the name of an instruction
+        tree[opcode] = {}
+        kinds[opcode] = kind
+    
+    if kind == 'R':
+        # Use f3 and f7
+        if f3 not in tree[opcode]:
+            tree[opcode][f3] = {
+            }
+
+        # Shouldn't have two exact matches
+        assert f7 not in tree[opcode][f3]
+
+        # Leaf node of the instruction
+        tree[opcode][f3][f7] = name
+    elif kind == 'I':
+        # Shouldn't have two exact matches
+        assert f3 not in tree[opcode]
+
+        # Leaf node of the instruction
+        tree[opcode][f3] = name
+    elif kind == 'S':
+        # Shouldn't have two exact matches
+        assert f3 not in tree[opcode]
+
+        # Leaf node of the instruction
+        tree[opcode][f3] = name
+    elif kind == 'B':
+        # Shouldn't have two exact matches
+        assert f3 not in tree[opcode]
+
+        # Leaf node of the instruction
+        tree[opcode][f3] = name
+    elif kind == 'J':
+        # Neither
+
+        # Leaf node of the instruction
+        tree[opcode] = name
+    elif kind == 'U':
+        # Neither
+
+        # Leaf node of the instruction
+        tree[opcode] = name
+    else:
+        raise Exception('Unknown kind: ' + repr(kind))
+
+print (tree)
+
+
+print(f"""static inline void exec_inst(carve_state s, carve_inst inst) {{
+    carve_inst opcode, f3, f7, rd, rs1, rs2, imm;    
+    switch (opcode = inst & 0x7F) {{""")
+
+
+for opcode in tree:
+    # Returns string of code to execute for 'name'
+    def output_exec(name):
+        res = f"CARVE_{name}("
+        kind = riscvdata.get_kind(name)
+        if kind == 'R':
+            res += 'rd, rs1, rs2'
+        elif kind == 'I':
+            res += 'rd, rs1, imm'
+        elif kind == 'U':
+            res += 'rd, imm'
+        elif kind == 'S':
+            res += 'rs1, rs2, imm'
+        elif kind == 'B':
+            res += 'rs1, rs2, imm'
+        elif kind == 'J':
+            res += 'rd, imm'
+        res += ");"
+        return res
+
+    val = tree[opcode]
+    print(f"""        case {hex(opcode)}:""")
+    if isinstance(val, dict):
+        # 'val' is subtree, keyed on 'f3'
+        kind = kinds[opcode]
+        if kind == 'R':
+            print(f"""            CARVE_DEC_R(inst, opcode, f3, f7, rd, rs1, rs2);""")
+        elif kind == 'I':
+            print(f"""            CARVE_DEC_I(inst, opcode, f3, rd, rs1, imm);""")
+        elif kind == 'U':
+            print(f"""            CARVE_DEC_U(inst, opcode, rd, imm);""")
+        elif kind == 'S':
+            print(f"""            CARVE_DEC_S(inst, opcode, f3, rs1, rs2, imm);""")
+        elif kind == 'B':
+            print(f"""            CARVE_DEC_B(inst, opcode, f3, rs1, rs2, imm);""")
+        elif kind == 'J':
+            print(f"""            CARVE_DEC_J(inst, opcode, rd, imm);""")
+
+
+        print(f"""            switch (f3) {{""")
+
+        for f3 in val:
+            val_ = val[f3]
+            print(f"""                case {hex(f3)}:""")
+
+            if isinstance(val_, dict):
+                # 'val_' is a subtree, keyed on 'f7'
+                print(f"""                    switch (f7) {{""")
+                for f7 in val_:
+                    val__ = val_[f7]
+                    print(f"""                        case {hex(f7)}:""")
+                    print(f"""                            /* {val__} */""")
+                    print(f"""                            {output_exec(val__)}""")
+                    print(f"""                        break;""")
+
+                print(f"""                    }}""")
+
+            else:
+                # 'val_' is a instruction
+                print(f"""                    /* {val_} */""")
+                print(f"""                    {output_exec(val_)}""")
+
+            print(f"""                    break;""")
+
+
+        print(f"""            }}""")
+
+    else:
+        # 'val' is instruction
+        if kind == 'R':
+            print(f"""            CARVE_DEC_R(inst, opcode, f3, f7, rd, rs1, rs2);""")
+        elif kind == 'I':
+            print(f"""            CARVE_DEC_I(inst, opcode, f3, rd, rs1, imm);""")
+        elif kind == 'U':
+            print(f"""            CARVE_DEC_U(inst, opcode, rd, imm);""")
+        elif kind == 'S':
+            print(f"""            CARVE_DEC_S(inst, opcode, f3, rs1, rs2, imm);""")
+        elif kind == 'B':
+            print(f"""            CARVE_DEC_B(inst, opcode, f3, rs1, rs2, imm);""")
+        elif kind == 'J':
+            print(f"""            CARVE_DEC_J(inst, opcode, rd, imm);""")
+        print(f"""            /* {val} */""")
+        print(f"""            {output_exec(val)}""")
+
+    print(f"""            break;""")
+
+print(f"    }}")
+print(f"}}")
 

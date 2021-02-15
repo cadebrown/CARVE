@@ -16,290 +16,423 @@
 /* Program counter */
 #define PC (s->pc)
 
-#define CARVE_DO_LUI(_rd, _imm) REGS(_rd) = _imm;
-#define CARVE_DO_AUIPC(_rd, _imm)
-#define CARVE_DO_JAL(_rd, _imm) if (_rd != 0) { REGU(_rd) = PC; } PC += CARVE_SEXT(_imm, 20);
-#define CARVE_DO_JALR(_rd, _rs1, _imm) do { \
-    carve_int rr = PC;\
-    PC = REGU(_rd) + CARVE_SEXT(_imm, 19); \
-    if (_rd != 0) { REGU(_rd) = rr; } \
-} while (0);
-#define CARVE_DO_BEQ(_rs1, _rs2, _imm)
-#define CARVE_DO_BNE(_rs1, _rs2, _imm)
-#define CARVE_DO_BLT(_rs1, _rs2, _imm)
-#define CARVE_DO_BGE(_rs1, _rs2, _imm) do { \
-    if (REGS(_rs1) >= REGS(_rs2)) PC += CARVE_SEXT(_imm, 12); \
-} while (0);
-#define CARVE_DO_BLTU(_rs1, _rs2, _imm)
-#define CARVE_DO_BGEU(_rs1, _rs2, _imm)
-#define CARVE_DO_LB(_rd, _rs1, _imm) REGU(_rd) = *((carve_b*)(REGU(_rs1) + _imm));
-#define CARVE_DO_LH(_rd, _rs1, _imm) REGU(_rd) = *((carve_h*)(REGU(_rs1) + _imm));
-#define CARVE_DO_LW(_rd, _rs1, _imm) REGU(_rd) = *((carve_w*)(REGU(_rs1) + _imm));
-#define CARVE_DO_LBU(_rd, _rs1, _imm)
-#define CARVE_DO_LHU(_rd, _rs1, _imm)
-#define CARVE_DO_SB(_rs1, _rs2, _imm) if (_rs1 != 0) { *((carve_b*)(REGU(_rs1) + _imm)) = REGU(_rs2); }
-#define CARVE_DO_SH(_rs1, _rs2, _imm) if (_rs1 != 0) { *((carve_h*)(REGU(_rs1) + _imm)) = REGU(_rs2); }
-#define CARVE_DO_SW(_rs1, _rs2, _imm) if (_rs1 != 0) { *((carve_w*)(REGU(_rs1) + _imm)) = REGU(_rs2); }
-#define CARVE_DO_ADDI(_rd, _rs1, _imm) REGU(_rd) = REGU(_rs1) + _imm;
-#define CARVE_DO_SLTI(_rd, _rs1, _imm) REGU(_rd) = REGS(_rs1) < _imm;
-#define CARVE_DO_SLTIU(_rd, _rs1, _imm) REGU(_rd) = REGS(_rs1) < _imm;
-#define CARVE_DO_XORI(_rd, _rs1, _imm) REGU(_rd) = REGU(_rs1) ^ _imm;
-#define CARVE_DO_ORI(_rd, _rs1, _imm) REGU(_rd) = REGU(_rs1) | _imm;
-#define CARVE_DO_ANDI(_rd, _rs1, _imm) REGU(_rd) = REGU(_rs1) & _imm;
-#define CARVE_DO_SLLI(_rd, _rs1, _imm) REGU(_rd) = REGU(_rs1) << _imm;
-#define CARVE_DO_SRLI(_rd, _rs1, _imm) do { \
-    carve_int v = _imm; \
-    carve_int shamt = _imm & 0x7F; \
-    if (v == shamt) { \
-        /* All higher bits are 0, so SRLI */ \
-        REGU(_rd) = REGU(_rs1) >> shamt;\
-    } else { \
-        /* High one bit, so SRAI */ \
-        REGS(_rd) = REGS(_rs1) / (1ULL << shamt);\
-    } \
-} while (0);
-#define CARVE_DO_SRAI(_rd, _rs1, _imm) assert(false);
 
-#define CARVE_DO_ADD(_rd, _rs1, _rs2) REGU(_rd) = REGU(_rs1) + REGU(_rs2);
-#define CARVE_DO_SUB(_rd, _rs1, _rs2) REGU(_rd) = REGU(_rs1) - REGU(_rs2);
-#define CARVE_DO_SLL(_rd, _rs1, _rs2) REGU(_rd) = REGU(_rs1) << REGU(_rs2);
-#define CARVE_DO_SLT(_rd, _rs1, _rs2) REGU(_rd) = REGS(_rs1) < REGS(_rs2);
-#define CARVE_DO_SLTU(_rd, _rs1, _rs2) REGU(_rd) = REGU(_rs1) < REGU(_rs2);
-#define CARVE_DO_XOR(_rd, _rs1, _rs2) REGU(_rd) = REGU(_rs1) ^ REGU(_rs2);
-#define CARVE_DO_SRL(_rd, _rs1, _rs2) REGU(_rd) = REGU(_rs1) >> REGU(_rs2);
-#define CARVE_DO_SRA(_rd, _rs1, _rs2) REGS(_rd) = REGS(_rs1) / REGS(_rs2);
-#define CARVE_DO_OR(_rd, _rs1, _rs2) REGU(_rd) = REGU(_rs1) | REGU(_rs2);
-#define CARVE_DO_AND(_rd, _rs1, _rs2) REGU(_rd) = REGU(_rs1) & REGU(_rs2);
+/** RISC-V Instructions **/
+
+#define CARVE_lui(rd, imm) do { \
+    REGS(rd) = imm; \
+} while (0)
+
+#define CARVE_auipc(rd, imm) do { \
+    PC += imm; \
+} while (0)
+
+#define CARVE_jal(rd, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = PC; \
+    } \
+    PC += CARVE_SEXT(imm, 20); \
+} while (0)
+
+#define CARVE_jalr(rd, rs1, imm) do { \
+    carve_int rr = PC; \
+    PC = REGU(rs1) + CARVE_SEXT(imm, 19); \
+    if (rd != 0) { \
+        REGU(rd) = rr; \
+    } \
+} while (0)
+
+
+#define CARVE_beq(rs1, rs2, imm) do { \
+    if (REGU(rs1) == REGU(rs2)) { \
+        PC += CARVE_SEXT(imm, 12); \
+    } \
+} while (0)
+
+#define CARVE_bne(rs1, rs2, imm) do { \
+    if (REGU(rs1) != REGU(rs2)) { \
+        PC += CARVE_SEXT(imm, 12); \
+    } \
+} while (0)
+
+#define CARVE_blt(rs1, rs2, imm) do { \
+    if (REGS(rs1) < REGS(rs2)) { \
+        PC += CARVE_SEXT(imm, 12); \
+    } \
+} while (0)
+
+#define CARVE_bge(rs1, rs2, imm) do { \
+    if (REGS(rs1) >= REGS(rs2)) { \
+        PC += CARVE_SEXT(imm, 12); \
+    } \
+} while (0)
+
+#define CARVE_bltu(rs1, rs2, imm) do { \
+    if (REGU(rs1) < REGU(rs2)) { \
+        PC += CARVE_SEXT(imm, 12); \
+    } \
+} while (0)
+
+#define CARVE_bgeu(rs1, rs2, imm) do { \
+    if (REGU(rs1) >= REGU(rs2)) { \
+        PC += CARVE_SEXT(imm, 12); \
+    } \
+} while (0)
+
+#define CARVE_lb(rd, rs1, imm) do { \
+    REGU(rd) = CARVE_SEXT(*((carve_b*)(REGU(rs1) + imm)), 7); \
+} while (0)
+#define CARVE_lh(rd, rs1, imm) do { \
+    REGU(rd) = CARVE_SEXT(*((carve_h*)(REGU(rs1) + imm)), 15); \
+} while (0)
+#define CARVE_lw(rd, rs1, imm) do { \
+    REGU(rd) = CARVE_SEXT(*((carve_w*)(REGU(rs1) + imm)), 31); \
+} while (0)
+#define CARVE_lbu(rd, rs1, imm) do { \
+    REGU(rd) = *((carve_b*)(REGU(rs1) + imm)); \
+} while (0)
+#define CARVE_lhu(rd, rs1, imm) do { \
+    REGU(rd) = *((carve_h*)(REGU(rs1) + imm)); \
+} while (0)
+
+#define CARVE_sb(rs1, rs2, imm) do { \
+    if (rs1 != 0) { \
+        *((carve_b*)(REGU(rs1) + imm)) = REGU(rs2); \
+    } \
+} while (0)
+#define CARVE_sh(rs1, rs2, imm) do { \
+    if (rs1 != 0) { \
+        *((carve_h*)(REGU(rs1) + imm)) = REGU(rs2); \
+    } \
+} while (0)
+#define CARVE_sw(rs1, rs2, imm) do { \
+    if (rs1 != 0) { \
+        *((carve_w*)(REGU(rs1) + imm)) = REGU(rs2); \
+    } \
+} while (0)
+
+#define CARVE_addi(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) + imm; \
+    } \
+} while (0)
+
+#define CARVE_slti(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGS(rd) = REGS(rs1) < imm; \
+    } \
+} while (0)
+#define CARVE_sltiu(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) < imm; \
+    } \
+} while (0)
+
+#define CARVE_xori(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) ^ imm; \
+    } \
+} while (0)
+#define CARVE_ori(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) | imm; \
+    } \
+} while (0)
+#define CARVE_andi(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) & imm; \
+    } \
+} while (0)
+#define CARVE_slli(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) << imm; \
+    } \
+} while (0)
+
+#define CARVE_srli(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        carve_int v = imm; \
+        carve_int shamt = imm & 0x7F; \
+        if (v == shamt) { \
+            /* All higher bits are 0, so SRLI */ \
+            REGU(rd) = REGU(rs1) >> shamt;\
+        } else { \
+            /* High one bit, so SRAI */ \
+            REGS(rd) = REGS(rs1) / (1ULL << shamt);\
+        } \
+    } \
+} while (0)
+
+#define CARVE_add(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) + REGU(rs2); \
+    } \
+} while (0)
+#define CARVE_sub(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) - REGU(rs2); \
+    } \
+} while (0)
+
+
+#define CARVE_sll(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) << REGU(rs2); \
+    } \
+} while (0)
+
+#define CARVE_srl(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) >> REGU(rs2); \
+    } \
+} while (0)
+
+#define CARVE_sra(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) >> REGU(rs2); \
+    } \
+} while (0)
+
+#define CARVE_slt(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGS(rs1) < REGS(rs2); \
+    } \
+} while (0)
+
+#define CARVE_sltu(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) < REGU(rs2); \
+    } \
+} while (0)
+
+#define CARVE_xor(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) ^ REGU(rs2); \
+    } \
+} while (0)
+#define CARVE_or(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) | REGU(rs2); \
+    } \
+} while (0)
+
+#define CARVE_and(rd, rs1, imm) do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) & REGU(rs2); \
+    } \
+} while (0)
+
 
 static inline void exec_inst(carve_state s, carve_inst inst) {
-    carve_inst opcode, rd, f3, rs1, rs2, f7, imm_11_0, imm_31_12, imm_4_0, imm_11_5, _11, imm_4_1, imm_10_5, _12, imm_19_12, imm_10_1, _20, tmp0, tmp1, tmp2;
+    carve_inst opcode, f3, f7, rd, rs1, rs2, imm;    
     switch (opcode = inst & 0x7F) {
         case 0x37:
-            CARVE_DEC_U(inst, opcode, rd, imm_31_12);
-            /* LUI */
-            tmp0 = (imm_31_12 << 12);
-            CARVE_DO_LUI(rd, tmp0);
+            CARVE_DEC_R(inst, opcode, f3, f7, rd, rs1, rs2);
+            /* lui */
+            CARVE_lui(rd, imm);
             break;
         case 0x17:
-            CARVE_DEC_U(inst, opcode, rd, imm_31_12);
-            /* AUIPC */
-            tmp0 = (imm_31_12 << 12);
-            CARVE_DO_AUIPC(rd, tmp0);
+            CARVE_DEC_R(inst, opcode, f3, f7, rd, rs1, rs2);
+            /* auipc */
+            CARVE_auipc(rd, imm);
             break;
         case 0x6f:
-            CARVE_DEC_J(inst, opcode, rd, imm_19_12, _11, imm_10_1, _20);
-            /* JAL */
-            tmp0 = (imm_10_1 << 1) | (_11 << 11) | (imm_19_12 << 12) | (_20 << 20);
-            CARVE_DO_JAL(rd, tmp0);
+            CARVE_DEC_R(inst, opcode, f3, f7, rd, rs1, rs2);
+            /* jal */
+            CARVE_jal(rd, imm);
             break;
         case 0x67:
-            CARVE_DEC_I(inst, opcode, rd, f3, rs1, imm_11_0);
+            CARVE_DEC_I(inst, opcode, f3, rd, rs1, imm);
             switch (f3) {
                 case 0x0:
-                    /* JALR */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_JALR(rd, rs1, tmp0);
+                    /* jalr */
+                    CARVE_jalr(rd, rs1, imm);
                     break;
             }
             break;
         case 0x63:
-            CARVE_DEC_B(inst, opcode, _11, imm_4_1, f3, rs1, rs2, imm_10_5, _12);
+            CARVE_DEC_B(inst, opcode, f3, rs1, rs2, imm);
             switch (f3) {
                 case 0x0:
-                    /* BEQ */
-                    tmp0 = (imm_4_1 << 1) | (imm_10_5 << 5) | (_11 << 11) | (_12 << 12);
-                    CARVE_DO_BEQ(rs1, rs2, tmp0);
+                    /* beq */
+                    CARVE_beq(rs1, rs2, imm);
                     break;
                 case 0x1:
-                    /* BNE */
-                    tmp0 = (imm_4_1 << 1) | (imm_10_5 << 5) | (_11 << 11) | (_12 << 12);
-                    CARVE_DO_BNE(rs1, rs2, tmp0);
+                    /* bne */
+                    CARVE_bne(rs1, rs2, imm);
                     break;
                 case 0x4:
-                    /* BLT */
-                    tmp0 = (imm_4_1 << 1) | (imm_10_5 << 5) | (_11 << 11) | (_12 << 12);
-                    CARVE_DO_BLT(rs1, rs2, tmp0);
+                    /* blt */
+                    CARVE_blt(rs1, rs2, imm);
                     break;
                 case 0x5:
-                    /* BGE */
-                    tmp0 = (imm_4_1 << 1) | (imm_10_5 << 5) | (_11 << 11) | (_12 << 12);
-                    CARVE_DO_BGE(rs1, rs2, tmp0);
-
+                    /* bge */
+                    CARVE_bge(rs1, rs2, imm);
                     break;
                 case 0x6:
-                    /* BLTU */
-                    tmp0 = (imm_4_1 << 1) | (imm_10_5 << 5) | (_11 << 11) | (_12 << 12);
-                    CARVE_DO_BLTU(rs1, rs2, tmp0);
+                    /* bltu */
+                    CARVE_bltu(rs1, rs2, imm);
                     break;
                 case 0x7:
-                    /* BGEU */
-                    tmp0 = (imm_4_1 << 1) | (imm_10_5 << 5) | (_11 << 11) | (_12 << 12);
-                    CARVE_DO_BGEU(rs1, rs2, tmp0);
+                    /* bgeu */
+                    CARVE_bgeu(rs1, rs2, imm);
                     break;
             }
             break;
         case 0x3:
-            CARVE_DEC_I(inst, opcode, rd, f3, rs1, imm_11_0);
+            CARVE_DEC_I(inst, opcode, f3, rd, rs1, imm);
             switch (f3) {
                 case 0x0:
-                    /* LB */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_LB(rd, rs1, tmp0);
+                    /* lb */
+                    CARVE_lb(rd, rs1, imm);
                     break;
                 case 0x1:
-                    /* LH */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_LH(rd, rs1, tmp0);
+                    /* lh */
+                    CARVE_lh(rd, rs1, imm);
                     break;
                 case 0x2:
-                    /* LW */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_LW(rd, rs1, tmp0);
+                    /* lw */
+                    CARVE_lw(rd, rs1, imm);
                     break;
                 case 0x4:
-                    /* LBU */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_LBU(rd, rs1, tmp0);
+                    /* lbu */
+                    CARVE_lbu(rd, rs1, imm);
                     break;
                 case 0x5:
-                    /* LHU */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_LHU(rd, rs1, tmp0);
+                    /* lhu */
+                    CARVE_lhu(rd, rs1, imm);
                     break;
             }
             break;
         case 0x23:
-            CARVE_DEC_S(inst, opcode, imm_4_0, f3, rs1, rs2, imm_11_5);
+            CARVE_DEC_S(inst, opcode, f3, rs1, rs2, imm);
             switch (f3) {
                 case 0x0:
-                    /* SB */
-                    tmp0 = (imm_4_0 << 0) | (imm_11_5 << 5);
-                    CARVE_DO_SB(rs1, rs2, tmp0);
+                    /* sb */
+                    CARVE_sb(rs1, rs2, imm);
                     break;
                 case 0x1:
-                    /* SH */
-                    tmp0 = (imm_4_0 << 0) | (imm_11_5 << 5);
-                    CARVE_DO_SH(rs1, rs2, tmp0);
+                    /* sh */
+                    CARVE_sh(rs1, rs2, imm);
                     break;
                 case 0x2:
-                    /* SW */
-                    tmp0 = (imm_4_0 << 0) | (imm_11_5 << 5);
-                    CARVE_DO_SW(rs1, rs2, tmp0);
+                    /* sw */
+                    CARVE_sw(rs1, rs2, imm);
                     break;
             }
             break;
         case 0x13:
-            CARVE_DEC_I(inst, opcode, rd, f3, rs1, imm_11_0);
+            CARVE_DEC_I(inst, opcode, f3, rd, rs1, imm);
             switch (f3) {
                 case 0x0:
-                    /* ADDI */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_ADDI(rd, rs1, tmp0);
+                    /* addi */
+                    CARVE_addi(rd, rs1, imm);
                     break;
                 case 0x2:
-                    /* SLTI */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_SLTI(rd, rs1, tmp0);
+                    /* slti */
+                    CARVE_slti(rd, rs1, imm);
                     break;
                 case 0x3:
-                    /* SLTIU */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_SLTIU(rd, rs1, tmp0);
+                    /* sltiu */
+                    CARVE_sltiu(rd, rs1, imm);
                     break;
                 case 0x4:
-                    /* XORI */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_XORI(rd, rs1, tmp0);
+                    /* xori */
+                    CARVE_xori(rd, rs1, imm);
                     break;
                 case 0x6:
-                    /* ORI */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_ORI(rd, rs1, tmp0);
+                    /* ori */
+                    CARVE_ori(rd, rs1, imm);
                     break;
                 case 0x7:
-                    /* ANDI */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_ANDI(rd, rs1, tmp0);
+                    /* andi */
+                    CARVE_andi(rd, rs1, imm);
                     break;
                 case 0x1:
-                    /* SLLI */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_SLLI(rd, rs1, tmp0);
+                    /* slli */
+                    CARVE_slli(rd, rs1, imm);
                     break;
                 case 0x5:
-                    /* SRLI */
-                    tmp0 = imm_11_0 << 0; 
-                    CARVE_DO_SRLI(rd, rs1, tmp0);
+                    /* srli */
+                    CARVE_srli(rd, rs1, imm);
                     break;
             }
             break;
         case 0x33:
-            CARVE_DEC_R(inst, opcode, rd, f3, rs1, rs2, f7); 
+            CARVE_DEC_R(inst, opcode, f3, f7, rd, rs1, rs2);
             switch (f3) {
                 case 0x0:
                     switch (f7) {
                         case 0x0:
-                            /* ADD */
-                            CARVE_DO_ADD(rd, rs1, rs2);
-                            break;
+                            /* add */
+                            CARVE_add(rd, rs1, rs2);
+                        break;
                         case 0x20:
-                            /* SUB */
-                            CARVE_DO_SUB(rd, rs1, rs2);
-                            break;
+                            /* sub */
+                            CARVE_sub(rd, rs1, rs2);
+                        break;
                     }
+                    break;
                 case 0x1:
                     switch (f7) {
                         case 0x0:
-                            /* SLL */
-                            CARVE_DO_SLL(rd, rs1, rs2);
-                            break;
+                            /* sll */
+                            CARVE_sll(rd, rs1, rs2);
+                        break;
                     }
+                    break;
                 case 0x2:
                     switch (f7) {
                         case 0x0:
-                            /* SLT */
-                            CARVE_DO_SLT(rd, rs1, rs2);
-                            break;
+                            /* slt */
+                            CARVE_slt(rd, rs1, rs2);
+                        break;
                     }
+                    break;
                 case 0x3:
                     switch (f7) {
                         case 0x0:
-                            /* SLTU */
-                            CARVE_DO_SLTU(rd, rs1, rs2);
-                            break;
+                            /* sltu */
+                            CARVE_sltu(rd, rs1, rs2);
+                        break;
                     }
+                    break;
                 case 0x4:
                     switch (f7) {
                         case 0x0:
-                            /* XOR */
-                            CARVE_DO_XOR(rd, rs1, rs2);
-                            break;
+                            /* xor */
+                            CARVE_xor(rd, rs1, rs2);
+                        break;
                     }
+                    break;
                 case 0x5:
                     switch (f7) {
                         case 0x0:
-                            /* SRL */
-                            CARVE_DO_SRL(rd, rs1, rs2);
-                            break;
+                            /* srl */
+                            CARVE_srl(rd, rs1, rs2);
+                        break;
                         case 0x10:
-                            /* SRA */
-                            CARVE_DO_SRA(rd, rs1, rs2);
-                            break;
+                            /* sra */
+                            CARVE_sra(rd, rs1, rs2);
+                        break;
                     }
+                    break;
                 case 0x6:
                     switch (f7) {
                         case 0x0:
-                            /* OR */
-                            CARVE_DO_OR(rd, rs1, rs2);
-                            break;
+                            /* or */
+                            CARVE_or(rd, rs1, rs2);
+                        break;
                     }
+                    break;
                 case 0x7:
                     switch (f7) {
                         case 0x0:
-                            /* AND */
-                            CARVE_DO_AND(rd, rs1, rs2);
-                            break;
+                            /* and */
+                            CARVE_and(rd, rs1, rs2);
+                        break;
                     }
+                    break;
             }
             break;
     }

@@ -193,6 +193,14 @@ typedef struct carve_prog_s {
 /* Sign extent '_val', if the '_sb'th bit is set (the sign bit) */
 #define CARVE_SEXT(_val, _sb) (carve_sint)(((_val) & (1ULL << (_sb))) ? (~CARVE_MASK(0, _sb) | (_val)) : (_val))
 
+/* Decode specific field from bit '_i' (inclusive) to '_j' (exclusive)
+ */
+#define CARVE_DEC_FIELD(_inst, _to, _i, _j) do { \
+    (_to) = ((_inst) & CARVE_MASK(_i, _j)) >> (_i); \
+} while (0);
+
+
+
 
 /* Make an instruction, from one of many families:
  *
@@ -203,19 +211,79 @@ typedef struct carve_prog_s {
  *   makeB: Branch
  *   makeJ: Jump
  */
-CARVE_API carve_inst carve_makeR(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst funct7);
-CARVE_API carve_inst carve_makeI(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst rs1, carve_inst imm_11_0);
-CARVE_API carve_inst carve_makeU(carve_inst opcode, carve_inst rd, carve_inst imm_31_12);
-CARVE_API carve_inst carve_makeS(carve_inst opcode, carve_inst imm_4_0, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm_11_5);
-CARVE_API carve_inst carve_makeB(carve_inst opcode, carve_inst _11, carve_inst imm_4_1, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm_10_5, carve_inst _12);
-CARVE_API carve_inst carve_makeJ(carve_inst opcode, carve_inst rd, carve_inst imm_19_12, carve_inst _11, carve_inst imm_10_1, carve_inst _20);
+CARVE_API carve_inst carve_makeR(carve_inst opcode, carve_inst f3, carve_inst f7, carve_inst rd, carve_inst rs1, carve_inst rs2);
+CARVE_API carve_inst carve_makeI(carve_inst opcode, carve_inst f3, carve_inst rd, carve_inst rs1, carve_inst imm);
+CARVE_API carve_inst carve_makeU(carve_inst opcode, carve_inst rd, carve_inst imm);
+CARVE_API carve_inst carve_makeJ(carve_inst opcode, carve_inst rd, carve_inst imm);
+CARVE_API carve_inst carve_makeS(carve_inst opcode, carve_inst f3, carve_inst rs1, carve_inst rs2, carve_inst imm);
+CARVE_API carve_inst carve_makeB(carve_inst opcode, carve_inst f3, carve_inst rs1, carve_inst rs2, carve_inst imm);
 
-CARVE_API carve_inst carve_makeRr(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst funct7, carve_inst rs1, carve_inst rs2);
-CARVE_API carve_inst carve_makeIr(carve_inst opcode, carve_inst rd, carve_inst funct3, carve_inst rs1, carve_inst imm);
-CARVE_API carve_inst carve_makeUr(carve_inst opcode, carve_inst rd, carve_inst imm);
-CARVE_API carve_inst carve_makeJr(carve_inst opcode, carve_inst rd, carve_inst imm);
-CARVE_API carve_inst carve_makeSr(carve_inst opcode, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm);
-CARVE_API carve_inst carve_makeBr(carve_inst opcode, carve_inst funct3, carve_inst rs1, carve_inst rs2, carve_inst imm);
+/* Decode instruction of various types, inverse of 'carve_make*'
+ */
+#define CARVE_DEC_R(_inst, _opcode, _f3, _f7, _rd, _rs1, _rs2) do { \
+    CARVE_DEC_FIELD(_inst, _opcode, 0, 7)   \
+    CARVE_DEC_FIELD(_inst, _f3, 12, 15)     \
+    CARVE_DEC_FIELD(_inst, _f7, 25, 32)     \
+    CARVE_DEC_FIELD(_inst, _rd, 7, 12)      \
+    CARVE_DEC_FIELD(_inst, _rs1, 15, 20)    \
+    CARVE_DEC_FIELD(_inst, _rs2, 20, 25)    \
+} while (0)
+
+#define CARVE_DEC_I(_inst, _opcode, _f3, _rd, _rs1, _imm) do { \
+    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
+    CARVE_DEC_FIELD(_inst, _rd, 7, 12) \
+    CARVE_DEC_FIELD(_inst, _f3, 12, 15) \
+    CARVE_DEC_FIELD(_inst, _rs1, 15, 20) \
+    carve_inst _t; \
+    CARVE_DEC_FIELD(_inst, _t, 20, 32) \
+    _imm = _t; \
+} while (0)
+
+#define CARVE_DEC_U(_inst, _opcode, _rd, _imm) do { \
+    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
+    CARVE_DEC_FIELD(_inst, _rd, 7, 12) \
+    carve_inst _t; \
+    CARVE_DEC_FIELD(_inst, _t, 12, 32) \
+    _imm = _t << 12; \
+} while (0)
+
+#define CARVE_DEC_S(_inst, _opcode, _f3, _rs1, _rs2, _imm) do { \
+    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
+    CARVE_DEC_FIELD(_inst, _f3, 12, 15) \
+    CARVE_DEC_FIELD(_inst, _rs1, 15, 20) \
+    CARVE_DEC_FIELD(_inst, _rs2, 20, 25) \
+    carve_inst _t0, _t1; \
+    CARVE_DEC_FIELD(_inst, _t0, 7, 12) \
+    CARVE_DEC_FIELD(_inst, _t1, 25, 32) \
+    _imm = (_t0) | (_t1 << 5); \
+} while (0)
+
+#define CARVE_DEC_B(_inst, _opcode, _f3, _rs1, _rs2, _imm) do { \
+    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
+    CARVE_DEC_FIELD(_inst, _f3, 12, 15) \
+    CARVE_DEC_FIELD(_inst, _rs1, 15, 20) \
+    CARVE_DEC_FIELD(_inst, _rs2, 20, 25) \
+    carve_inst _t0, _t1, _t2, _t3; \
+    CARVE_DEC_FIELD(_inst, _t0, 8, 12) \
+    CARVE_DEC_FIELD(_inst, _t1, 25, 31) \
+    CARVE_DEC_FIELD(_inst, _t2, 7, 8) \
+    CARVE_DEC_FIELD(_inst, _t3, 31, 32) \
+    _imm = (_t0 << 1) | (_t1 << 5) | (_t2 << 11) | (_t3 << 12); \
+} while (0)
+
+#define CARVE_DEC_J(_inst, _opcode, _rd, _imm) do { \
+    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
+    CARVE_DEC_FIELD(_inst, _rd, 7, 12) \
+    carve_inst _t0, _t1, _t2, _t3; \
+    CARVE_DEC_FIELD(_inst, _t0, 21, 31) \
+    CARVE_DEC_FIELD(_inst, _t1, 20, 21) \
+    CARVE_DEC_FIELD(_inst, _t2, 12, 20) \
+    CARVE_DEC_FIELD(_inst, _t3, 31, 32) \
+    _imm = (_t0 << 1) | (_t1 << 11) | (_t2 << 12) | (_t3 << 20); \
+} while (0)
+
+
+
 
 /* Replace 'inst's immediate with 'imm', and return it
  * Suffix (I, U, J, ...) is the type of instruction 'inst' is
@@ -226,70 +294,10 @@ CARVE_API carve_inst carve_newimmJ(carve_inst inst, carve_inst imm);
 CARVE_API carve_inst carve_newimmS(carve_inst inst, carve_inst imm);
 CARVE_API carve_inst carve_newimmB(carve_inst inst, carve_inst imm);
 
-/* Decode specific field from bit '_i' (inclusive) to '_j' (exclusive)
- */
-#define CARVE_DEC_FIELD(_inst, _to, _i, _j) do { \
-    (_to) = ((_inst) & CARVE_MASK(_i, _j)) >> (_i); \
-} while (0);
 
-/* Decode instruction, inverse of 'carve_make*'
- *
- */
-#define CARVE_DEC_R(_inst, _opcode, _rd, _funct3, _rs1, _rs2, _funct7) do { \
-    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
-    CARVE_DEC_FIELD(_inst, _rd, 7, 12) \
-    CARVE_DEC_FIELD(_inst, _funct3, 12, 15) \
-    CARVE_DEC_FIELD(_inst, _rs1, 15, 20) \
-    CARVE_DEC_FIELD(_inst, _rs2, 20, 25) \
-    CARVE_DEC_FIELD(_inst, _funct7, 25, 32) \
-} while (0)
-
-#define CARVE_DEC_I(_inst, _opcode, _rd, _funct3, _rs1, _imm_11_0) do { \
-    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
-    CARVE_DEC_FIELD(_inst, _rd, 7, 12) \
-    CARVE_DEC_FIELD(_inst, _funct3, 12, 15) \
-    CARVE_DEC_FIELD(_inst, _rs1, 15, 20) \
-    CARVE_DEC_FIELD(_inst, _imm_11_0, 20, 32) \
-} while (0)
-
-#define CARVE_DEC_U(_inst, _opcode, _rd, _imm_31_12) do { \
-    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
-    CARVE_DEC_FIELD(_inst, _rd, 7, 12) \
-    CARVE_DEC_FIELD(_inst, _imm_31_12, 12, 32) \
-} while (0)
-
-#define CARVE_DEC_S(_inst, _opcode, _imm_4_0, _funct3, _rs1, _rs2, _imm_11_5) do { \
-    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
-    CARVE_DEC_FIELD(_inst, _imm_4_0, 7, 12) \
-    CARVE_DEC_FIELD(_inst, _funct3, 12, 15) \
-    CARVE_DEC_FIELD(_inst, _rs1, 15, 20) \
-    CARVE_DEC_FIELD(_inst, _rs2, 20, 25) \
-    CARVE_DEC_FIELD(_inst, _imm_11_5, 25, 32) \
-} while (0)
-
-#define CARVE_DEC_B(_inst, _opcode, __11, _imm_4_1, _funct3, _rs1, _rs2, _imm_10_5, __12) do { \
-    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
-    CARVE_DEC_FIELD(_inst, __11, 7, 8) \
-    CARVE_DEC_FIELD(_inst, _imm_4_1, 8, 12) \
-    CARVE_DEC_FIELD(_inst, _funct3, 12, 15) \
-    CARVE_DEC_FIELD(_inst, _rs1, 15, 20) \
-    CARVE_DEC_FIELD(_inst, _rs2, 20, 25) \
-    CARVE_DEC_FIELD(_inst, _imm_10_5, 25, 31) \
-    CARVE_DEC_FIELD(_inst, __12, 31, 32) \
-} while (0)
-
-#define CARVE_DEC_J(_inst, _opcode, _rd, _imm_19_12, __11, _imm_10_1, __20) do { \
-    CARVE_DEC_FIELD(_inst, _opcode, 0, 7) \
-    CARVE_DEC_FIELD(_inst, _rd, 7, 12) \
-    CARVE_DEC_FIELD(_inst, _imm_19_12, 12, 20) \
-    CARVE_DEC_FIELD(_inst, __11, 20, 21) \
-    CARVE_DEC_FIELD(_inst, _imm_10_1, 21, 31) \
-    CARVE_DEC_FIELD(_inst, __20, 31, 32) \
-} while (0)
 
 
 /* Returns tne opcode associated with an instruction
- *
  */
 CARVE_API carve_inst carve_get_opcode(carve_inst inst);
 

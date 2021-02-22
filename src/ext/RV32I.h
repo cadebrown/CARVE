@@ -3,8 +3,8 @@
  * @author: Cade Brown <cade@utk.edu>
  */
 
-#ifndef EXT_RV32_H__
-#define EXT_RV32_H__
+#ifndef EXT_RV32I_H__
+#define EXT_RV32I_H__
 
 #define CARVE_lui(rd, imm) do { \
     if (rd != 0) { \
@@ -68,11 +68,7 @@
 } while (0)
 
 #define CARVE_lb(rd, rs1, imm) do { \
-    if (REGU(rs1) + imm == 1) { \
-        /* If loading from address 0x1, we have a little suprise... */ \
-        fprintf(stderr, "atheism\n"); \
-    } else if (REGU(rs1) + imm == 420) { \
-        /* If loading from address 0x1, we have a little suprise... */ \
+    if (REGU(rs1) + imm == 0x1A4) { \
         STATE->easteregg = 1; \
     } \
     if (rd != 0) { \
@@ -170,64 +166,64 @@
     } \
 } while (0)
 
-#define CARVE_add(rd, rs1, imm) do { \
+#define CARVE_add(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGU(rs1) + REGU(rs2); \
     } \
 } while (0)
 
-#define CARVE_sub(rd, rs1, imm) do { \
+#define CARVE_sub(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGU(rs1) - REGU(rs2); \
     } \
 } while (0)
 
-#define CARVE_sll(rd, rs1, imm) do { \
+#define CARVE_sll(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGU(rs1) << REGU(rs2); \
     } \
 } while (0)
 
-#define CARVE_srl(rd, rs1, imm) do { \
+#define CARVE_srl(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGU(rs1) >> REGU(rs2); \
     } \
 } while (0)
 
-#define CARVE_sra(rd, rs1, imm) do { \
+#define CARVE_sra(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGU(rs1) >> REGU(rs2); \
     } \
 } while (0)
 
-#define CARVE_slt(rd, rs1, imm) do { \
+#define CARVE_slt(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGS(rs1) < REGS(rs2); \
     } \
 } while (0)
 
-#define CARVE_sltu(rd, rs1, imm) do { \
+#define CARVE_sltu(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGU(rs1) < REGU(rs2); \
     } \
 } while (0)
 
-#define CARVE_xor(rd, rs1, imm) do { \
+#define CARVE_xor(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGU(rs1) ^ REGU(rs2); \
     } \
 } while (0)
 
-#define CARVE_or(rd, rs1, imm) do { \
+#define CARVE_or(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGU(rs1) | REGU(rs2); \
     } \
 } while (0)
 
-#define CARVE_and(rd, rs1, imm) do { \
+#define CARVE_and(rd, rs1, rs2) do { \
     if (rd != 0) { \
         REGU(rd) = REGU(rs1) & REGU(rs2); \
     } \
 } while (0)
 
-#endif /* EXT_RV32__ */
+#endif /* EXT_RV32I__ */

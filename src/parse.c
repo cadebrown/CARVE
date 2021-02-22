@@ -10,109 +10,6 @@
 
 #include "carve.h"
 
-/* Instruction description */
-struct instdesc {
-
-    /* Name of instruction (lowercase) */
-    char* name;
-    int nname;
-
-    /* Kind of instruction, 'R', 'I', 'S', ..., 'y' */
-    char kind;
-
-    /* Used per different kind of instruction */
-    carve_inst opcode, f3, f7;
-
-};
-
-
-
-/* Database of instructions */
-
-static int I_ninsts = 40;
-static struct instdesc I_insts[40] = {
-
-
-    (struct instdesc) { "add", 3, 'R', 51, 0, 0 },
-    (struct instdesc) { "addi", 4, 'I', 19, 0, 0 },
-    (struct instdesc) { "and", 3, 'R', 51, 7, 0 },
-    (struct instdesc) { "andi", 4, 'I', 19, 7, 0 },
-    (struct instdesc) { "auipc", 5, 'U', 55, 0, 0 },
-    (struct instdesc) { "beq", 3, 'B', 99, 0, 0 },
-    (struct instdesc) { "bge", 3, 'B', 99, 5, 0 },
-    (struct instdesc) { "bgeu", 4, 'B', 99, 7, 0 },
-    (struct instdesc) { "blt", 3, 'B', 99, 4, 0 },
-    (struct instdesc) { "bltu", 4, 'B', 99, 6, 0 },
-    (struct instdesc) { "bne", 3, 'B', 99, 1, 0 },
-    (struct instdesc) { "ebreak", 6, 'y', 0, 0, 0 },
-    (struct instdesc) { "ecall", 5, 'y', 0, 0, 0 },
-    (struct instdesc) { "fence", 5, 'y', 0, 0, 0 },
-    (struct instdesc) { "jal", 3, 'J', 111, 0, 0 },
-    (struct instdesc) { "jalr", 4, 'I', 103, 0, 0 },
-    (struct instdesc) { "lb", 2, 'I', 3, 0, 0 },
-    (struct instdesc) { "lbu", 3, 'I', 3, 4, 0 },
-    (struct instdesc) { "lh", 2, 'I', 3, 1, 0 },
-    (struct instdesc) { "lhu", 3, 'I', 3, 5, 0 },
-    (struct instdesc) { "lui", 3, 'U', 55, 0, 0 },
-    (struct instdesc) { "lw", 2, 'I', 3, 2, 0 },
-    (struct instdesc) { "or", 2, 'R', 51, 6, 0 },
-    (struct instdesc) { "ori", 3, 'I', 19, 6, 0 },
-    (struct instdesc) { "sb", 2, 'S', 35, 0, 0 },
-    (struct instdesc) { "sh", 2, 'S', 35, 1, 0 },
-    (struct instdesc) { "sll", 3, 'R', 51, 1, 0 },
-    (struct instdesc) { "slli", 4, 'I', 19, 1, 0 },
-    (struct instdesc) { "slt", 3, 'R', 51, 2, 0 },
-    (struct instdesc) { "slti", 4, 'I', 19, 2, 0 },
-    (struct instdesc) { "sltiu", 5, 'I', 19, 3, 0 },
-    (struct instdesc) { "sltu", 4, 'R', 51, 3, 0 },
-    (struct instdesc) { "sra", 3, 'R', 51, 5, 16 },
-    (struct instdesc) { "srai", 4, 'I', 19, 5, 0 },
-    (struct instdesc) { "srl", 3, 'R', 51, 5, 0 },
-    (struct instdesc) { "srli", 4, 'I', 19, 5, 0 },
-    (struct instdesc) { "sub", 3, 'R', 51, 0, 32 },
-    (struct instdesc) { "sw", 2, 'S', 35, 2, 0 },
-    (struct instdesc) { "xor", 3, 'R', 51, 4, 0 },
-    (struct instdesc) { "xori", 4, 'I', 19, 4, 0 },
-
-
-};
-
-/* Retrieve instruction information */
-static struct instdesc* getinst(char* src, int len) {
-    int l = 0, r = I_ninsts - 1, m;
-    while (l <= r) {
-        m = (l + r) / 2;
-
-        /* Key we are comparing to */
-        int nname = I_insts[m].nname;
-        char* name = I_insts[m].name;
-
-        int cmp = 0;
-        
-        if (len == nname) {
-            cmp = strncmp(src, name, nname);
-        } else {
-            int minl = len < nname ? len : nname;
-            cmp = strncmp(src, name, minl);
-            if (cmp == 0) {
-                cmp = len - nname;
-            }
-        }
-
-        if (cmp == 0) {
-            return &I_insts[m];
-        } else if (cmp > 0) {
-            l = m + 1;
-        } else {
-            r = m - 1;
-        }
-    }
-
-    /* Not-found */
-    return NULL;
-}
-
-
 
 /* Easy-to-use macros, for pointer parameters */
 #define ntoks (*ntoksp)
@@ -583,7 +480,7 @@ bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, s
                  * <ident> args* \n
                  */
 
-                struct instdesc* id = getinst(prog->src + t.pos, t.len);
+                struct carve_instdesc* id = carve_getinst(prog->src + t.pos, t.len);
                 if (!id) {
                     fprintf(stderr, "Unknown instruction\n");
                     carve_printcontext(prog->fname, prog->src, t);

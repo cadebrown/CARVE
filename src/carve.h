@@ -100,6 +100,22 @@ typedef  int64_t carve_sint;
 typedef uint32_t carve_inst;
 
 
+/* Instruction description */
+struct carve_instdesc {
+
+    /* Name of instruction (lowercase) */
+    char* name;
+    int nname;
+
+    /* Kind of instruction, 'R', 'I', 'S', ..., 'y' */
+    char kind;
+
+    /* Used per different kind of instruction */
+    carve_inst opcode, f3, f7;
+
+};
+
+
 /* carve_state - Current emulator state of RISC-V abstract machine
  *
  */
@@ -307,6 +323,9 @@ CARVE_API carve_inst carve_newimmS(carve_inst inst, carve_inst imm);
 CARVE_API carve_inst carve_newimmB(carve_inst inst, carve_inst imm);
 
 
+/* Gets an instruction descriptor for the instruction 'src'
+ */
+CARVE_API struct carve_instdesc* carve_getinst(char* src, int len);
 
 
 /* Returns tne opcode associated with an instruction

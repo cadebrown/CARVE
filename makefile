@@ -24,7 +24,7 @@ DEFS         += $(foreach x,$(RISCV),-D$(x))
 
 # -*- Files -*-
 
-src_C        := $(wildcard src/*.c)
+src_C        := $(filter-out src/execinst.c src/getinst.c,$(wildcard src/*.c)) src/execinst.c src/getinst.c
 src_H        := $(wildcard src/*.h) 
 
 # -*- Outputs -*-
@@ -51,6 +51,10 @@ update: build/libcarve.js build/libcarve.wasm
 
 src/execinst.c: tools/genexecinst.py tools/riscvdata.py
 	$< > $@
+
+src/getinst.c: tools/gengetinst.py tools/riscvdata.py
+	$< > $@
+
 
 $(carve_SHARED): $(src_O) src/pre.js
 	@mkdir -p $(dir $@)

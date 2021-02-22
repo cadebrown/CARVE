@@ -15,6 +15,12 @@ EMCC         := emcc
 # Emscripten compiler options
 EMCC_CFLAGS  := -sASSERTIONS=1 -sSAFE_HEAP=1 -sDEMANGLE_SUPPORT=1
 
+# RISC-V extensions
+RISCV        ?= RV32I
+
+# Defines
+DEFS         += $(foreach x,$(RISCV),-D$(x))
+
 
 # -*- Files -*-
 
@@ -43,6 +49,9 @@ update: build/libcarve.js build/libcarve.wasm
 	cp build/libcarve.js docs/js/lib
 	cp build/libcarve.wasm docs/js/lib
 
+src/execinst.c: tools/genexecinst.py tools/riscvdata.py
+	$< > $@
+
 $(carve_SHARED): $(src_O) src/pre.js
 	@mkdir -p $(dir $@)
 	$(EMCC) \
@@ -57,4 +66,4 @@ $(carve_SHARED): $(src_O) src/pre.js
 
 build/%.o: %.c $(src_H)
 	@mkdir -p $(dir $@)
-	$(EMCC) $(EMCC_CFLAGS) $< -c -fPIC -o $@
+	$(EMCC) $(EMCC_CFLAGS) $(DEFS) -Isrc $< -c -fPIC -o $@

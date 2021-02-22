@@ -15,8 +15,9 @@ def get_kind(name):
 
     raise KeyError(name)
 
+exts = {
 
-insts = [
+'RV32I': [
     # (name, kind, opcode, f3, f7)
     ('lui',    'U',  0b0110111,  0b000,  0b0000000),
     ('auipc',  'U',  0b0010111,  0b000,  0b0000000),
@@ -58,5 +59,8 @@ insts = [
     #('fence',  'y',  0b0000000,  0b000,  0b0000000),
     #('ecall',  'y',  0b0000000,  0b000,  0b0000000),
     #('ebreak', 'y',  0b0000000,  0b000,  0b0000000),
-]
+],
+}
 
+# List of all instructions
+insts = sum((exts[k] for k in exts), [])

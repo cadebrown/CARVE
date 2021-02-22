@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-""" genexec.ks - Generate execution code for CSV description of instructions
+""" genexecinst.ks - Generate function to execute a single RISC-V instruction
 
-$ ./tools/genexec.py
+$ ./tools/genexecinst.py > src/execinst.c
 
 You can copy that and put it in 'src/exec.c'
 
@@ -24,66 +24,80 @@ Find a tree that is keyed on:
 
 And then generate a nested switch/case
 
-
 """
 
 
 # Tree showing how to decode instructions
 tree = {}
-# Opcode to kinds
+
+# Mapping of opcodes to '(extension, instkind)'
 kinds = {}
-for (name, kind, opcode, f3, f7) in riscvdata.insts:
-    if opcode not in tree:
-        # May be reset to just the name of an instruction
-        tree[opcode] = {}
-        kinds[opcode] = kind
-    
-    if kind == 'R':
-        # Use f3 and f7
-        if f3 not in tree[opcode]:
-            tree[opcode][f3] = {
-            }
 
-        # Shouldn't have two exact matches
-        assert f7 not in tree[opcode][f3]
+for ext in riscvdata.exts:
+    for (name, kind, opcode, f3, f7) in riscvdata.exts[ext]:
+        if opcode not in tree:
+            # May be reset to just the name of an instruction
+            tree[opcode] = {}
+            kinds[opcode] = (ext, kind)
+        
+        if kind == 'R':
+            # Use f3 and f7
+            if f3 not in tree[opcode]:
+                tree[opcode][f3] = {}
 
-        # Leaf node of the instruction
-        tree[opcode][f3][f7] = name
-    elif kind == 'I':
-        # Shouldn't have two exact matches
-        assert f3 not in tree[opcode]
+            # Shouldn't have two exact matches
+            assert f7 not in tree[opcode][f3]
 
-        # Leaf node of the instruction
-        tree[opcode][f3] = name
-    elif kind == 'S':
-        # Shouldn't have two exact matches
-        assert f3 not in tree[opcode]
+            # Leaf node of the instruction
+            tree[opcode][f3][f7] = name
+        elif kind == 'I':
+            # Shouldn't have two exact matches
+            assert f3 not in tree[opcode]
 
-        # Leaf node of the instruction
-        tree[opcode][f3] = name
-    elif kind == 'B':
-        # Shouldn't have two exact matches
-        assert f3 not in tree[opcode]
+            # Leaf node of the instruction
+            tree[opcode][f3] = name
+        elif kind == 'S':
+            # Shouldn't have two exact matches
+            assert f3 not in tree[opcode]
 
-        # Leaf node of the instruction
-        tree[opcode][f3] = name
-    elif kind == 'J':
-        # Neither
+            # Leaf node of the instruction
+            tree[opcode][f3] = name
+        elif kind == 'B':
+            # Shouldn't have two exact matches
+            assert f3 not in tree[opcode]
 
-        # Leaf node of the instruction
-        tree[opcode] = name
-    elif kind == 'U':
-        # Neither
+            # Leaf node of the instruction
+            tree[opcode][f3] = name
+        elif kind == 'J':
+            # Neither
 
-        # Leaf node of the instruction
-        tree[opcode] = name
-    else:
-        raise Exception('Unknown kind: ' + repr(kind))
+            # Leaf node of the instruction
+            tree[opcode] = name
+        elif kind == 'U':
+            # Neither
 
-print (tree)
+            # Leaf node of the instruction
+            tree[opcode] = name
+        else:
+            raise Exception('Unknown kind: ' + repr(kind))
 
 
-print(f"""static inline void exec_inst(carve_state s, carve_inst inst) {{
+print(f"""/* execinst.c - Generated file that defines executing RISC-V instructions
+ *  
+ * ** THIS IS A GENERATED FILE, DO NOT EDIT ** 
+ */
+
+#include "ext/common.h"
+
+""")
+
+for ext in riscvdata.exts:
+    print(f"""#ifdef {ext}
+  #include "ext/{ext}.h"
+#endif /* {ext} */
+""")
+
+print(f"""void carve_execinst(carve_state s, carve_inst inst) {{
     carve_inst opcode, f3, f7, rd, rs1, rs2, imm;    
     switch (opcode = inst & 0x7F) {{""")
 
@@ -112,7 +126,8 @@ for opcode in tree:
     print(f"""        case {hex(opcode)}:""")
     if isinstance(val, dict):
         # 'val' is subtree, keyed on 'f3'
-        kind = kinds[opcode]
+        ext, kind = kinds[opcode]
+
         if kind == 'R':
             print(f"""            CARVE_DEC_R(inst, opcode, f3, f7, rd, rs1, rs2);""")
         elif kind == 'I':
@@ -139,16 +154,24 @@ for opcode in tree:
                 for f7 in val_:
                     val__ = val_[f7]
                     print(f"""                        case {hex(f7)}:""")
+                    print(f"""                          #ifdef {ext}""")
                     print(f"""                            /* {val__} */""")
                     print(f"""                            {output_exec(val__)}""")
-                    print(f"""                        break;""")
+                    print(f"""                          #else""")
+                    print(f"""                            HALT("unsupported instruction '{val__}' (extension {ext} not supported)"); """)
+                    print(f"""                          #endif /* {ext} */""")
+                    print(f"""                            break;""")
 
                 print(f"""                    }}""")
 
             else:
                 # 'val_' is a instruction
+                print(f"""                  #ifdef {ext}""")
                 print(f"""                    /* {val_} */""")
                 print(f"""                    {output_exec(val_)}""")
+                print(f"""                  #else""")
+                print(f"""                    HALT("unsupported instruction '{val_}' (extension {ext} not supported)"); """)
+                print(f"""                  #endif /* {ext} */""")
 
             print(f"""                    break;""")
 
@@ -170,10 +193,13 @@ for opcode in tree:
         elif kind == 'J':
             print(f"""            CARVE_DEC_J(inst, opcode, rd, imm);""")
         print(f"""            /* {val} */""")
+        print(f"""          #ifdef {ext}""")
         print(f"""            {output_exec(val)}""")
+        print(f"""          #else""")
+        print(f"""             HALT("unsupported instruction '{val}' (extension {ext} not supported)"); """)
+        print(f"""          #endif /* {ext} */""")
 
     print(f"""            break;""")
 
 print(f"    }}")
 print(f"}}")
-

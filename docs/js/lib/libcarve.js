@@ -4346,6 +4346,9 @@ var ___wasm_call_ctors = Module["___wasm_call_ctors"] = createExportWrapper("__w
 var _carve_exec = Module["_carve_exec"] = createExportWrapper("carve_exec");
 
 /** @type {function(...*):?} */
+var _carve_execinst = Module["_carve_execinst"] = createExportWrapper("carve_execinst");
+
+/** @type {function(...*):?} */
 var _carve_makeR = Module["_carve_makeR"] = createExportWrapper("carve_makeR");
 
 /** @type {function(...*):?} */
@@ -4389,6 +4392,9 @@ var _carve_state_new = Module["_carve_state_new"] = createExportWrapper("carve_s
 
 /** @type {function(...*):?} */
 var _malloc = Module["_malloc"] = createExportWrapper("malloc");
+
+/** @type {function(...*):?} */
+var _carve_easteregg = Module["_carve_easteregg"] = createExportWrapper("carve_easteregg");
 
 /** @type {function(...*):?} */
 var _carve_state_sri = Module["_carve_state_sri"] = createExportWrapper("carve_state_sri");

@@ -114,12 +114,6 @@ static struct instdesc* getinst(char* src, int len) {
 
 
 
-
-
-
-
-
-
 /* Easy-to-use macros, for pointer parameters */
 #define ntoks (*ntoksp)
 #define toks (*toksp)

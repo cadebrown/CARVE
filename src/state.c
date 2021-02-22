@@ -13,7 +13,14 @@ carve_state carve_state_new() {
         self->x[i] = 0;
     }
 
+    self->easteregg = 0;
+
     return self;
+}
+int carve_easteregg(carve_state s) {
+    int res = s->easteregg;
+    s->easteregg = 0;
+    return res;
 }
 
 #define MAXBUF 100

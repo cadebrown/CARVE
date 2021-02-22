@@ -45,8 +45,6 @@
 
 
 
-
-
 /** Constants **/
 
 
@@ -102,7 +100,6 @@ typedef  int64_t carve_sint;
 typedef uint32_t carve_inst;
 
 
-
 /* carve_state - Current emulator state of RISC-V abstract machine
  *
  */
@@ -113,6 +110,21 @@ typedef struct carve_state_s {
 
     /* Program counter */
     carve_int pc;
+
+    /* If this is given, something really bad happened... 
+     * 
+     * Alan Turing wants to
+     *   ___
+     *  / O \
+     *  \   /    know your location
+     *   | |
+     *    V
+     * 
+     */
+    bool is_halted;
+
+    /* Current easter egg activated... This is just for fun */
+    int easteregg;
 
 }* carve_state;
 
@@ -310,9 +322,18 @@ CARVE_API void carve_init();
  */
 CARVE_API carve_state carve_state_new();
 
+/* Get easter egg from state
+ */
+CARVE_API int carve_easteregg(carve_state s);
+
 /* Execute a program
  */
 CARVE_API int carve_exec(carve_state s, carve_prog p);
+
+/* Executes a single instruction applied to a state 's'
+ */
+CARVE_API void carve_execinst(carve_state s, carve_inst inst);
+
 
 /* SRI -> Returns a string describing integer register 'xi' in base 'base'
  * NOTE: must call 'free(res)' 

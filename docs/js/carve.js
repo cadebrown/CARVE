@@ -107,6 +107,14 @@ function selregtable(elem, val) {
     genregtable(elem, REG_TAB[val], val)
 }
 
+function doeasteregg(num) {
+    if (num == 1) {
+        var audio = new Audio('/assets/google_sound1.mp3');
+        audio.play();
+    }
+
+}
+
 /* Inspired by w3 schools lesson                          */
 /* https://www.w3schools.com/howto/howto_js_draggable.asp */
 
@@ -204,6 +212,12 @@ function compile() {
     var prog = libcarve._carve_prog_new(_fname, _src)
 
     libcarve._carve_exec(state, prog)
+
+    var ee = libcarve._carve_easteregg(state);
+    if (ee != 0) {
+        doeasteregg(ee)
+    }
+
 
     update_registers(state)
 

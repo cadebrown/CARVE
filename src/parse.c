@@ -1,8 +1,4 @@
-/* parse.c - AUTO GENERATED parsing code for RISC-V assembler
- *
- * DO NOT EDIT -- rerun the generator script
- *
- * Generated at 2021-02-01 23:09:26.592765
+/* parse.c - parsing code for RISC-V assembler
  *
  * @author: Gregory Croisdale <greg@kscript.org>
  * @author: Cade Brown <cade@kscript.org>
@@ -49,7 +45,6 @@ static bool my_isident_m(int c) {
 
 
 /** Lexer (splits into tokens) **/
-
 bool carve_lex(const char* fname, const char* src, int* ntoksp, carve_tok** toksp) {
     int pos = 0, sl = strlen(src);
     int line = 0, col = 0;
@@ -80,71 +75,92 @@ bool carve_lex(const char* fname, const char* src, int* ntoksp, carve_tok** toks
         sline = line;
         scol = col;
         spos = pos;
-        if (c == '\n') {
-            ADV();
-            ADD(CARVE_TOK_NEWLINE);
-        } else if (c == ';') {
-            do {
-                ADV();
-            } while (pos < sl && src[pos] != '\n');
-        } else if (c == ' ' || c == '\t' || c == '\r') {
-            ADV();
-        } else if (c == '.') {
-            ADV();
-            ADD(CARVE_TOK_DOT);
-        } else if (c == ':') {
-            ADV();
-            ADD(CARVE_TOK_COL);
-        } else if (c == ',') {
-            ADV();
-            ADD(CARVE_TOK_COM);
-        } else if (c == '+') {
-            ADV();
-            ADD(CARVE_TOK_ADD);
-        } else if (c == '-') {
-            ADV();
-            ADD(CARVE_TOK_SUB);
-        } else if (c == '(') {
-            ADV();
-            ADD(CARVE_TOK_LPAR);
-        } else if (c == ')') {
-            ADV();
-            ADD(CARVE_TOK_RPAR);
-        } else if (my_isident_s(c)) {
-            /* Match regex:
-             * [a-zA-Z_][a-zA-Z0-9_]*
-             */
-            do {
-                ADV();
-            } while (pos < sl && my_isident_m(src[pos]));
+        switch (c) {
+            /* match comments */
+            case '#': {
+                do {
+                    ADV();
+                } while (pos < sl && src[pos] != '\n');
+            } break;
 
-            ADD(CARVE_TOK_IDENT);
-        } else if (my_isdigit(c, 10)) {
-            /* Match regex:
-             * [0-9]+
-             * 0[xX][0-9a-fA-F]+
-             */
-
-            int base = 10;
-
-            /* 0[xX] prefix for base 16 */
-            if (pos+1 < sl && src[pos+1] == 'x' || src[pos+1] == 'X') {
+            /* ignore whitespace */
+            case ' ': case '\t': case '\r': {
                 ADV();
-                ADV();
-                base = 16;
-            }
+            } break;
 
-            do {
+            /* single char matching */
+            case '\n': {
                 ADV();
-            } while (pos < sl && my_isdigit(src[pos], base));
+                ADD(CARVE_TOK_NEWLINE);
+            } break;
+            case '.': {
+                ADV();
+                ADD(CARVE_TOK_DOT);
+            } break;
+            case ':': {
+                ADV();
+                ADD(CARVE_TOK_COL);
+            } break;
+            case ',': {
+                ADV();
+                ADD(CARVE_TOK_COM);
+            } break;
+            case '+': {
+                ADV();
+                ADD(CARVE_TOK_ADD);
+            } break;
+            case '-': {
+                ADV();
+                ADD(CARVE_TOK_SUB);
+            } break;
+            case '(': {
+                ADV();
+                ADD(CARVE_TOK_LPAR);
+            } break;
+            case ')': {
+                ADV();
+                ADD(CARVE_TOK_RPAR);
+            } break;
 
-            ADD(CARVE_TOK_INT);
-        } else {
-            /* Unknown character */
-            ADD(CARVE_TOK_IDENT);
-            fprintf(stderr, "Unexpected character: '%c'\n", c);
-            carve_printcontext(fname, src, toks[ntoks - 1]);
-            return false;
+            /* ident / const matching */
+            default: {
+                if (my_isident_s(c)) {
+                    /* Match regex:
+                    * [a-zA-Z_][a-zA-Z0-9_]*
+                    */
+                    do {
+                        ADV();
+                    } while (pos < sl && my_isident_m(src[pos]));
+
+                    ADD(CARVE_TOK_IDENT);
+                } else if (my_isdigit(c, 10)) {
+                    /* Match regex:
+                    * [0-9]+
+                    * 0[xX][0-9a-fA-F]+
+                    */
+
+                    int base = 10;
+
+                    /* 0[xX] prefix for base 16 */
+                    if (pos+1 < sl && src[pos+1] == 'x' || src[pos+1] == 'X') {
+                        ADV();
+                        ADV();
+                        base = 16;
+                    }
+
+                    do {
+                        ADV();
+                    } while (pos < sl && my_isdigit(src[pos], base));
+
+                    ADD(CARVE_TOK_INT);
+                } else {
+                    /* Unknown character */
+                    ADD(CARVE_TOK_IDENT);
+                    fprintf(stderr, "Unexpected character: '%c'\n", c);
+                    carve_printcontext(fname, src, toks[ntoks - 1]);
+                    return false;
+                }
+            } break;
         }
     }
 
@@ -487,39 +503,46 @@ bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, s
                     return false;
                 }
 
-                if (id->kind == 'R') {
-                    if (!parse_R(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode, id->f3, id->f7)) {
+                switch (id->kind) {
+                    case 'R': {
+                        if (!parse_R(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode, id->f3, id->f7)) {
+                            return false;
+                        }
+                    } break;
+                    case 'I': {
+                        if (!parse_I(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode, id->f3)) {
+                            return false;
+                        }
+                    } break;
+                    case 'S': {
+                        if (!parse_S(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode, id->f3)) {
+                            return false;
+                        }
+                    } break;
+                    case 'B': {
+                        if (!parse_B(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode, id->f3)) {
+                            return false;
+                        }
+                    } break;
+                    case 'U': {
+                        if (!parse_U(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode)) {
+                            return false;
+                        }
+                    } break;
+                    case 'J': {
+                        if (!parse_J(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode)) {
+                            return false;
+                        }
+                    } break;
+                    default: {
+                        fprintf(stderr, "TODO: Instruction type not implemented!\n");
+                        carve_printcontext(prog->fname, prog->src, t);
                         return false;
-                    }
-                } else if (id->kind == 'I') {
-                    if (!parse_I(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode, id->f3)) {
-                        return false;
-                    }
-                } else if (id->kind == 'S') {
-                    if (!parse_S(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode, id->f3)) {
-                        return false;
-                    }
-                } else if (id->kind == 'B') {
-                    if (!parse_B(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode, id->f3)) {
-                        return false;
-                    }
-                } else if (id->kind == 'U') {
-                    if (!parse_U(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode)) {
-                        return false;
-                    }
-                } else if (id->kind == 'J') {
-                    if (!parse_J(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode)) {
-                        return false;
-                    }
-                } else {
-                    fprintf(stderr, "TODO: We haven't implemented this instruction!\n");
-                    carve_printcontext(prog->fname, prog->src, t);
-                    return false;
+                    } break;
                 }
             }
         } else if (t.kind == CARVE_TOK_DOT) {
-            /* Directive
-             */
+            /* Directive */
         } else if (t.kind == CARVE_TOK_NEWLINE) {
             /* Skip */
         } else {

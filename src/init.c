@@ -20,7 +20,7 @@ int carve_printcontext(const char* fname, const char* src, carve_tok tok) {
 
     /* Find the end of the line */
     int el = tok.pos + 1;
-    while (src[el] != '\0' && src[el + 1] != '\n') {
+    while (src[el] != '\0' && src[el] != '\n') {
         el++;
     }
 

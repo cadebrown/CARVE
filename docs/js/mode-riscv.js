@@ -22,43 +22,12 @@ define("ace/mode/riscv_highlight_rules",["require","exports","module","ace/lib/o
                caseInsensitive: true },
              { token: 'string.assembly', regex: /'([^\\']|\\.)*'/ },
              { token: 'string.assembly', regex: /"([^\\"]|\\.)*"/ },
-             { token: 'support.function.directive.assembly',
-               regex: '^\\[',
-               push: 
-                [ { token: 'support.function.directive.assembly',
-                    regex: '\\]$',
-                    next: 'pop' },
-                  { defaultToken: 'support.function.directive.assembly' } ] },
-             { token: 
-                [ 'support.function.directive.assembly',
-                  'support.function.directive.assembly',
-                  'entity.name.function.assembly' ],
-               regex: '(^struc)( )([_a-zA-Z][_a-zA-Z0-9]*)' },
-             { token: 'support.function.directive.assembly',
-               regex: '^endstruc\\b' },
-            { token: 
-                [ 'support.function.directive.assembly',
-                  'entity.name.function.assembly',
-                  'support.function.directive.assembly',
-                  'constant.character.assembly' ],
-               regex: '^(%macro )([_a-zA-Z][_a-zA-Z0-9]*)( )([0-9]+)' },
-             { token: 'support.function.directive.assembly',
-               regex: '^%endmacro' },
-             { token: 
-                [ 'text',
-                  'support.function.directive.assembly',
-                  'text',
-                  'entity.name.function.assembly' ],
-               regex: '(\\s*)(%define|%xdefine|%idefine|%undef|%assign|%defstr|%strcat|%strlen|%substr|%00|%0|%rotate|%rep|%endrep|%include|\\$\\$|\\$|%unmacro|%if|%elif|%else|%endif|%(?:el)?ifdef|%(?:el)?ifmacro|%(?:el)?ifctx|%(?:el)?ifidn|%(?:el)?ifidni|%(?:el)?ifid|%(?:el)?ifnum|%(?:el)?ifstr|%(?:el)?iftoken|%(?:el)?ifempty|%(?:el)?ifenv|%pathsearch|%depend|%use|%push|%pop|%repl|%arg|%stacksize|%local|%error|%warning|%fatal|%line|%!|%comment|%endcomment|__NASM_VERSION_ID__|__NASM_VER__|__FILE__|__LINE__|__BITS__|__OUTPUT_FORMAT__|__DATE__|__TIME__|__DATE_NUM__|_TIME__NUM__|__UTC_DATE__|__UTC_TIME__|__UTC_DATE_NUM__|__UTC_TIME_NUM__|__POSIX_TIME__|__PASS__|ISTRUC|AT|IEND|BITS 16|BITS 32|BITS 64|USE16|USE32|__SECT__|ABSOLUTE|EXTERN|GLOBAL|COMMON|CPU|FLOAT)\\b( ?)((?:[_a-zA-Z][_a-zA-Z0-9]*)?)',
-               caseInsensitive: true },
-              { token: 'support.function.directive.assembly',
-               regex: '\\b(?:d[bwdqtoy]|res[bwdqto]|equ|times|align|alignb|sectalign|section|ptr|byte|word|dword|qword|incbin)\\b',
-               caseInsensitive: true },
+             { token: 'support.function.directive.assembly', regex: '\\.\\S+' },
              { token: 'entity.name.function.assembly', regex: '^\\s*%%[\\w.]+?:$' },
              { token: 'entity.name.function.assembly', regex: '^\\s*%\\$[\\w.]+?:$' },
              { token: 'entity.name.function.assembly', regex: '^\\s*[\\w.]+?:' },
              { token: 'entity.name.function.assembly', regex: '^\\s*[\\w.]+?\\b' },
-             { token: 'comment.assembly', regex: ';.*$' } ] 
+             { token: 'comment.assembly', regex: '#.*$' } ] 
         };
         
         this.normalizeRules();

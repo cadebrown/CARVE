@@ -540,7 +540,14 @@ bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, s
                         return false;
                     } break;
                 }
+                /* Special cases */
+                if (strcmp(id->name, "srai")) {
+                    /* See: https://stackoverflow.com/questions/39489318/risc-v-implementing-slli-srli-and-srai */
+                    /* We need to set the 30th bit */
+                    prog->inst[prog->ninst - 1] |= 1ULL << 30;
+                }
             }
+
         } else if (t.kind == CARVE_TOK_DOT) {
             /* Directive */
         } else if (t.kind == CARVE_TOK_NEWLINE) {

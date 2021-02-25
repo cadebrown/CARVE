@@ -219,7 +219,7 @@ typedef struct carve_prog_s {
 #define CARVE_FIELD(_val, _i, _j) (carve_inst)(((_val) & CARVE_MASK(0, (_j) - (_i))) << (_i))
 
 /* Sign extent '_val', if the '_sb'th bit is set (the sign bit) */
-#define CARVE_SEXT(_val, _sb) (carve_sint)(((_val) & (1ULL << (_sb))) ? (~CARVE_MASK(0, _sb) | (_val)) : (_val))
+#define CARVE_SEXT(_val, _sb) (carve_sint)(((_val) & (1ULL << (_sb))) ? ((~CARVE_MASK(0, _sb)) | (_val)) : (_val))
 
 /* Decode specific field from bit '_i' (inclusive) to '_j' (exclusive)
  */

@@ -118,6 +118,8 @@ carve_prog carve_prog_new(const char* fname, const char* src) {
             self->inst[back[i].inst] = carve_newimmI(self->inst[back[i].inst], v); 
         } else if (kind == 'J') {
             self->inst[back[i].inst] = carve_newimmJ(self->inst[back[i].inst], v); 
+            carve_inst a, b, c, d;
+            CARVE_DEC_J(self->inst[back[i].inst], a, b, c);
         } else if (kind == 'B') {
             self->inst[back[i].inst] = carve_newimmB(self->inst[back[i].inst], v); 
         } else if (kind == 'S') {
@@ -127,6 +129,7 @@ carve_prog carve_prog_new(const char* fname, const char* src) {
         } else {
             assert(false && "Unexpected instruction type for backpatching");
         }
+
     }
 
     free(back);

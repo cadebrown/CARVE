@@ -10,8 +10,8 @@
 
 /* Database of instructions */
 
-static int I_ninsts = 36;
-static struct carve_instdesc I_insts[36] = {
+static int I_ninsts = 38;
+static struct carve_instdesc I_insts[38] = {
 
     (struct carve_instdesc) { "add", 3, 'R', 51, 0, 0 },
     (struct carve_instdesc) { "addi", 4, 'I', 19, 0, 0 },
@@ -24,6 +24,7 @@ static struct carve_instdesc I_insts[36] = {
     (struct carve_instdesc) { "blt", 3, 'B', 99, 4, 0 },
     (struct carve_instdesc) { "bltu", 4, 'B', 99, 6, 0 },
     (struct carve_instdesc) { "bne", 3, 'B', 99, 1, 0 },
+    (struct carve_instdesc) { "j", 1, 'p', 0, 0, 0 },
     (struct carve_instdesc) { "jal", 3, 'J', 111, 0, 0 },
     (struct carve_instdesc) { "jalr", 4, 'I', 103, 0, 0 },
     (struct carve_instdesc) { "lb", 2, 'I', 3, 0, 0 },
@@ -43,6 +44,7 @@ static struct carve_instdesc I_insts[36] = {
     (struct carve_instdesc) { "sltiu", 5, 'I', 19, 3, 0 },
     (struct carve_instdesc) { "sltu", 4, 'R', 51, 3, 0 },
     (struct carve_instdesc) { "sra", 3, 'R', 51, 5, 16 },
+    (struct carve_instdesc) { "srai", 4, 'I', 19, 5, 0 },
     (struct carve_instdesc) { "srl", 3, 'R', 51, 5, 0 },
     (struct carve_instdesc) { "srli", 4, 'I', 19, 5, 0 },
     (struct carve_instdesc) { "sub", 3, 'R', 51, 0, 32 },
@@ -57,6 +59,7 @@ static struct carve_instdesc I_insts[36] = {
 
 /* Retrieve instruction information */
 struct carve_instdesc* carve_getinst(char* src, int len) {
+    if (len < 0) len = strlen(src);
     int l = 0, r = I_ninsts - 1, m;
     while (l <= r) {
         m = (l + r) / 2;

@@ -470,7 +470,22 @@ static bool parse_J(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
     return true;
 }
 
+static bool parse_p(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, struct carve_backpatch** backp, int* tokip, const char* name) {
+    if (*name == 'j') {
+        /* j offset -> jal x0, offset */
+        int imm;
+        if ((imm = parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'J')) < 0) {
+            return false;
+        }
+        carve_prog_add(prog, carve_makeJ(carve_getinst("jal", -1)->opcode, 0, imm));
+    } else {
+        fprintf(stderr, "Unsupported pseudoinstruction!\n");
+        carve_printcontext(prog->fname, prog->src, toks[toki - 1]);
+        return false;
+    }
 
+    return true;
+}
 
 bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, struct carve_backpatch** backp) {
     /* Current token */
@@ -531,6 +546,11 @@ bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, s
                     } break;
                     case 'J': {
                         if (!parse_J(prog, ntoksp, toksp, nbackp, backp, &i, id->opcode)) {
+                            return false;
+                        }
+                    } break;
+                    case 'p': {
+                        if (!parse_p(prog, ntoksp, toksp, nbackp, backp, &i, id->name)) {
                             return false;
                         }
                     } break;

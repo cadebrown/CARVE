@@ -52,7 +52,8 @@ for ext in riscvdata.exts:
             tree[opcode][f3][f7] = name
         elif kind == 'I':
             # Shouldn't have two exact matches
-            assert f3 not in tree[opcode]
+            if f3 in tree[opcode]:
+                continue
 
             # Leaf node of the instruction
             tree[opcode][f3] = name
@@ -78,6 +79,8 @@ for ext in riscvdata.exts:
 
             # Leaf node of the instruction
             tree[opcode] = name
+        elif kind == 'p':
+            pass
         else:
             raise Exception('Unknown kind: ' + repr(kind))
 

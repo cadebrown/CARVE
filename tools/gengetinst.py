@@ -49,6 +49,7 @@ print(f"""
 
 /* Retrieve instruction information */
 struct carve_instdesc* carve_getinst(char* src, int len) {{
+    if (len < 0) len = strlen(src);
     int l = 0, r = I_ninsts - 1, m;
     while (l <= r) {{
         m = (l + r) / 2;

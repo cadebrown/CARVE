@@ -50,7 +50,7 @@ for ext in riscvdata.exts:
 
             # Leaf node of the instruction
             tree[opcode][f3][f7] = name
-        elif kind == 'I':
+        elif kind == 'I' or kind  == 'y':
             # Shouldn't have two exact matches
             if f3 in tree[opcode]:
                 continue
@@ -81,8 +81,7 @@ for ext in riscvdata.exts:
             tree[opcode] = name
         elif kind == 'p':
             pass
-        elif kind == 'y':
-            tree[opcode] = name
+
 
         else:
             raise Exception('Unknown kind: ' + repr(kind))
@@ -115,7 +114,7 @@ for opcode in tree:
         kind = riscvdata.get_kind(name)
         if kind == 'R':
             res += 'rd, rs1, rs2'
-        elif kind == 'I':
+        elif kind == 'I' or kind == 'y':
             res += 'rd, rs1, imm'
         elif kind == 'U':
             res += 'rd, imm'
@@ -146,6 +145,9 @@ for opcode in tree:
             print(f"""            CARVE_DEC_B(inst, opcode, f3, rs1, rs2, imm);""")
         elif kind == 'J':
             print(f"""            CARVE_DEC_J(inst, opcode, rd, imm);""")
+        elif kind == 'y':
+            # y's are decoded like I's
+            print(f"""            CARVE_DEC_I(inst, opcode, f3, rd, rs1, imm);""")
 
         print(f"""            switch (f3) {{""")
 
@@ -197,6 +199,9 @@ for opcode in tree:
             print(f"""            CARVE_DEC_B(inst, opcode, f3, rs1, rs2, imm);""")
         elif kind == 'J':
             print(f"""            CARVE_DEC_J(inst, opcode, rd, imm);""")
+        elif kind == 'y':
+            print(f"""            CARVE_DEC_I(inst, opcode, rd, imm);""")
+
         print(f"""            /* {val} */""")
         print(f"""          #ifdef {ext}""")
         print(f"""            {output_exec(val)}""")

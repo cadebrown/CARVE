@@ -598,6 +598,9 @@ bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, s
         }
     }
 
+    /* Add ebreak */
+    carve_prog_add(prog, carve_makeI(0x73, 0, 0, 0, 1 /* ebreak */));
+
     /* Success */
     return true;
 }

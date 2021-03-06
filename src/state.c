@@ -18,6 +18,11 @@ carve_state carve_state_new() {
     self->nvmem = CARVE_DEFAULT_NVMEM;
     self->vmem = malloc(self->nvmem);
 
+    /* initialize virtual memory */
+    for (i = 0; i < self->nvmem; ++i) {
+        self->vmem[i] = 1;
+    }
+
     /* Set stack pointer to the top of the virtual memory space */
     self->x[2] = CARVE_VMEM_START + self->nvmem;
 

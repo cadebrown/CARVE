@@ -31,7 +31,8 @@
     (STATE)->is_halted = true; \
 } while (0)
 
-
+/* Converts virtual address to real address in C */
+#define V2R(_val) (STATE->vmem + ((_val) - CARVE_VMEM_START))
 
 
 #endif /* EXT_COMMON_H__ */

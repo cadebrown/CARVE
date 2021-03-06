@@ -72,41 +72,51 @@
         STATE->easteregg = 1; \
     } \
     if (rd != 0) { \
-        REGU(rd) = CARVE_SEXT(*((carve_b*)(REGU(rs1) + imm)), 7); \
+        void* addr = V2R(REGU(rs1) + imm); \
+        REGU(rd) = *(carve_b*)addr; \
     } \
 } while (0)
 
 #define CARVE_lh(rd, rs1, imm) do { \
     if (rd != 0) { \
-        REGU(rd) = CARVE_SEXT(*((carve_h*)(REGU(rs1) + imm)), 15); \
+        void* addr = V2R(REGU(rs1) + imm); \
+        REGU(rd) = CARVE_SEXT(*(carve_h*)addr, 15); \
     } \
 } while (0)
 
 #define CARVE_lw(rd, rs1, imm) do { \
     if (rd != 0) { \
-        REGU(rd) = CARVE_SEXT(*((carve_w*)(REGU(rs1) + imm)), 31); \
+        void* addr = V2R(REGU(rs1) + imm); \
+        REGU(rd) = CARVE_SEXT(*(carve_w*)addr, 31); \
     } \
 } while (0)
 
 #define CARVE_lbu(rd, rs1, imm) do { \
     if (rd != 0) { \
-        REGU(rd) = *((carve_b*)(REGU(rs1) + imm)); \
+        void* addr = V2R(REGU(rs1) + imm); \
+        REGU(rd) = *(carve_b*)addr; \
     } \
 } while (0)
 
 #define CARVE_lhu(rd, rs1, imm) do { \
     if (rd != 0) { \
-        REGU(rd) = *((carve_h*)(REGU(rs1) + imm)); \
+        void* addr = V2R(REGU(rs1) + imm); \
+        REGU(rd) = *(carve_h*)addr; \
     } \
 } while (0)
 
 #define CARVE_sb(rs1, rs2, imm) do { \
-    *((carve_b*)(REGU(rs1) + imm)) = REGU(rs2); \
+    void* addr = V2R(REGU(rs1) + imm); \
+    *(carve_b*)addr = REGU(rs2); \
 } while (0)
+
 #define CARVE_sh(rs1, rs2, imm) do { \
-    *((carve_h*)(REGU(rs1) + imm)) = REGU(rs2); \
+    void* addr = V2R(REGU(rs1) + imm); \
+    *(carve_h*)addr = REGU(rs2); \
 } while (0)
+
 #define CARVE_sw(rs1, rs2, imm) do { \
+    void* addr = V2R(REGU(rs1) + imm); \
     *((carve_w*)(REGU(rs1) + imm)) = REGU(rs2); \
 } while (0)
 
@@ -227,10 +237,13 @@
 } while (0)
 
 
-/* Handle syscalls here */
-#define CARVE_ebreak() do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) & REGU(rs2); \
+#define CARVE_ebreak(rd, rs1, imm) do { \
+    /* ebreak and ecall are here */ \
+    if (imm == 0) { \
+        /* ecall */ \
+    } else if (imm == 1) { \
+        /* ebreak */ \
+        STATE->is_halted = true; \
     } \
 } while (0)
 

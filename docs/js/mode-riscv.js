@@ -4,30 +4,31 @@ define("ace/mode/riscv_highlight_rules",["require","exports","module","ace/lib/o
     
     var riscvHighlightRules = function() {
         this.$rules = { start: 
-           [ { token: 'keyword.control.assembly',
-               /* Put all instructions here */
-               regex: '\\b(?:a|b|c)\\b',
-               caseInsensitive: true },
-             { token: 'variable.parameter.register.assembly',
-               /* Put all registers here */
-               regex: '\\b(?:x[0-9]|x[1-2][0-9]|x3[0-1]|zero|ra|sp|gp|tp|t[0-6]|s[0-1]|fp|a[0-9]|s[0-9]|s1[0-1]|f[0-9]|f[1-2][0-9]|f3[0-1]|ft[0-9]|ft1[0-1]|fs[0-9]|fs1[0-1]|fa[0-7])\\b',
-               caseInsensitive: true },
-             { token: 'constant.character.decimal.assembly',
-               regex: '\\b[0-9]+\\b' },
-             { token: 'constant.character.hexadecimal.assembly',
-               regex: '\\b0x[A-F0-9]+\\b',
-               caseInsensitive: true },
-             { token: 'constant.character.hexadecimal.assembly',
-               regex: '\\b[A-F0-9]+h\\b',
-               caseInsensitive: true },
-             { token: 'string.assembly', regex: /'([^\\']|\\.)*'/ },
-             { token: 'string.assembly', regex: /"([^\\"]|\\.)*"/ },
-             { token: 'support.function.directive.assembly', regex: '\\.\\S+' },
-             { token: 'entity.name.function.assembly', regex: '^\\s*%%[\\w.]+?:$' },
-             { token: 'entity.name.function.assembly', regex: '^\\s*%\\$[\\w.]+?:$' },
-             { token: 'entity.name.function.assembly', regex: '^\\s*[\\w.]+?:' },
-             { token: 'entity.name.function.assembly', regex: '^\\s*[\\w.]+?\\b' },
-             { token: 'comment.assembly', regex: '#.*$' } ] 
+            [
+                { token: 'comment.assembly', regex: '#.*$' },
+                { token: 'variable.parameter.register.assembly',
+                /* Put all registers here */
+                regex: '\\b(?:x[0-9]|x[1-2][0-9]|x3[0-1]|zero|ra|sp|gp|tp|t[0-6]|s[0-1]|fp|a[0-9]|s[0-9]|s1[0-1]|f[0-9]|f[1-2][0-9]|f3[0-1]|ft[0-9]|ft1[0-1]|fs[0-9]|fs1[0-1]|fa[0-7])\\b',
+                caseInsensitive: true },
+                { token: 'constant.character.decimal.assembly',
+                regex: '-?[0-9]+\\b' },
+                { token: 'constant.character.hexadecimal.assembly',
+                regex: '\\b0x[A-F0-9]+\\b',
+                caseInsensitive: true },
+                { token: 'constant.character.binary.assembly',
+                regex: '\\b0b[A-F0-9]+\\b',
+                caseInsensitive: true },
+                { token: 'string.assembly', regex: /'([^\\']|\\.)*'/ },
+                { token: 'string.assembly', regex: /"([^\\"]|\\.)*"/ },
+                { token: 'support.function.directive.assembly', regex: '\\.\\S+' },
+                { token: 'entity.name.function.assembly', regex: '^\\s*%%[\\w.]+?:$' },
+                { token: 'entity.name.function.assembly', regex: '^\\s*%\\$[\\w.]+?:$' },
+                { token: 'entity.name.function.assembly', regex: '^\\s*[\\w.]+?:' },
+                { token: 'keyword.control.assembly',
+                /* Put all instructions here */
+                regex: '\\b\\w+\\b',
+                caseInsensitive: true },
+            ] 
         };
         
         this.normalizeRules();

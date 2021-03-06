@@ -15,6 +15,15 @@ carve_state carve_state_new() {
 
     self->easteregg = 0;
 
+    self->nvmem = CARVE_DEFAULT_NVMEM;
+    self->vmem = malloc(self->nvmem);
+
+    /* Set stack pointer to the top of the virtual memory space */
+    self->x[2] = CARVE_VMEM_START + self->nvmem;
+
+    /* Set heap pointer */
+    self->hp = CARVE_VMEM_START;
+
     return self;
 }
 int carve_easteregg(carve_state s) {

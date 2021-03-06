@@ -116,8 +116,20 @@ struct carve_instdesc {
 };
 
 
+/* Default size of virtual memory 
+ *
+ * 0x10000: 64k
+ */
+#define CARVE_DEFAULT_NVMEM (0x10000)
+
+/* Start of virtual memory, as is seen by the program
+ *
+ */
+#define CARVE_VMEM_START (0x1000)
+
 /* carve_state - Current emulator state of RISC-V abstract machine
  *
+ * Virtual memory starts at 0x1000, and heap and stack are in between 0x1000
  */
 typedef struct carve_state_s {
 
@@ -126,6 +138,12 @@ typedef struct carve_state_s {
 
     /* Program counter */
     carve_int pc;
+
+    /* Heap pointer, which is like the stack pointer but grows upwards 
+     * Heap pointer starts at 0x1000, the start of VMEM space
+     */
+    carve_int hp;
+
 
     /* If this is given, something really bad happened... 
      * 
@@ -141,6 +159,15 @@ typedef struct carve_state_s {
 
     /* Current easter egg activated... This is just for fun */
     int easteregg;
+
+    /* Virtual memory area for the program, stack starts at top, 
+     *   heap at bottom
+     */
+    carve_b* vmem;
+
+    /* Number of bytes in the virtual memory space */
+    int nvmem;
+
 
 }* carve_state;
 
@@ -203,6 +230,7 @@ typedef struct carve_prog_s {
         int val;
 
     }* htl;
+
 
 }* carve_prog;
 

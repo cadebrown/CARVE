@@ -25,7 +25,7 @@ DEFS         += $(foreach x,$(RISCV),-D$(x))
 # -*- Files -*-
 
 src_C        := $(filter-out src/execinst.c src/getinst.c,$(wildcard src/*.c)) src/execinst.c src/getinst.c
-src_H        := $(wildcard src/*.h) 
+src_H        := $(wildcard src/*.h) $(wildcard src/ext/*.h) 
 
 # -*- Outputs -*-
 

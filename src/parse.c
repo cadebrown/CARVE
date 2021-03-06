@@ -561,7 +561,7 @@ bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, s
                     } break;
                 }
                 /* Special cases */
-                if (strcmp(id->name, "srai")) {
+                if (strcmp(id->name, "srai") == 0) {
                     /* See: https://stackoverflow.com/questions/39489318/risc-v-implementing-slli-srli-and-srai */
                     /* We need to set the 30th bit */
                     prog->inst[prog->ninst - 1] |= 1ULL << 30;

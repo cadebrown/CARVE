@@ -126,10 +126,10 @@ for opcode in tree:
         return res
 
     val = tree[opcode]
+    ext, kind = kinds[opcode]
     print(f"""        case {hex(opcode)}:""")
     if isinstance(val, dict):
         # 'val' is subtree, keyed on 'f3'
-        ext, kind = kinds[opcode]
 
         if kind == 'R':
             print(f"""            CARVE_DEC_R(inst, opcode, f3, f7, rd, rs1, rs2);""")
@@ -143,7 +143,6 @@ for opcode in tree:
             print(f"""            CARVE_DEC_B(inst, opcode, f3, rs1, rs2, imm);""")
         elif kind == 'J':
             print(f"""            CARVE_DEC_J(inst, opcode, rd, imm);""")
-
 
         print(f"""            switch (f3) {{""")
 

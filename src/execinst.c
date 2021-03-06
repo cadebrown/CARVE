@@ -14,6 +14,7 @@ void carve_execinst(carve_state s, carve_inst inst) {
     carve_inst opcode, f3, f7, rd, rs1, rs2, imm;    
     switch (opcode = inst & 0x7F) {
         case 0x37:
+            CARVE_DEC_U(inst, opcode, rd, imm);
             /* lui */
           #ifdef RV32I
             CARVE_lui(rd, imm);
@@ -22,6 +23,7 @@ void carve_execinst(carve_state s, carve_inst inst) {
           #endif /* RV32I */
             break;
         case 0x17:
+            CARVE_DEC_U(inst, opcode, rd, imm);
             /* auipc */
           #ifdef RV32I
             CARVE_auipc(rd, imm);
@@ -30,6 +32,7 @@ void carve_execinst(carve_state s, carve_inst inst) {
           #endif /* RV32I */
             break;
         case 0x6f:
+            CARVE_DEC_J(inst, opcode, rd, imm);
             /* jal */
           #ifdef RV32I
             CARVE_jal(rd, imm);

@@ -192,7 +192,12 @@ static bool parse_skip(carve_prog prog, int* ntoksp, carve_tok** toksp, int* tok
 /* Parse an immediate value, returns -1 if an error was thrown 
  * 'sbit' is the starting bit, 'nbit' is the number of bits
  */
-static int parse_imm(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, struct carve_backpatch** backp, int* tokip, char kind) {
+static bool parse_imm(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, struct carve_backpatch** backp, int* tokip, char kind, int* res) {
+    bool isneg = false;
+    if (TOK.kind == CARVE_TOK_SUB) {
+        EAT();
+        isneg = true;
+    }
     if (TOK.kind == CARVE_TOK_INT) {
         carve_tok t = EAT();
         int rv = 0;
@@ -203,7 +208,8 @@ static int parse_imm(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nback
             i++;
         }
 
-        return rv;
+        *res = isneg ? -rv : rv;
+        return true;
     } else if (TOK.kind == CARVE_TOK_IDENT) {
         int tokidx = toki;
         carve_tok t = EAT();
@@ -215,11 +221,12 @@ static int parse_imm(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nback
         back[bi].tok = tokidx;
         back[bi].kind = kind;
 
-        return 0xFF;
+        *res = 0xCADE;
+        return true;
     } else {
         fprintf(stderr, "Unexpected token, expected immediate value (i.e. an integer)\n");
         carve_printcontext(prog->fname, prog->src, TOK);
-        return -1;
+        return false;
     }
 }
 
@@ -360,7 +367,7 @@ static bool parse_I(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
         return false;
     }
 
-    if ((imm = parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'I')) < 0) {
+    if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'I', &imm)) {
         return false;
     }
 
@@ -381,7 +388,7 @@ static bool parse_S(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
         return false;
     }
 
-    if ((imm = parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'S')) < 0) {
+    if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'S', &imm)) {
         return false;
     }
 
@@ -418,7 +425,7 @@ static bool parse_B(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
         return false;
     }
 
-    if ((imm = parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'B')) < 0) {
+    if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'B', &imm)) {
         return false;
     }
 
@@ -439,7 +446,7 @@ static bool parse_U(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
         return false;
     }
 
-    if ((imm = parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'U')) < 0) {
+    if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'U', &imm)) {
         return false;
     }
 
@@ -460,7 +467,7 @@ static bool parse_J(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
         return false;
     }
 
-    if ((imm = parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'J')) < 0) {
+    if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'J', &imm)) {
         return false;
     }
 
@@ -487,7 +494,7 @@ static bool parse_p(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
     if (*name == 'j') {
         /* j offset -> jal x0, offset */
         int imm;
-        if ((imm = parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'J')) < 0) {
+        if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'J', &imm)) {
             return false;
         }
         carve_prog_add(prog, carve_makeJ(carve_getinst("jal", -1)->opcode, 0, imm));

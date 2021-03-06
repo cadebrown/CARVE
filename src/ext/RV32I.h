@@ -226,4 +226,14 @@
     } \
 } while (0)
 
+
+/* Handle syscalls here */
+#define CARVE_ebreak() do { \
+    if (rd != 0) { \
+        REGU(rd) = REGU(rs1) & REGU(rs2); \
+    } \
+} while (0)
+
+
+
 #endif /* EXT_RV32I__ */

@@ -10,8 +10,8 @@
 
 /* Database of instructions */
 
-static int I_ninsts = 38;
-static struct carve_instdesc I_insts[38] = {
+static int I_ninsts = 40;
+static struct carve_instdesc I_insts[40] = {
 
     (struct carve_instdesc) { "add", 3, 'R', 51, 0, 0 },
     (struct carve_instdesc) { "addi", 4, 'I', 19, 0, 0 },
@@ -24,6 +24,8 @@ static struct carve_instdesc I_insts[38] = {
     (struct carve_instdesc) { "blt", 3, 'B', 99, 4, 0 },
     (struct carve_instdesc) { "bltu", 4, 'B', 99, 6, 0 },
     (struct carve_instdesc) { "bne", 3, 'B', 99, 1, 0 },
+    (struct carve_instdesc) { "ebreak", 6, 'y', 115, 0, 0 },
+    (struct carve_instdesc) { "ecall", 5, 'y', 115, 0, 0 },
     (struct carve_instdesc) { "j", 1, 'p', 0, 0, 0 },
     (struct carve_instdesc) { "jal", 3, 'J', 111, 0, 0 },
     (struct carve_instdesc) { "jalr", 4, 'I', 103, 0, 0 },

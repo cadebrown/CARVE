@@ -144,7 +144,6 @@ typedef struct carve_state_s {
      */
     carve_int hp;
 
-
     /* If this is given, something really bad happened... 
      * 
      * Alan Turing wants to
@@ -167,7 +166,6 @@ typedef struct carve_state_s {
 
     /* Number of bytes in the virtual memory space */
     int nvmem;
-
 
 }* carve_state;
 

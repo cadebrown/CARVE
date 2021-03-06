@@ -81,6 +81,9 @@ for ext in riscvdata.exts:
             tree[opcode] = name
         elif kind == 'p':
             pass
+        elif kind == 'y':
+            tree[opcode] = name
+
         else:
             raise Exception('Unknown kind: ' + repr(kind))
 

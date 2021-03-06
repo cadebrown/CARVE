@@ -470,6 +470,19 @@ static bool parse_J(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
     return true;
 }
 
+static bool parse_y(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, struct carve_backpatch** backp, int* tokip, const char* name, int opcode) {
+    if (strcmp(name, "ecall") == 0) {
+        /* ecall # syscall */
+        carve_prog_add(prog, carve_makeI(opcode, 0, 0, 0, 0 /* only thing that matters */));
+    } else {
+        fprintf(stderr, "Unsupported instruction!\n");
+        carve_printcontext(prog->fname, prog->src, toks[toki - 1]);
+        return false;
+    }
+
+    return true;
+}
+
 static bool parse_p(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, struct carve_backpatch** backp, int* tokip, const char* name) {
     if (*name == 'j') {
         /* j offset -> jal x0, offset */
@@ -551,6 +564,11 @@ bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, s
                     } break;
                     case 'p': {
                         if (!parse_p(prog, ntoksp, toksp, nbackp, backp, &i, id->name)) {
+                            return false;
+                        }
+                    } break;
+                    case 'y': {
+                        if (!parse_y(prog, ntoksp, toksp, nbackp, backp, &i, id->name, id->opcode)) {
                             return false;
                         }
                     } break;

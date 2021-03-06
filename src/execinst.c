@@ -370,5 +370,13 @@ void carve_execinst(carve_state s, carve_inst inst) {
             switch (f3) {
             }
             break;
+        case 0x73:
+            /* ebreak */
+          #ifdef RV32I
+            CARVE_ebreak();
+          #else
+             HALT("unsupported instruction 'ebreak' (extension RV32I not supported)"); 
+          #endif /* RV32I */
+            break;
     }
 }

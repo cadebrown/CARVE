@@ -20,7 +20,7 @@ carve_state carve_state_new() {
 
     /* initialize virtual memory */
     for (i = 0; i < self->nvmem; ++i) {
-        self->vmem[i] = 1;
+        self->vmem[i] = 0xFF;
     }
 
     /* Set stack pointer to the top of the virtual memory space */

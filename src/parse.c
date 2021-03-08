@@ -359,16 +359,38 @@ static bool parse_I(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
         return false;
     }
 
-    if ((rs1 = parse_reg_int(prog, ntoksp, toksp, tokip)) < 0) {
-        return false;
-    }
+    if (toks[toki+1].kind == CARVE_TOK_LPAR) {
+        /* inst a, c(b) */
+        if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'I', &imm)) {
+            return false;
+        }
 
-    if (!parse_skip(prog, ntoksp, toksp, tokip, CARVE_TOK_COM)) {
-        return false;
-    }
+        if (!parse_skip(prog, ntoksp, toksp, tokip, CARVE_TOK_LPAR)) {
+            return false;
+        }
 
-    if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'I', &imm)) {
-        return false;
+        if ((rs1 = parse_reg_int(prog, ntoksp, toksp, tokip)) < 0) {
+            return false;
+        }
+
+        if (!parse_skip(prog, ntoksp, toksp, tokip, CARVE_TOK_RPAR)) {
+            return false;
+        }
+
+
+    } else {
+        /* inst a, b, c */
+        if ((rs1 = parse_reg_int(prog, ntoksp, toksp, tokip)) < 0) {
+            return false;
+        }
+
+        if (!parse_skip(prog, ntoksp, toksp, tokip, CARVE_TOK_COM)) {
+            return false;
+        }
+
+        if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'I', &imm)) {
+            return false;
+        }
     }
 
     /* Add assembled instruction */
@@ -388,17 +410,43 @@ static bool parse_S(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
         return false;
     }
 
-    if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'S', &imm)) {
-        return false;
+
+
+    if (toks[toki+1].kind == CARVE_TOK_LPAR) {
+        /* inst a, c(b) */
+        if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'S', &imm)) {
+            return false;
+        }
+
+        if (!parse_skip(prog, ntoksp, toksp, tokip, CARVE_TOK_LPAR)) {
+            return false;
+        }
+
+        if ((rs1 = parse_reg_int(prog, ntoksp, toksp, tokip)) < 0) {
+            return false;
+        }
+
+        if (!parse_skip(prog, ntoksp, toksp, tokip, CARVE_TOK_RPAR)) {
+            return false;
+        }
+
+
+    } else {
+        /* inst a, b, c */
+        if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'S', &imm)) {
+            return false;
+        }
+
+        if (!parse_skip(prog, ntoksp, toksp, tokip, CARVE_TOK_COM)) {
+            return false;
+        }
+
+        if ((rs1 = parse_reg_int(prog, ntoksp, toksp, tokip)) < 0) {
+            return false;
+        }
     }
 
-    if (!parse_skip(prog, ntoksp, toksp, tokip, CARVE_TOK_COM)) {
-        return false;
-    }
 
-    if ((rs1 = parse_reg_int(prog, ntoksp, toksp, tokip)) < 0) {
-        return false;
-    }
 
     /* Add assembled instruction */
     carve_prog_add(prog, carve_makeS(opcode, f3, rs1, rs2, imm));

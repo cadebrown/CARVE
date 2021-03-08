@@ -122,7 +122,6 @@
 
 #define CARVE_addi(rd, rs1, imm) do { \
     if (rd != 0) { \
-        printf("%lld\n", CARVE_SEXT(imm, 11)); \
         REGS(rd) = REGS(rs1) + CARVE_SEXT(imm, 11); \
     } \
 } while (0)

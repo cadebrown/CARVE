@@ -7,16 +7,19 @@
 
 :root {
     --base-panel-color: #2f3029;
-    --dark-panel-color: #272822;
+    --dark-panel-color: #282923;
     --derk-panel-color: #1c1c18;
     --light-1: #8F908A;
     --light-2: #5b5c58;
     --light-3: #404238;
 
+    --button-color: #70705f;
+
     --reg: #ffc98a;
     --num: #cfcae8;
 
     --body-text: #F8F8F2;
+    --button-text: #eeeeee;
 }
 
 /* layout classes */
@@ -31,7 +34,7 @@ body {
     background-color: var(--base-panel-color);
     color: var(--body-color);
 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Ubuntu Mono", monospace;
 }
 
 a, a:visited {
@@ -61,7 +64,6 @@ a, a:visited {
     color: #EEE;
     border-radius: 0.8em;
     background-color:rgb(70, 70, 70)
-
 }
 
 /* editor */
@@ -79,12 +81,13 @@ a, a:visited {
 
 #exe_controls {
     height: 22px;
-    display: inline-block;
+    display: flex;
 }
 
 .exe_button {
     display: inline-block;
-    background: red;
+    background: var(--button-color);
+    color: var(--button-text);
 
     min-width: 50px;
     padding-left: 4px;
@@ -100,7 +103,7 @@ a, a:visited {
 }
 
 .exe_button:hover {
-    background: pink;
+    background: var(--light-1);
     cursor: pointer;
 }
 
@@ -181,22 +184,31 @@ table.register_table, td.register_table {
     font-size: 1.2em;
     padding: 0.2em 0.2em 0.2em 0.2em;
 
+    display: flex;
+
     background-color: var(--light-3);
     border: 1px solid var(--derk-panel-color);
 }
 
 .menu_item {
     display: inline-block;
-    background: red;
+    background: var(--button-color);
+    color: var(--button-text);
     min-width: 50px;
     padding-left: 4px;
     padding-right: 4px;
 
     margin-left: 4px;
+
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
 }
 
 .menu_item:hover {
-    background: pink;
+    background: var(--light-1);
     cursor: pointer;
 }
 

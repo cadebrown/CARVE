@@ -80,8 +80,9 @@ a, a:visited {
 /* executable bar */
 
 #exe_controls {
-    height: 22px;
     display: flex;
+    height: 18px;
+
 }
 
 .exe_button {
@@ -118,6 +119,7 @@ a, a:visited {
 #resize-console {
     width: 100%;
     height: 6px;
+    z-index: 10000;
     cursor: row-resize;
 }
 
@@ -179,9 +181,9 @@ table.register_table, td.register_table {
 
 .menu {
     width: 100%;
-    height: 22px;
+    height: 30px;
 
-    font-size: 1.2em;
+    font-size: 1.6em;
     padding: 0.2em 0.2em 0.2em 0.2em;
 
     display: flex;
@@ -190,13 +192,18 @@ table.register_table, td.register_table {
     border: 1px solid var(--derk-panel-color);
 }
 
+.menu-dropdown {
+    font-size: 1.4em;
+    cursor:pointer;
+}
+
 .menu_item {
     display: inline-block;
     background: var(--button-color);
     color: var(--button-text);
     min-width: 50px;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
 
     margin-left: 4px;
 
@@ -215,8 +222,10 @@ table.register_table, td.register_table {
 /* console */
 
 #console {
-    height: 25.1vh;
-    min-height: 12vh;
+    height: 28.1vh;
+    min-height: 8vh;
+
+    font-size: 14px;
 
     font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
 
@@ -226,3 +235,11 @@ table.register_table, td.register_table {
 .terminal {
     --background: var(--derk-panel-color);
 }
+
+/* special elements */
+
+.file-select-hidden {
+    opacity: 0;
+
+}
+

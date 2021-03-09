@@ -213,7 +213,9 @@ function compile() {
     libcarve.stringToUTF8(src, _src, src.length + 1)
 
     var prog = libcarve._carve_prog_new(_fname, _src)
+    if (!prog) return
 
+    
     libcarve._carve_exec(state, prog)
 
     var ee = libcarve._carve_easteregg(state);
@@ -223,6 +225,7 @@ function compile() {
 
 
     update_registers(state)
+
 
 }
 

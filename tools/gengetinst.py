@@ -15,7 +15,7 @@ import riscvdata
 # Sorted list of all instructions containing rows of:
 #   (name, kind, opcode, f3, f7)
 # Sorted on 'name'
-insts = sorted(riscvdata.insts, key=lambda x: x[0])
+insts = sorted(riscvdata.insts + [(p,  'p',  0b1110011,  0b000,  0b0000000) for p in riscvdata.pseudos], key=lambda x: x[0])
 
 
 print(f"""/* getinst.c - Generated file that defines parse modes for RISC-V instructions

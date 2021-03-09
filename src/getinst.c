@@ -26,7 +26,7 @@ static struct carve_instdesc I_insts[40] = {
     (struct carve_instdesc) { "bne", 3, 'B', 99, 1, 0 },
     (struct carve_instdesc) { "ebreak", 6, 'y', 115, 0, 0 },
     (struct carve_instdesc) { "ecall", 5, 'y', 115, 0, 0 },
-    (struct carve_instdesc) { "j", 1, 'p', 0, 0, 0 },
+    (struct carve_instdesc) { "j", 1, 'p', 115, 0, 0 },
     (struct carve_instdesc) { "jal", 3, 'J', 111, 0, 0 },
     (struct carve_instdesc) { "jalr", 4, 'I', 103, 0, 0 },
     (struct carve_instdesc) { "lb", 2, 'I', 3, 0, 0 },

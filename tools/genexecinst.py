@@ -34,7 +34,7 @@ tree = {}
 kinds = {}
 
 for ext in riscvdata.exts:
-    for (name, kind, opcode, f3, f7) in riscvdata.exts[ext]:
+    for (name, kind, opcode, f3, f7) in riscvdata.instructions[ext]:
         if opcode not in tree:
             # May be reset to just the name of an instruction
             tree[opcode] = {}

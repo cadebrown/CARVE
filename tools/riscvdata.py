@@ -15,7 +15,7 @@ def get_kind(name):
 
     raise KeyError(name)
 
-exts = {
+instructions = {
     'RV32I': [
         # (name, kind, opcode, f3, f7)
         ('lui',    'U',  0b0110111,  0b000,  0b0000000),
@@ -55,11 +55,22 @@ exts = {
         ('sra',    'R',  0b0110011,  0b101,  0b0010000),
         ('or',     'R',  0b0110011,  0b110,  0b0000000),
         ('and',    'R',  0b0110011,  0b111,  0b0000000),
-        ('j',      'p',  0b0000000,  0b000,  0b0000000),
         ('ebreak', 'y',  0b1110011,  0b000,  0b0000000),
         ('ecall',  'y',  0b1110011,  0b000,  0b0000000),
     ]
 }
 
+pseudoinstructions = {
+    'RV32I': [
+        'j',
+    ]
+}
+
 # List of all instructions
-insts = sum((exts[k] for k in exts), [])
+insts = sum((instructions[k] for k in instructions), [])
+
+# List of all pseudo instructions
+pseudos = sum((pseudoinstructions[k] for k in pseudoinstructions), [])
+
+# List of all extensions
+exts = {i for i in instructions} | {i for i in pseudoinstructions}

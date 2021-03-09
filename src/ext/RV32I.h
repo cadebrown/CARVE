@@ -247,6 +247,14 @@
     } \
 } while (0)
 
+#define CARVE_PSEUDO_j() do { \
+    /* j offset -> jal x0, offset */ \
+    int imm; \
+    if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'J', &imm)) { \
+        return false; \
+    } \
+    carve_prog_add(prog, carve_makeJ(carve_getinst("jal", -1)->opcode, 0, imm)); \
+} while (0)
 
 
 #endif /* EXT_RV32I__ */

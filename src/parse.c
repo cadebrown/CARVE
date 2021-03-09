@@ -5,6 +5,7 @@
  */
 
 #include "carve.h"
+#include "parse_p.h"
 
 
 /* Easy-to-use macros, for pointer parameters */
@@ -539,20 +540,7 @@ static bool parse_y(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp
 }
 
 static bool parse_p(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, struct carve_backpatch** backp, int* tokip, const char* name) {
-    if (*name == 'j') {
-        /* j offset -> jal x0, offset */
-        int imm;
-        if (!parse_imm(prog, ntoksp, toksp, nbackp, backp, tokip, 'J', &imm)) {
-            return false;
-        }
-        carve_prog_add(prog, carve_makeJ(carve_getinst("jal", -1)->opcode, 0, imm));
-    } else {
-        fprintf(stderr, "Unsupported pseudoinstruction!\n");
-        carve_printcontext(prog->fname, prog->src, toks[toki - 1]);
-        return false;
-    }
-
-    return true;
+    CARVE_parse_p();
 }
 
 bool carve_parse(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbackp, struct carve_backpatch** backp) {

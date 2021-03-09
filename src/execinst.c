@@ -366,10 +366,6 @@ void carve_execinst(carve_state s, carve_inst inst) {
                     break;
             }
             break;
-        case 0x0:
-            switch (f3) {
-            }
-            break;
         case 0x73:
             CARVE_DEC_I(inst, opcode, f3, rd, rs1, imm);
             switch (f3) {

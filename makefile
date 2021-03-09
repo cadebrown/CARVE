@@ -25,7 +25,7 @@ DEFS         += $(foreach x,$(RISCV),-D$(x))
 # -*- Files -*-
 
 src_C        := $(filter-out src/execinst.c src/getinst.c,$(wildcard src/*.c)) src/execinst.c src/getinst.c
-src_H        := $(wildcard src/*.h) $(wildcard src/ext/*.h) 
+src_H        := $(wildcard src/*.h) $(wildcard src/ext/*.h) src/parse_p.h
 
 # -*- Outputs -*-
 
@@ -53,6 +53,9 @@ src/execinst.c: tools/genexecinst.py tools/riscvdata.py
 	$< > $@
 
 src/getinst.c: tools/gengetinst.py tools/riscvdata.py
+	$< > $@
+
+src/parse_p.h: tools/genpseudo.py tools/riscvdata.py
 	$< > $@
 
 

@@ -12,6 +12,9 @@ loadlibcarve().then(function (_libcarve) {
     });
     ace.config.set('basePath', '/js')
     editor.setTheme('ace/theme/monokai')
+    editor.setOptions({
+        fontSize: '13pt',
+    })
     editor.getSession().setMode('ace/mode/riscv')
     editor.setAutoScrollEditorIntoView(true);
 
@@ -220,5 +223,39 @@ function compile() {
 
 
     update_registers(state)
+
+}
+
+
+/* Menu Options */
+
+function do_file_open() {
+    let elem = $("#file-select")
+    
+    elem.trigger('click')
+    elem.on('change', function() {
+        elem[0].files[0].text().then(function (src) {
+            // Change ace editor contents
+            //console.log(src)
+            editor.setValue(src)
+        })
+        elem.off('change')
+    })
+
+}
+
+function do_file_save() {
+    let fname = 'src.s'
+    let src = editor.getValue()
+
+    var elem = document.createElement('a');
+    elem.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(src));
+    elem.setAttribute('download', fname);
+  
+    elem.style.display = 'none';
+    document.body.appendChild(elem);
+  
+    elem.click();
+    document.body.removeChild(elem);
 
 }

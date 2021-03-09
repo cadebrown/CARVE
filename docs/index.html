@@ -5,11 +5,14 @@ desc: Main page
 ---
 
 <div class="menu" id="menu_bar">
-  <div class="menu_item">File</div>
+  <div id="menu_file" class="menu_item">File</div>
   <div class="menu_item">Options</div>
   <div class="menu_item">Assemble</div>
   <div class="menu_item">Help</div>
 </div>
+
+
+
 
 <div id="main" class="main row">
     <div class="col" id="editor-container">
@@ -47,4 +50,33 @@ addi t0, zero, 10
 
 <div id="console">
 </div>
+
+
+<input type="file" class="file-select-hidden" id="file-select">
+
+<script>
+
+
+
+let tree = {
+    'file': ['open', 'save']
+}
+
+for (let k in tree) {
+    let content = ''
+    for (let i = 0; i < tree[k].length; ++i) {
+        content += '<div class="menu-dropdown" onclick="do_' + k + '_' + tree[k][i] + '()">' + tree[k][i] + '</div>'
+    }
+
+
+    tippy('#menu_' + k, {
+        content: content,
+        allowHTML: true,
+        interactive: true,
+    });
+
+}
+
+</script>
+
 

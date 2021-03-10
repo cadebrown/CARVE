@@ -63,6 +63,15 @@ instructions = {
 pseudoinstructions = {
     'RV32I': [
         'j',
+        'nop',
+        'li',
+        'mv',
+        'not',
+        'neg',
+        'seqz',
+        'snez',
+        'sltz',
+        'sgtz',
     ]
 }
 

@@ -10,8 +10,8 @@
 
 /* Database of instructions */
 
-static int I_ninsts = 40;
-static struct carve_instdesc I_insts[40] = {
+static int I_ninsts = 49;
+static struct carve_instdesc I_insts[49] = {
 
     (struct carve_instdesc) { "add", 3, 'R', 51, 0, 0 },
     (struct carve_instdesc) { "addi", 4, 'I', 19, 0, 0 },
@@ -33,11 +33,18 @@ static struct carve_instdesc I_insts[40] = {
     (struct carve_instdesc) { "lbu", 3, 'I', 3, 4, 0 },
     (struct carve_instdesc) { "lh", 2, 'I', 3, 1, 0 },
     (struct carve_instdesc) { "lhu", 3, 'I', 3, 5, 0 },
+    (struct carve_instdesc) { "li", 2, 'p', 115, 0, 0 },
     (struct carve_instdesc) { "lui", 3, 'U', 55, 0, 0 },
     (struct carve_instdesc) { "lw", 2, 'I', 3, 2, 0 },
+    (struct carve_instdesc) { "mv", 2, 'p', 115, 0, 0 },
+    (struct carve_instdesc) { "neg", 3, 'p', 115, 0, 0 },
+    (struct carve_instdesc) { "nop", 3, 'p', 115, 0, 0 },
+    (struct carve_instdesc) { "not", 3, 'p', 115, 0, 0 },
     (struct carve_instdesc) { "or", 2, 'R', 51, 6, 0 },
     (struct carve_instdesc) { "ori", 3, 'I', 19, 6, 0 },
     (struct carve_instdesc) { "sb", 2, 'S', 35, 0, 0 },
+    (struct carve_instdesc) { "seqz", 4, 'p', 115, 0, 0 },
+    (struct carve_instdesc) { "sgtz", 4, 'p', 115, 0, 0 },
     (struct carve_instdesc) { "sh", 2, 'S', 35, 1, 0 },
     (struct carve_instdesc) { "sll", 3, 'R', 51, 1, 0 },
     (struct carve_instdesc) { "slli", 4, 'I', 19, 1, 0 },
@@ -45,6 +52,8 @@ static struct carve_instdesc I_insts[40] = {
     (struct carve_instdesc) { "slti", 4, 'I', 19, 2, 0 },
     (struct carve_instdesc) { "sltiu", 5, 'I', 19, 3, 0 },
     (struct carve_instdesc) { "sltu", 4, 'R', 51, 3, 0 },
+    (struct carve_instdesc) { "sltz", 4, 'p', 115, 0, 0 },
+    (struct carve_instdesc) { "snez", 4, 'p', 115, 0, 0 },
     (struct carve_instdesc) { "sra", 3, 'R', 51, 5, 16 },
     (struct carve_instdesc) { "srai", 4, 'I', 19, 5, 0 },
     (struct carve_instdesc) { "srl", 3, 'R', 51, 5, 0 },

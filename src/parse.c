@@ -27,6 +27,8 @@ static bool my_isdigit(int c, int b) {
         return '0' <= c && c <= '9';
     } else if (b == 16) {
         return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F');
+    } else if (b == 2) {
+        return (c == '0' || c == '1');
     }
 
     return false;
@@ -148,10 +150,15 @@ bool carve_lex(const char* fname, const char* src, int* ntoksp, carve_tok** toks
                         ADV();
                         base = 16;
                     }
+                    else if (pos+1 < sl && src[pos+1] == 'b' || src[pos+1] == 'B') {
+                        ADV();
+                        ADV();
+                        base = 2;
+                    }
 
                     do {
                         ADV();
-                    } while (pos < sl && my_isdigit(src[pos], base));
+                    } while (pos < sl && (my_isdigit(src[pos], base) || (src[pos] == '_')));
 
                     ADD(CARVE_TOK_INT);
                 } else {
@@ -202,11 +209,36 @@ static bool parse_imm(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbac
     if (TOK.kind == CARVE_TOK_INT) {
         carve_tok t = EAT();
         int rv = 0;
-        int i = 0;
-        while (i < t.len) {
+        
+        int base = 10;
+        for (int i = 0; i < t.len; i++) {
             char d = prog->src[t.pos + i];
-            rv = 10 * rv + (d - '0');
-            i++;
+            
+            if (d == '_') continue;
+
+            /* handle nondigits */
+            if (!my_isdigit(d, base)) {
+                /* if base change is valid, check for base char */
+                if (i == 1 && prog->src[t.pos] == '0') {
+                    if (d == 'x' || d == 'X') {
+                        base = 16;
+                        continue;
+                    } else if (d == 'b' || d == 'B') {
+                        base = 2;
+                        continue;
+                    } else {
+                        fprintf(stderr, "Character does not match expected base (should have been handled in lexer?)\n");
+                        carve_printcontext(prog->fname, prog->src, TOK);
+                        return false;
+                    }
+                }
+            }
+
+            if (d >= 'a') d -= ('a' - 10);
+            else if (d >= 'A') d -= ('A' - 10);
+            else d -= '0';
+
+            rv = base * rv + d;
         }
 
         *res = isneg ? -rv : rv;

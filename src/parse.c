@@ -208,7 +208,7 @@ static bool parse_imm(carve_prog prog, int* ntoksp, carve_tok** toksp, int* nbac
     }
     if (TOK.kind == CARVE_TOK_INT) {
         carve_tok t = EAT();
-        int rv = 0;
+        int64_t rv = 0;
         
         int base = 10;
         for (int i = 0; i < t.len; i++) {

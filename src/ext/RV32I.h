@@ -227,7 +227,7 @@
         rs = rd; \
     } \
     inst = carve_getinst("addi", -1); \
-    carve_prog_add(prog, carve_makeI(inst->opcode, inst->f3, rd, rs, imm & ((1 << 12) - 1))); \
+    carve_prog_add(prog, carve_makeI(inst->opcode, inst->f3, rd, rs, imm)); \
 } while (0)
 
 #define CARVE_PSEUDO_mv() do { \

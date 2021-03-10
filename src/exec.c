@@ -12,6 +12,7 @@ int carve_exec(carve_state s, carve_prog p) {
 
     while (!s->is_halted) {
         carve_execinst(s, *(carve_inst*)s->pc);
+        s->x[0] = 0;
         s->pc += sizeof(carve_inst);
     }
 

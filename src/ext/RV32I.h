@@ -7,9 +7,7 @@
 #define EXT_RV32I_H__
 
 #define CARVE_lui(rd, imm) do { \
-    if (rd != 0) { \
-        REGS(rd) = imm; \
-    } \
+    REGS(rd) = imm; \
 } while (0)
 
 #define CARVE_auipc(rd, imm) do { \
@@ -17,18 +15,14 @@
 } while (0)
 
 #define CARVE_jal(rd, imm) do { \
-    if (rd != 0) { \
-        REGU(rd) = PC; \
-    } \
+    REGU(rd) = PC; \
     PC += CARVE_SEXT(imm, 20); \
 } while (0)
 
 #define CARVE_jalr(rd, rs1, imm) do { \
     carve_int rr = PC; \
     PC = REGU(rs1) + CARVE_SEXT(imm, 19); \
-    if (rd != 0) { \
-        REGU(rd) = rr; \
-    } \
+    REGU(rd) = rr; \
 } while (0)
 
 #define CARVE_beq(rs1, rs2, imm) do { \
@@ -71,38 +65,28 @@
     if (REGU(rs1) + imm == 0x1A4) { \
         STATE->easteregg = 1; \
     } \
-    if (rd != 0) { \
-        void* addr = V2R(REGU(rs1) + imm); \
-        REGU(rd) = *(carve_b*)addr; \
-    } \
+    void* addr = V2R(REGU(rs1) + imm); \
+    REGU(rd) = *(carve_b*)addr; \
 } while (0)
 
 #define CARVE_lh(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        void* addr = V2R(REGU(rs1) + imm); \
-        REGU(rd) = CARVE_SEXT(*(carve_h*)addr, 15); \
-    } \
+    void* addr = V2R(REGU(rs1) + imm); \
+    REGU(rd) = CARVE_SEXT(*(carve_h*)addr, 15); \
 } while (0)
 
 #define CARVE_lw(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        void* addr = V2R(REGU(rs1) + imm); \
-        REGU(rd) = CARVE_SEXT(*(carve_w*)addr, 31); \
-    } \
+    void* addr = V2R(REGU(rs1) + imm); \
+    REGU(rd) = CARVE_SEXT(*(carve_w*)addr, 31); \
 } while (0)
 
 #define CARVE_lbu(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        void* addr = V2R(REGU(rs1) + imm); \
-        REGU(rd) = *(carve_b*)addr; \
-    } \
+    void* addr = V2R(REGU(rs1) + imm); \
+    REGU(rd) = *(carve_b*)addr; \
 } while (0)
 
 #define CARVE_lhu(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        void* addr = V2R(REGU(rs1) + imm); \
-        REGU(rd) = *(carve_h*)addr; \
-    } \
+    void* addr = V2R(REGU(rs1) + imm); \
+    REGU(rd) = *(carve_h*)addr; \
 } while (0)
 
 #define CARVE_sb(rs1, rs2, imm) do { \
@@ -121,119 +105,83 @@
 } while (0)
 
 #define CARVE_addi(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        REGS(rd) = REGS(rs1) + CARVE_SEXT(imm, 11); \
-    } \
+    REGS(rd) = REGS(rs1) + CARVE_SEXT(imm, 11); \
 } while (0)
 
 #define CARVE_slti(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        REGS(rd) = REGS(rs1) < imm; \
-    } \
+    REGS(rd) = REGS(rs1) < imm; \
 } while (0)
 
 #define CARVE_sltiu(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) < imm; \
-    } \
+    REGU(rd) = REGU(rs1) < imm; \
 } while (0)
 
 #define CARVE_xori(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) ^ imm; \
-    } \
+    REGU(rd) = REGU(rs1) ^ imm; \
 } while (0)
 
 #define CARVE_ori(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) | imm; \
-    } \
+    REGU(rd) = REGU(rs1) | imm; \
 } while (0)
 
 #define CARVE_andi(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) & imm; \
-    } \
+    REGU(rd) = REGU(rs1) & imm; \
 } while (0)
 
 #define CARVE_slli(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) << imm; \
-    } \
+    REGU(rd) = REGU(rs1) << imm; \
 } while (0)
 
 #define CARVE_srli(rd, rs1, imm) do { \
-    if (rd != 0) { \
-        carve_int v = imm; \
-        carve_int shamt = imm & 0x7F; \
-        if (v == shamt) { \
-            /* All higher bits are 0, so SRLI */ \
-            REGU(rd) = REGU(rs1) >> shamt;\
-        } else { \
-            /* High one bit, so SRAI */ \
-            REGS(rd) = REGS(rs1) / (1ULL << shamt);\
-        } \
+    carve_int v = imm; \
+    carve_int shamt = imm & 0x7F; \
+    if (v == shamt) { \
+        /* All higher bits are 0, so SRLI */ \
+        REGU(rd) = REGU(rs1) >> shamt;\
+    } else { \
+        /* High one bit, so SRAI */ \
+        REGS(rd) = REGS(rs1) / (1ULL << shamt);\
     } \
 } while (0)
 
 #define CARVE_add(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) + REGU(rs2); \
-    } \
+    REGU(rd) = REGU(rs1) + REGU(rs2); \
 } while (0)
 
 #define CARVE_sub(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) - REGU(rs2); \
-    } \
+    REGU(rd) = REGU(rs1) - REGU(rs2); \
 } while (0)
 
 #define CARVE_sll(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) << REGU(rs2); \
-    } \
+    REGU(rd) = REGU(rs1) << REGU(rs2); \
 } while (0)
 
 #define CARVE_srl(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) >> REGU(rs2); \
-    } \
+    REGU(rd) = REGU(rs1) >> REGU(rs2); \
 } while (0)
 
 #define CARVE_sra(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) >> REGU(rs2); \
-    } \
+    REGU(rd) = REGU(rs1) >> REGU(rs2); \
 } while (0)
 
 #define CARVE_slt(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGS(rs1) < REGS(rs2); \
-    } \
+    REGU(rd) = REGS(rs1) < REGS(rs2); \
 } while (0)
 
 #define CARVE_sltu(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) < REGU(rs2); \
-    } \
+    REGU(rd) = REGU(rs1) < REGU(rs2); \
 } while (0)
 
 #define CARVE_xor(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) ^ REGU(rs2); \
-    } \
+    REGU(rd) = REGU(rs1) ^ REGU(rs2); \
 } while (0)
 
 #define CARVE_or(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) | REGU(rs2); \
-    } \
+    REGU(rd) = REGU(rs1) | REGU(rs2); \
 } while (0)
 
 #define CARVE_and(rd, rs1, rs2) do { \
-    if (rd != 0) { \
-        REGU(rd) = REGU(rs1) & REGU(rs2); \
-    } \
+    REGU(rd) = REGU(rs1) & REGU(rs2); \
 } while (0)
 
 

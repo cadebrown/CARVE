@@ -6,9 +6,9 @@ desc: Main page
 
 <div class="menu" id="menu_bar">
   <div id="menu_file" class="menu_item">File</div>
-  <div class="menu_item">Options</div>
-  <div class="menu_item">Assemble</div>
-  <div class="menu_item">Help</div>
+  <div id="menu_options" class="menu_item">Options</div>
+  <div id="menu_assembler" class="menu_item">Assembler</div>
+  <div id="menu_help" class="menu_item">Help</div>
 </div>
 
 
@@ -30,7 +30,6 @@ addi t0, zero, 10
                 <div class="exe_button">PC</div>
             </div>
     </div>
-
     <div class="col resize" id="resize-tabedit"></div>
     <div class="col" id="registers">
         <div class="table_label">
@@ -43,7 +42,6 @@ addi t0, zero, 10
 
         <div id="reg-table"></div>
     </div>
-
 </div>
 
 <div class="resize" id="resize-console"></div>
@@ -56,16 +54,25 @@ addi t0, zero, 10
 
 <script>
 
-
-
 let tree = {
-    'file': ['open', 'save']
+    'file': ['open', 'save', 'new'],
+    'options': [['autocomplete', 'autocomplete <input type="checkbox" id="autocomplete_sel">']],
+    'assembler': ['ASSEMBLER INFORMATION (extensions, compilation date, etc.)'],
+    'help': ['CARVE Documentation', 'Syscall reference', 'RISC-V Spec']
 }
 
 for (let k in tree) {
     let content = ''
     for (let i = 0; i < tree[k].length; ++i) {
-        content += '<div class="menu-dropdown" onclick="do_' + k + '_' + tree[k][i] + '()">' + tree[k][i] + '</div>'
+        let name, elm;
+        if (Array.isArray(tree[k][i])) {
+            name = [tree[k][i][0]];
+            elm = [tree[k][i][1]];
+        } else {
+            name = tree[k][i];
+            elm = '<div class="menu-dropdown" onclick="do_' + k + '_' + name + '()">' + name + '</div>'
+        }
+        content += elm;
     }
 
 
@@ -74,7 +81,6 @@ for (let k in tree) {
         allowHTML: true,
         interactive: true,
     });
-
 }
 
 </script>

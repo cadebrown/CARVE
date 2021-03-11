@@ -70,7 +70,6 @@ loadlibcarve().then(function (_libcarve) {
 
         update_registers(state);
     })
-        
 })
 
 
@@ -90,7 +89,7 @@ function update_registers(s) {
 /* Generate the register table with appropriate IDs */
 function genregtable(elem, regs, type) {
     const genrow = (reg, abi, desc, saver) => {
-        return '<tr"><td class="register_table reg_id">'+reg+'</td><td class="register_table reg_name">'+abi+'</td><td class="register_table reg_hex" id="reg_'+type+reg+'_hex">0</td><td class="register_table reg_dec" id="reg_'+type+reg+'_dec">0</td></tr>';
+        return '<tr id="row_'+type+reg+'"><td id="reg_'+type+'lab'+reg+'"class="register_table reg_'+type+'id">'+reg+'</td><td id="reg_name'+reg+'"class="register_table reg_name">'+abi+'</td><td class="register_table reg_hex" id="reg_'+type+reg+'_hex">0</td><td class="register_table reg_dec" id="reg_'+type+reg+'_dec">0</td></tr>';
     }
 
     let out = "<table class='register_table' id='reg_table'>";
@@ -104,6 +103,22 @@ function genregtable(elem, regs, type) {
     out += "</table>";
 
     elem[0].innerHTML = out;
+
+    for (let i = 0; i < regs.length; i++) {
+        let content = regs[i][2];
+
+        if (regs[i][3] != "--") {
+            content += "; " + regs[i][3] + " saved"
+        }
+
+        tippy('#row_'+type+regs[i][0], {
+            content: content,
+            placement: 'left',
+            allowHTML: true,
+            interactive: true,
+        });
+        out += genrow(...regs[i]);
+    }
 }
 
 function selregtable(elem, val) {
@@ -225,8 +240,6 @@ function compile() {
 
 
     update_registers(state)
-
-
 }
 
 
@@ -261,4 +274,8 @@ function do_file_save() {
     elem.click();
     document.body.removeChild(elem);
 
+}
+
+function do_file_new() {
+    editor.setValue("");
 }

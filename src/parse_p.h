@@ -97,5 +97,6 @@
   \
   fprintf(stderr, "Unsupported pseudoinstruction!\n"); \
   carve_printcontext(prog->fname, prog->src, (*toksp)[*tokip - 1]); \
-  return false; } while (0)
+  return false; \
+} while (0)
 

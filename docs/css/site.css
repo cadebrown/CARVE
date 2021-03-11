@@ -81,8 +81,7 @@ a, a:visited {
 
 #exe_controls {
     display: flex;
-    height: 18px;
-
+    height: 20px;
 }
 
 .exe_button {
@@ -95,6 +94,8 @@ a, a:visited {
     padding-right: 4px;
 
     margin-left: 4px;
+
+    height: 130%;
 
     user-select: none;
     -moz-user-select: none;
@@ -153,8 +154,13 @@ table.register_table, td.register_table {
     width: 4em;
     color: var(--reg);
 }
+
 .reg_name {
     width: 4em;
+    color: var(--reg);
+}
+
+.reg_intid {
     color: var(--reg);
 }
 
@@ -195,6 +201,10 @@ table.register_table, td.register_table {
 .menu-dropdown {
     font-size: 1.4em;
     cursor:pointer;
+}
+
+.menu-dropdown:hover {
+    color: lightgray;
 }
 
 .menu_item {
@@ -243,3 +253,10 @@ table.register_table, td.register_table {
 
 }
 
+.tippy-content {
+    background-color: var(--button-color);
+}
+
+.tippy-arrow {
+    color: var(--button-color);
+}

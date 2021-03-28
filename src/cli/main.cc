@@ -36,8 +36,6 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    cout << "Initially done" << endl;
-    
     State* s = new State();
     
     // Initialize from the program

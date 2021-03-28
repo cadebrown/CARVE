@@ -168,13 +168,17 @@ void _and    (State& s, int rd, int rs1, int rs2) {
 void _ebreak (State& s, int rd, int rs1, u64 imm) {
     switch (imm)
     {
-    case 0:
+    case 0: {
         // ecall
+        u8* dp = &s.vmem[s.rx[5]];
         break;
-    case 1:
+
+    }
+    case 1: {
         // ebreak
         s.is_halted = true;
         break;
+    }
     default:
         break;
     }

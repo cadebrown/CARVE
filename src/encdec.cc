@@ -108,7 +108,7 @@ void dec_I(inst v, u64& op, u64& f3, int& rd, int& rs1, u64& imm) {
 void dec_U(inst v, u64& op, int& rd, u64& imm) {
     op = UNFIELD(v, 0, 7);
     rd = UNFIELD(v, 7, 12);
-    imm = UNFIELD(v, 12, 32);
+    imm = UNFIELD(v, 12, 32) << 12;
 }
 void dec_J(inst v, u64& op, int& rd, u64& imm) {
     op = UNFIELD(v, 0, 7);

@@ -18,7 +18,23 @@ void carve_state_free(State* self) {
 }
 
 Program* carve_program_new(const char* fname, const char* src) {
+    string fname_s = fname;
+    string src_s = src;
+   
+    // Lex source code
+    vector<Token> toks = lex(fname_s, src_s);
+    if (toks.size() == 0) {
+        return NULL;
+    }
 
+    // Parse source code
+    Program* res = parse(fname_s, src_s, toks);
+    if (!res) {
+        return NULL;
+    }
+
+    // Otherwise, everything worked
+    return res;
 }
 
 void carve_program_free(Program* self) {

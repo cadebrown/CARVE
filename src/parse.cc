@@ -132,6 +132,29 @@ vector<Token> lex(const string& fname, const string& src) {
         } else if (my_isspace(c)) {
             // Skip space
             ADV();
+
+        } else if (c == '"') {
+            char sc = c;
+
+            do {
+                if (s[pos] == '\\') {
+                    ADV();
+                }
+                ADV();
+
+            } while (pos < sl && s[pos] != sc);
+
+            if (s[pos] != sc) {
+                cerr << "Expected an end to the string literal" << endl;
+                ADD(Token::Kind::IDENT);
+                cerr << res[res.size() - 1].context(fname, src);
+                res.clear();
+                return res;
+            }
+            ADV();
+
+            ADD(Token::Kind::STR);
+
         } else {
             // Unknown character
             cerr << "Unexpected character: '" << c << "'" << endl;
@@ -147,11 +170,7 @@ vector<Token> lex(const string& fname, const string& src) {
         res.push_back(Token(Token::Kind::NEWLINE, 0, 0, 0, 0));
     }
     return res;
-
 }
-
-
-
 
 
 // Parse and skip a token kind
@@ -309,8 +328,8 @@ static bool parse_imm(Program* res, unordered_map< pair<int, int>, pair<string, 
         // Add to the backpatch array
         back[{seg, res->vmem[seg].size()}] = { id.kind, t.get(res->src) };
 
-        // Return 0 for now
-        out = 0x0;
+        // Return 0 for now, so add nothing
+        out = 0;
         return true;
     } else {
         cerr << "Unexpected token, expected immediate value" << endl;
@@ -318,6 +337,44 @@ static bool parse_imm(Program* res, unordered_map< pair<int, int>, pair<string, 
         return false;
     }
 }
+
+// Parse a string literal
+static bool parse_str(Program* res, const string& dir, unordered_map< pair<int, int>, pair<string, string> >& back, const vector<Token>& toks, int& toki, string& val) {
+    if (toks[toki].kind == Token::Kind::STR) {
+        Token t = toks[toki++];
+        string st = t.get(res->src);
+        val = "";
+
+        for (size_t i = 1; i < st.size() - 1; ++i) {
+            char c = st[i];
+            if (c == '\\') {
+                // Escape sequence
+                i++;
+                c = st[i];
+                if (c == 'n') {
+                    val.push_back('\n');
+                } else if (c == 't') {
+                    val.push_back('\t');
+                } else if (c == 'a') {
+                    val.push_back('\a');
+                } else if (c == 'b') {
+                    val.push_back('\b');
+                } else {
+                    val.push_back('\\');
+                }
+            } else {
+                val.push_back(c);
+            }
+        }
+
+        return true;
+    } else {
+        cerr << "Expected string literal" << endl;
+        cerr << toks[toki].context(res->fname, res->src);
+        return false;
+    }
+}
+
 // Parse R-kind instruction
 static bool parse_R(Program* res, unordered_map< pair<int, int>, pair<string, string> >& back, const vector<Token>& toks, int& toki, instdesc& id, int seg) {
     int rd, rs1, rs2;
@@ -359,7 +416,6 @@ static bool parse_I(Program* res, unordered_map< pair<int, int>, pair<string, st
 
     } else {
         // inst a, b, c
-
         if (!parse_rx(res, toks, toki, rs1)) return false;
 
         if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
@@ -394,13 +450,11 @@ static bool parse_S(Program* res, unordered_map< pair<int, int>, pair<string, st
 
     } else {
         // inst a, b, c
-
         if (!parse_rx(res, toks, toki, rs1)) return false;
 
         if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
 
         if (!parse_imm(res, back, toks, toki, id, seg, imm)) return false;
-
     }
 
     // Add assembled instruction
@@ -467,11 +521,18 @@ static bool parse_J(Program* res, unordered_map< pair<int, int>, pair<string, st
 
 // Parse y-kind instruction
 static bool parse_y(Program* res, unordered_map< pair<int, int>, pair<string, string> >& back, const vector<Token>& toks, int& toki, instdesc& id, int seg) {
-    if (id.kind == "ecall") {
+    if (id.name == "ecall") {
         // Add assembled instruction
         inst v = enc_I(id.op, 0, 0, 0, 0 /* = ecall */);
         addbytes<inst>(res->vmem[seg], v);
         return true;
+
+    } else if (id.name == "ebreak") {
+        // Add assembled instruction
+        inst v = enc_I(id.op, 0, 0, 0, 1 /* = ebreak */);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
     } else {
         cerr << "Unsupported instruction" << endl;
         cerr << toks[toki - 1].context(res->fname, res->src);
@@ -479,6 +540,229 @@ static bool parse_y(Program* res, unordered_map< pair<int, int>, pair<string, st
     }
 }
 
+// Parse p-kind instruction (psuedo-instructions)
+static bool parse_p(Program* res, unordered_map< pair<int, int>, pair<string, string> >& back, const vector<Token>& toks, int& toki, instdesc& id, int seg) {
+    if (id.name == "j") {
+        // Add assembled instruction
+        instdesc& oid = insts.find("jal")->second;
+        int imm;
+        if (!parse_imm(res, back, toks, toki, oid, seg, imm)) return false;
+
+        // Encode psuedo-instruction
+        inst v = enc_J(oid.op, 0, imm);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+    } else if (id.name == "nop") {
+        instdesc& oid = insts.find("addi")->second;
+        int imm;
+        if (!parse_imm(res, back, toks, toki, oid, seg, imm)) return false;
+
+        inst v = enc_I(oid.op, oid.f3, 0, 0, 0);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
+    } else if (id.name == "li") {
+        int rd, rs = 0, imm;
+        if (!parse_rx(res, toks, toki, rd)) return false;
+
+        if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
+
+        // TODO: REplace id with oid?
+        if (!parse_imm(res, back, toks, toki, id, seg, imm)) return false;
+
+        if (imm & ~((1ULL << 12) - 1)) {
+            instdesc& oid = insts.find("lui")->second;
+            inst v = enc_U(oid.op, rd, imm + (1 << 11));
+            addbytes<inst>(res->vmem[seg], v);
+            rs = rd;
+        }
+
+        instdesc& oid = insts.find("addi")->second;
+        inst v = enc_I(oid.op, oid.f3, rd, rs, imm);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
+    } else if (id.name == "la") {
+        int rd, rs = 0, imm;
+        if (!parse_rx(res, toks, toki, rd)) return false;
+
+        if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
+        instdesc& oid = insts.find("auipc")->second;
+
+        Token t = toks[toki];
+        if (!parse_imm(res, back, toks, toki, oid, seg, imm)) return false;
+
+        inst v = enc_U(oid.op, rd, imm);
+        addbytes<inst>(res->vmem[seg], v);
+
+        oid = insts.find("addi")->second;
+        v = enc_I(oid.op, oid.f3, rd, rd, imm);
+        if (t.kind == Token::Kind::IDENT) {
+            // We need to link both instructions to be backpatched
+            back[{seg, res->vmem[seg].size()}] = { oid.kind, t.get(res->src) };
+        }
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
+    } else if (id.name == "mv") {
+        instdesc& oid = insts.find("addi")->second;
+        int rd, rs;
+        if (!parse_rx(res, toks, toki, rd)) return false;
+
+        if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
+
+        if (!parse_rx(res, toks, toki, rs)) return false;
+
+        inst v = enc_I(oid.op, oid.f3, rd, rs, 0);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
+    } else if (id.name == "not") {
+        instdesc& oid = insts.find("xori")->second;
+
+        int rd, rs;
+        if (!parse_rx(res, toks, toki, rd)) return false;
+
+        if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
+
+        if (!parse_rx(res, toks, toki, rs)) return false;
+
+        inst v = enc_I(oid.op, oid.f3, rd, rs, -1);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+    } else if (id.name == "neg") {
+        instdesc& oid = insts.find("sub")->second;
+
+        int rd, rs;
+        if (!parse_rx(res, toks, toki, rd)) return false;
+
+        if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
+
+        if (!parse_rx(res, toks, toki, rs)) return false;
+
+        inst v = enc_R(oid.op, oid.f3, oid.f7, rd, rs, 0);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
+    } else if (id.name == "seqz") {
+        instdesc& oid = insts.find("sltiu")->second;
+
+        int rd, rs;
+        if (!parse_rx(res, toks, toki, rd)) return false;
+
+        if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
+
+        if (!parse_rx(res, toks, toki, rs)) return false;
+
+        inst v = enc_I(oid.op, oid.f3, rd, rs, 1);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
+
+    } else if (id.name == "snez") {
+        instdesc& oid = insts.find("sltu")->second;
+
+        int rd, rs;
+        if (!parse_rx(res, toks, toki, rd)) return false;
+
+        if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
+
+        if (!parse_rx(res, toks, toki, rs)) return false;
+
+        inst v = enc_I(oid.op, oid.f3, rd, 0, rs);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
+    } else if (id.name == "sltz") {
+        instdesc& oid = insts.find("slt")->second;
+
+        int rd, rs;
+        if (!parse_rx(res, toks, toki, rd)) return false;
+
+        if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
+
+        if (!parse_rx(res, toks, toki, rs)) return false;
+
+        inst v = enc_R(oid.op, oid.f3, oid.f7, rd, rs, 0);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
+    } else if (id.name == "sgtz") {
+        instdesc& oid = insts.find("slt")->second;
+
+        int rd, rs;
+        if (!parse_rx(res, toks, toki, rd)) return false;
+
+        if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
+
+        if (!parse_rx(res, toks, toki, rs)) return false;
+
+        inst v = enc_R(oid.op, oid.f3, oid.f7, rd, 0, rs);
+        addbytes<inst>(res->vmem[seg], v);
+        return true;
+
+    } else {
+        cerr << "Unknown psuedo instruction" << endl;
+        cerr << toks[toki - 1].context(res->fname, res->src);
+        return false;
+    }
+}
+// Perform a directive
+static bool do_dir(Program* res, const string& dir, unordered_map< pair<int, int>, pair<string, string> >& back, const vector<Token>& toks, int& toki, int& seg) {
+    if (dir == "ascii") {
+        string val;
+        if (!parse_str(res, dir, back, toks, toki, val)) {
+            return false;
+        }
+
+        // Push all data to current segment
+        for (size_t i = 0; i < val.size(); ++i) {
+            res->vmem[seg].push_back(val[i]);
+        }
+
+        return true;
+
+    } else if (dir == "asciz") {
+        string val;
+        if (!parse_str(res, dir, back, toks, toki, val)) {
+            return false;
+        }
+
+        // Push all data to current segment
+        for (size_t i = 0; i < val.size(); ++i) {
+            res->vmem[seg].push_back(val[i]);
+        }
+        res->vmem[seg].push_back(0);
+
+        return true;
+
+    } else if (dir == "section") {
+        string sec = toks[toki++].get(res->src);
+        int ss = 0;
+        if (sec == "text") {
+            ss = 0;
+        } else if (sec == "rodata") {
+            ss = 1;
+        } else if (sec == "data") {
+            ss = 2;
+        } else if (sec == "bss") {
+            ss = 3;
+        } else {
+            cerr << "Unknown section name" << endl;
+            cerr << toks[toki - 1].context(res->fname, res->src);
+            return false;
+        }
+
+        // Set segment
+        seg = ss;
+        return true;
+
+    } else {
+        cerr << "Unknown directive" << endl;
+        cerr << toks[toki - 1].context(res->fname, res->src);
+        return false;
+    }
+}
 
 Program* parse(const string& fname, const string& src, const vector<Token>& toks) {
     Program* res = new Program();
@@ -523,6 +807,7 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
                 // Now, parse the instruction
                 instdesc& id = it->second;
 
+                // Parse depending on the specific kind of instruction
                 if (id.kind == "R") {
                     if (!parse_R(res, back, toks, toki, id, seg)) {
                         delete res;
@@ -558,6 +843,11 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
                         delete res;
                         return NULL;
                     }
+                } else if (id.kind == "p") {
+                    if (!parse_p(res, back, toks, toki, id, seg)) {
+                        delete res;
+                        return NULL;
+                    }
                 } else {
                     cerr << "Internal error: Instruction kind not supported yet (" << id.kind << ")" << endl;
                     cerr << t.context(res->fname, res->src);
@@ -573,7 +863,14 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
 
             }
         } else if (t.kind == Token::Kind::DOT) {
-            // Directive, TODO
+            // Directive
+            // Get directive name
+            string dir = toks[toki++].get(src);
+            if (!do_dir(res, dir, back, toks, toki, seg)) {
+                delete res;
+                return NULL;
+            }
+
         } else if (t.kind == Token::Kind::NEWLINE) {
             // Skip newline
         } else {
@@ -597,8 +894,19 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
         // Label target
         pair<int, int> from = it->first;
         pair<int, int> to = labels[it->second.second];
-        // TODO: calculate offset
-        u64 newimm = to.second - from.second - 4;
+
+        // Calculate offset
+        s64 newimm = to.second - from.second - 4;
+
+        // Add spaces between segments
+        for (int i = from.first; i < to.first; ++i) {
+            newimm += res->vmem[i].size();
+        }
+        for (int i = from.first; i > to.first; --i) {
+            newimm -= res->vmem[i].size();
+        }
+
+        // Make sure to add back the immediate that was already there!
         if (kind == "I") {
             dec_I(v, op, f3, rd, rs1, imm);
             v = enc_I(op, f3, rd, rs1, newimm);
@@ -614,6 +922,9 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
         } else if (kind == "B") {
             dec_B(v, op, f3, rs1, rs2, imm);
             v = enc_B(op, f3, rs1, rs2, newimm);
+        } else if (kind == "U") {
+            dec_U(v, op, rd, imm);
+            v = enc_U(op, rd, imm);
         } else {
             assert(false);
         }

@@ -67,9 +67,9 @@ serve:
 	bundle exec jekyll serve
 
 # Generated files
-src/insts.cc: tools/geninsts.py
+src/insts.cc: tools/geninsts.py tools/riscvdata.py
 	$< > $@
-src/exec.cc: tools/genexec.py
+src/exec.cc: tools/genexec.py tools/riscvdata.py
 	$< > $@
 
 $(out_LIB_JS): $(src_EMCCO) src/pre.js

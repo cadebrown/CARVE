@@ -1,0 +1,20 @@
+
+# Editors
+.vscode
+
+# Build files
+.o
+.a
+.lib
+.dll
+.so
+.dylib
+
+# Build folders
+build
+carve
+dist
+
+__pycache__
+.py[cod]
+

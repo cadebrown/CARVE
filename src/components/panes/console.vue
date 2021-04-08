@@ -1,10 +1,18 @@
 <template>
-    <div id="console"></div>
+    <div id="console">
+      
+    </div>
+    
 </template>
 
 <script>
 export default {
   name: 'console',
+  methods: {
+    created() {
+      console.log("wootowoot");
+    }
+  }
 }
 
 </script>

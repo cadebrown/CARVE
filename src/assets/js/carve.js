@@ -1,5 +1,5 @@
 function main() {
-    console.log("running main");
+    console.log("cade is smart... not");
 }
 
 main()

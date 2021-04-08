@@ -1,6 +1,5 @@
 <template>
     <AceEditor 
-        v-model="content"
         @init="editorInit" 
         lang="javascript" 
         theme="monokai"

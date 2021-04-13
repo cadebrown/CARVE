@@ -21,42 +21,42 @@ void _auipc  (State& s, int rd, u64 imm) {
 
 void _jal    (State& s, int rd, u64 imm) {
     if (rd != 0) s.rx[rd] = s.pc;
-    s.pc += sext(imm, 20);
+    s.pc += sext(imm, 20) - 4;
 }
 void _jalr   (State& s, int rd, int rs1, u64 imm) {
     u64 rr = s.pc;
-    s.pc = s.rx[rs1] + sext(imm, 19);
+    s.pc = s.rx[rs1] + sext(imm, 19) - 4;
     if (rd != 0) s.rx[rd] = rr;
 
 }
 void _beq    (State& s, int rs1, int rs2, u64 imm) {
     if (s.rx[rs1] == s.rx[rs2]) {
-        s.pc += sext(imm, 12);
+        s.pc += sext(imm, 12) - 4;
     }
 }
 void _bne    (State& s, int rs1, int rs2, u64 imm) {
     if (s.rx[rs1] != s.rx[rs2]) {
-        s.pc += sext(imm, 12);
+        s.pc += sext(imm, 12) - 4;
     }
 }
 void _blt    (State& s, int rs1, int rs2, u64 imm) {
     if (s.rxs(rs1) < s.rxs(rs2)) {
-        s.pc += sext(imm, 12);
+        s.pc += sext(imm, 12) - 4;
     }
 }
 void _bge    (State& s, int rs1, int rs2, u64 imm) {
     if (s.rxs(rs1) >= s.rxs(rs2)) {
-        s.pc += sext(imm, 12);
+        s.pc += sext(imm, 12) - 4;
     }
 }
 void _bltu   (State& s, int rs1, int rs2, u64 imm) {
     if (s.rx[rs1] < s.rx[rs2]) {
-        s.pc += sext(imm, 12);
+        s.pc += sext(imm, 12) - 4;
     }
 }
 void _bgeu   (State& s, int rs1, int rs2, u64 imm) {
     if (s.rx[rs1] >= s.rx[rs2]) {
-        s.pc += sext(imm, 12);
+        s.pc += sext(imm, 12) - 4;
     }
 }
 void _lb     (State& s, int rd, int rs1, u64 imm) {

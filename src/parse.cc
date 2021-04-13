@@ -127,7 +127,15 @@ vector<Token> lex(const string& fname, const string& src) {
                 ADV();
             } while (pos < sl && (my_isdigit(s[pos], base) || (s[pos] == '_')));
 
-            ADD(Token::Kind::INT);
+            bool is_float = s[pos] == '.';
+            if (is_float) {
+                ADV();
+                do {
+                    ADV();
+                } while (pos < sl && (my_isdigit(s[pos], base) || (s[pos] == '_')));
+            }
+
+            ADD(is_float ? Token::Kind::FLOAT : Token::Kind::INT);
 
         } else if (my_isspace(c)) {
             // Skip space
@@ -338,6 +346,82 @@ static bool parse_imm(Program* res, unordered_map< pair<int, int>, pair<string, 
     }
 }
 
+
+// Parse integer
+static bool parse_int(Program* res, const vector<Token>& toks, int& toki, s64& out) {
+    bool is_neg = false;
+    if (toks[toki].kind == Token::Kind::SUB) {
+        toki++;
+        is_neg = true;
+    }
+    if (toks[toki].kind == Token::Kind::INT) {
+        Token t = toks[toki++];
+        s64 rv = 0;
+        
+        int base = 10;
+        for (int i = 0; i < t.len; i++) {
+            char d = res->src[t.pos + i];
+            
+            if (d == '_') continue;
+
+            /* handle nondigits */
+            if (!my_isdigit(d, base)) {
+                /* if base change is valid, check for base char */
+                if (i == 1 && res->src[t.pos] == '0') {
+                    if (d == 'x' || d == 'X') {
+                        base = 16;
+                        continue;
+                    } else if (d == 'b' || d == 'B') {
+                        base = 2;
+                        continue;
+                    } else {
+                        cerr << "Character doesn't match expected integer base" << endl;
+                        cerr << t.context(res->fname, res->src);
+                        return false;
+                    }
+                }
+            }
+
+            if (d >= 'a') d -= ('a' - 10);
+            else if (d >= 'A') d -= ('A' - 10);
+            else d -= '0';
+
+            rv = base * rv + d;
+        }
+
+        out = is_neg ? -rv : rv;
+        return true;
+    } else {
+        cerr << "Unexpected token, expected integer" << endl;
+        cerr << toks[toki].context(res->fname, res->src);
+        return false;
+    }
+}
+
+
+
+// Parse float
+static bool parse_float(Program* res, const vector<Token>& toks, int& toki, double& out) {
+    int i = 0;
+
+    bool is_neg = false;
+    if (toks[toki].kind == Token::Kind::SUB) {
+        toki++;
+        is_neg = true;
+    }
+    if (toks[toki].kind == Token::Kind::INT || toks[toki].kind == Token::Kind::FLOAT) {
+        Token t = toks[toki++];
+        double rv = strtod(t.get(res->src).c_str(), NULL);
+
+
+        out = is_neg ? -rv : rv;
+        return true;
+    } else {
+        cerr << "Unexpected token, expected floating point number" << endl;
+        cerr << toks[toki].context(res->fname, res->src);
+        return false;
+    }
+}
 // Parse a string literal
 static bool parse_str(Program* res, const string& dir, unordered_map< pair<int, int>, pair<string, string> >& back, const vector<Token>& toks, int& toki, string& val) {
     if (toks[toki].kind == Token::Kind::STR) {
@@ -404,7 +488,7 @@ static bool parse_I(Program* res, unordered_map< pair<int, int>, pair<string, st
 
     if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
 
-    if (toks[toki].kind == Token::Kind::LPAR) {
+    if (toks[toki+1].kind == Token::Kind::LPAR) {
         // inst a, c(b)
         if (!parse_imm(res, back, toks, toki, id, seg, imm)) return false;
 
@@ -438,7 +522,7 @@ static bool parse_S(Program* res, unordered_map< pair<int, int>, pair<string, st
 
     if (!parse_skip(res, toks, toki, Token::Kind::COM)) return false;
 
-    if (toks[toki].kind == Token::Kind::LPAR) {
+    if (toks[toki+1].kind == Token::Kind::LPAR) {
         // inst a, c(b)
         if (!parse_imm(res, back, toks, toki, id, seg, imm)) return false;
 
@@ -593,12 +677,21 @@ static bool parse_p(Program* res, unordered_map< pair<int, int>, pair<string, st
         if (!parse_imm(res, back, toks, toki, oid, seg, imm)) return false;
 
         inst v = enc_U(oid.op, rd, imm);
-        addbytes<inst>(res->vmem[seg], v);
+        bool dou = (imm & (~0xFFF)) != 0;
+        if (dou) {
+            addbytes<inst>(res->vmem[seg], v);
+        }
 
         oid = insts.find("addi")->second;
         v = enc_I(oid.op, oid.f3, rd, rd, imm);
         if (t.kind == Token::Kind::IDENT) {
             // We need to link both instructions to be backpatched
+            if (dou) {
+                back.erase({seg, res->vmem[seg].size() - 4});
+                back.erase({seg, res->vmem[seg].size() - 8});
+            } else {
+                back.erase({seg, res->vmem[seg].size()});
+            }
             back[{seg, res->vmem[seg].size()}] = { oid.kind, t.get(res->src) };
         }
         addbytes<inst>(res->vmem[seg], v);
@@ -757,6 +850,118 @@ static bool do_dir(Program* res, const string& dir, unordered_map< pair<int, int
         seg = ss;
         return true;
 
+
+    } else if (dir == "byte") {
+        toki--;
+        do {
+            toki++;
+            s64 val;
+            if (!parse_int(res, toks, toki, val)) {
+                return false;
+            }
+
+            res->vmem[seg].push_back(val & 0xFF);
+        } while (toks[toki].kind == Token::Kind::COM);
+
+        return true;
+
+    } else if (dir == "half") {
+        toki--;
+        do {
+            toki++;
+            s64 val;
+            if (!parse_int(res, toks, toki, val)) {
+                return false;
+            }
+
+            res->vmem[seg].push_back(val & 0xFF);
+            res->vmem[seg].push_back((val >> 8) & 0xFF);
+        } while (toks[toki].kind == Token::Kind::COM);
+
+        return true;
+
+    } else if (dir == "word") {
+
+        toki--;
+        do {
+            toki++;
+            s64 val;
+            if (!parse_int(res, toks, toki, val)) {
+                return false;
+            }
+
+            res->vmem[seg].push_back(val & 0xFF);
+            res->vmem[seg].push_back((val >> 8) & 0xFF);
+            res->vmem[seg].push_back((val >> 16) & 0xFF);
+            res->vmem[seg].push_back((val >> 24) & 0xFF);
+        } while (toks[toki].kind == Token::Kind::COM);
+
+        return true;
+
+    } else if (dir == "dword") {
+
+
+        toki--;
+        do {
+            toki++;
+            s64 val;
+            if (!parse_int(res, toks, toki, val)) {
+                return false;
+            }
+
+            res->vmem[seg].push_back(val & 0xFF);
+            res->vmem[seg].push_back((val >> 8) & 0xFF);
+            res->vmem[seg].push_back((val >> 16) & 0xFF);
+            res->vmem[seg].push_back((val >> 24) & 0xFF);
+            res->vmem[seg].push_back((val >> 32) & 0xFF);
+            res->vmem[seg].push_back((val >> 40) & 0xFF);
+            res->vmem[seg].push_back((val >> 48) & 0xFF);
+            res->vmem[seg].push_back((val >> 56) & 0xFF);
+        } while (toks[toki].kind == Token::Kind::COM);
+
+        return true;
+
+    } else if (dir == "float") {
+
+        toki--;
+        do {
+            toki++;
+            double val;
+            if (!parse_float(res, toks, toki, val)) {
+                return false;
+            }
+            addbytes(res->vmem[seg], (float)val);
+        } while (toks[toki].kind == Token::Kind::COM);
+
+        return true;
+
+    } else if (dir == "double") {
+        toki--;
+        do {
+            toki++;
+
+            double val;
+            if (!parse_float(res, toks, toki, val)) {
+                return false;
+            }
+
+            addbytes(res->vmem[seg], (double)val);
+
+        } while (toks[toki].kind == Token::Kind::COM);
+
+        return true;
+
+    } else if (dir == "space") {
+        s64 num;
+        if (!parse_int(res, toks, toki, num)) {
+            return false;
+        }
+        for (int i = 0; i < num; ++i) {
+            res->vmem[seg].push_back(0);
+        }
+
+        return true;
+
     } else {
         cerr << "Unknown directive" << endl;
         cerr << toks[toki - 1].context(res->fname, res->src);
@@ -896,7 +1101,7 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
         pair<int, int> to = labels[it->second.second];
 
         // Calculate offset
-        s64 newimm = to.second - from.second - 4;
+        s64 newimm = to.second - from.second;
 
         // Add spaces between segments
         for (int i = from.first; i < to.first; ++i) {

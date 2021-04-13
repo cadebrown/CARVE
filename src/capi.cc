@@ -46,14 +46,16 @@ void carve_exec_single(State* s) {
     if (s->is_halted) {
         return;
     }
+
     // Now, first, we need to get the current instruction
     inst v = s->load<inst>(s->pc);
-    
-    // Increment to next instruction
-    s->pc += 4;
 
     // And execute in the state
     s->exec(v);
+
+    // Increment to next instruction
+    s->pc += 4;
+
 }
 
 

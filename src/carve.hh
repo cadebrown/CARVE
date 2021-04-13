@@ -234,12 +234,14 @@ struct State {
 
     // Return index into 'vmem' from an address
     s64 real(s64 idx) {
-        return idx - 0x1000;
+        return idx;
+       // return idx - 0x1000;
     }
 
     // Return fake address from 'vmem' index
     s64 fake(s64 idx) {
-        return idx + 0x1000;
+        return idx;
+       // return idx + 0x1000;
     }
 
     // Signed register

@@ -38,13 +38,13 @@ CXXFLAGS += -g
 
 # -*- Files -*-
 
-src_CC       := $(sort $(wildcard src/*.cc) $(wildcard src/impl/*.cc) src/insts.cc src/exec.cc)
-src_HH       := $(wildcard src/*.hh)
+src_CC       := $(sort $(wildcard src-c/*.cc) $(wildcard src-c/impl/*.cc) src-c/insts.cc src-c/exec.cc)
+src_HH       := $(wildcard src-c/*.hh)
 
 src_O        := $(patsubst %.cc,build/%.o,$(src_CC))
 src_EMCCO    := $(patsubst %.cc,build/%.emcco,$(src_CC))
 
-out_LIB_JS   := assets/js/libcarve.js
+out_LIB_JS   := src/assets/js/libcarve.js
 out_CLI      := carve
 
 
@@ -64,24 +64,24 @@ lib: $(out_LIB_JS)
 bin: $(out_CLI)
 
 serve:
-	bundle exec jekyll serve
+	npm run serve
 
 # Generated files
-src/insts.cc: tools/geninsts.py tools/riscvdata.py
+src-c/insts.cc: tools/geninsts.py tools/riscvdata.py
 	$< > $@
-src/exec.cc: tools/genexec.py tools/riscvdata.py
+src-c/exec.cc: tools/genexec.py tools/riscvdata.py
 	$< > $@
 
-$(out_LIB_JS): $(src_EMCCO) src/pre.js
+$(out_LIB_JS): $(src_EMCCO) src-c/pre.js
 	@mkdir -p $(dir $@)
 	$(EMCC) \
 		$(EMCC_LDFLAGS) \
 		-sMODULARIZE=1 -sEXPORT_NAME='loadlibcarve' \
 		$(src_EMCCO) \
-		--pre-js src/pre.js \
+		--pre-js src-c/pre.js \
 		-o $@
 
-$(out_CLI): $(src_O) build/src/cli/main.o
+$(out_CLI): $(src_O) build/src-c/cli/main.o
 	@mkdir -p $(dir $@)
 	$(CXX) \
 		$^ \
@@ -89,9 +89,9 @@ $(out_CLI): $(src_O) build/src/cli/main.o
 
 build/%.o: %.cc $(src_H)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -Isrc $< -c -fPIC -o $@
+	$(CXX) $(CXXFLAGS) -Isrc-c $< -c -fPIC -o $@
 
 build/%.emcco: %.cc $(src_H)
 	@mkdir -p $(dir $@)
-	$(EMCC) $(EMCC_CFLAGS) -Isrc $< -c -fPIC -o $@
+	$(EMCC) $(EMCC_CFLAGS) -Isrc-c $< -c -fPIC -o $@
 

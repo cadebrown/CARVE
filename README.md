@@ -23,12 +23,11 @@ $ make
 
 ## Running
 
-First, [install jekyll](https://jekyllrb.com/docs/installation/) to run locally
+You'll need to install NodeJS/npm to run the web app.
 
-To run the application, you'll need to use the Jekyll website in `docs/`. If you make changes to `libcarve` or the C sources, make sure to run `make update` to update the code used in the website
+You'll need to install with `npm install`
 
-Then, you can run `bundle exec jekyll serve` to host it locally
-
+Then, to serve, run `npm run serve`
 
 ## Adding an Instruction
 

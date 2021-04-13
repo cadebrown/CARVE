@@ -110,7 +110,7 @@ Module['ready'] = new Promise(function(resolve, reject) {
  */
 
 /* This will be the main module loaded in the website */
-let Module = {
+var Module = {
     /* Custom lists of callbacks to call when a line is written to either 
      *   stdout or stderr
      */
@@ -4957,6 +4957,9 @@ var asmLibraryArg = {
 var asm = createWasm();
 /** @type {function(...*):?} */
 var ___wasm_call_ctors = Module["___wasm_call_ctors"] = createExportWrapper("__wasm_call_ctors");
+
+/** @type {function(...*):?} */
+var _carve_init = Module["_carve_init"] = createExportWrapper("carve_init");
 
 /** @type {function(...*):?} */
 var _carve_state_new = Module["_carve_state_new"] = createExportWrapper("carve_state_new");

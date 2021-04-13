@@ -44,7 +44,7 @@ src_HH       := $(wildcard src-c/*.hh)
 src_O        := $(patsubst %.cc,build/%.o,$(src_CC))
 src_EMCCO    := $(patsubst %.cc,build/%.emcco,$(src_CC))
 
-out_LIB_JS   := src/assets/js/libcarve.js
+out_LIB_JS   := public/js/libcarve.js
 out_CLI      := carve
 
 
@@ -57,7 +57,7 @@ default: lib bin
 all: lib bin
 
 clean:
-	rm -rf $(wildcard $(src_O) $(out_LIB_JS) $(out_CLI))
+	rm -rf $(wildcard $(src_O) $(src_EMCCO) $(out_LIB_JS) $(out_CLI))
 
 lib: $(out_LIB_JS)
 

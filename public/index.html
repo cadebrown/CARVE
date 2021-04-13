@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="english">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://unpkg.com/jquery.terminal/js/jquery.terminal.min.js"></script>
+    <link rel="stylesheet" href="/css/jquery.terminal.css">
+
+    <script src="/js/libcarve.js"></script>
+    <script src="/js/carve.js"></script>
+
+    <script>
+      var libcarve = null
+      loadlibcarve().then(function (_libcarve) {
+        libcarve = _libcarve
+
+        var term = $('#console').terminal(function(cmd, term) {
+          // Write to stdin
+          libcarve._buf_stdin += cmd + '\n';
+        }, {
+          name: 'carve-console',
+          greetings: '',
+          prompt: '',
+        })
+
+        // write to stdout
+        libcarve._write_stdout.push(function (text) {
+            term.echo("[[;#BBBBBB;]" + text + "]")
+        })
+        // write to stderr
+        libcarve._write_stderr.push(function (text) {
+            term.echo("[[;#EA6452;]" + text + "]")
+        })
+
+        // Add hooks to libcarve to print console output as well as to the on screen terminal
+        libcarve._write_stdout.push(function (text) {
+            console.log('[stdout]', text)
+        })
+        libcarve._write_stderr.push(function (text) {
+            console.warn('[stderr]', text)
+        })
+
+        // Initialize the library before any more calls
+        libcarve._carve_init();
+
+      })
+    </script>
+
+
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

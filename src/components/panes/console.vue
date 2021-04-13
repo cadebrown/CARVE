@@ -2,7 +2,6 @@
     <div id="console">
       
     </div>
-    
 </template>
 
 <script>

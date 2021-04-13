@@ -349,6 +349,9 @@ void _ebreak (State& s, int rd, int rs1, u64 imm);
 
 /* External C-API interface */
 
+// Initialize the CARVE library
+CARVE_API void carve_init();
+
 // Create a new State
 // NOTE: Free this with 'carve_state_free()'
 CARVE_API State* carve_state_new();
@@ -365,6 +368,8 @@ CARVE_API void carve_program_free(Program* self);
 
 // Execute a single instruction on 's'
 CARVE_API void carve_exec_single(State* s);
+
+
 
 
 }

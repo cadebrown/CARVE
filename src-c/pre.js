@@ -4,7 +4,7 @@
  */
 
 /* This will be the main module loaded in the website */
-let Module = {
+var Module = {
     /* Custom lists of callbacks to call when a line is written to either 
      *   stdout or stderr
      */

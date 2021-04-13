@@ -8,6 +8,10 @@
 
 namespace carve {
 
+void carve_init() {
+    
+}
+
 
 State* carve_state_new() {
     return new State();

@@ -1,85 +1,67 @@
-#!/usr/bin/env python3
-""" riscvdata.py - RISC-V instruction data
+""" riscvdata.py - RISC-V instruction data, in tabulated form
 
-Used in the generator
+Can be imported into another Python script to access the data
 
-@author: Cade Brown <cade@kscript.org>
 
+@author: Cade Brown <cade@utk.edu>
 """
 
-# Returns instruction kind, from instruction name
-def get_kind(name):
-    for i in insts:
-        if i[0] == name:
-            return i[1]
 
-    raise KeyError(name)
-
-instructions = {
+exts = {
     'RV32I': [
-        # (name, kind, opcode, f3, f7)
-        ('lui',    'U',  0b0110111,  0b000,  0b0000000),
-        ('auipc',  'U',  0b0010111,  0b000,  0b0000000),
-        ('jal',    'J',  0b1101111,  0b000,  0b0000000),
-        ('jalr',   'I',  0b1100111,  0b000,  0b0000000),
-        ('beq',    'B',  0b1100011,  0b000,  0b0000000),
-        ('bne',    'B',  0b1100011,  0b001,  0b0000000),
-        ('blt',    'B',  0b1100011,  0b100,  0b0000000),
-        ('bge',    'B',  0b1100011,  0b101,  0b0000000),
-        ('bltu',   'B',  0b1100011,  0b110,  0b0000000),
-        ('bgeu',   'B',  0b1100011,  0b111,  0b0000000),
-        ('lb',     'I',  0b0000011,  0b000,  0b0000000),
-        ('lh',     'I',  0b0000011,  0b001,  0b0000000),
-        ('lw',     'I',  0b0000011,  0b010,  0b0000000),
-        ('lbu',    'I',  0b0000011,  0b100,  0b0000000),
-        ('lhu',    'I',  0b0000011,  0b101,  0b0000000),
-        ('sb',     'S',  0b0100011,  0b000,  0b0000000),
-        ('sh',     'S',  0b0100011,  0b001,  0b0000000),
-        ('sw',     'S',  0b0100011,  0b010,  0b0000000),
-        ('addi',   'I',  0b0010011,  0b000,  0b0000000),
-        ('slti',   'I',  0b0010011,  0b010,  0b0000000),
-        ('sltiu',  'I',  0b0010011,  0b011,  0b0000000),
-        ('xori',   'I',  0b0010011,  0b100,  0b0000000),
-        ('ori',    'I',  0b0010011,  0b110,  0b0000000),
-        ('andi',   'I',  0b0010011,  0b111,  0b0000000),
-        ('slli',   'I',  0b0010011,  0b001,  0b0000000),
-        ('srli',   'I',  0b0010011,  0b101,  0b0000000), # 'srli' and 'srai' are encoded the same, but the immediate value differs. Therefore, we only include 'srli' in the table, and the executor and encoder must solve that problem. SEE: https://stackoverflow.com/questions/39489318/risc-v-implementing-slli-srli-and-srai
-        ('srai',   'I',  0b0010011,  0b101,  0b0000000),
-        ('add',    'R',  0b0110011,  0b000,  0b0000000),
-        ('sub',    'R',  0b0110011,  0b000,  0b0100000),
-        ('sll',    'R',  0b0110011,  0b001,  0b0000000),
-        ('slt',    'R',  0b0110011,  0b010,  0b0000000),
-        ('sltu',   'R',  0b0110011,  0b011,  0b0000000),
-        ('xor',    'R',  0b0110011,  0b100,  0b0000000),
-        ('srl',    'R',  0b0110011,  0b101,  0b0000000),
-        ('sra',    'R',  0b0110011,  0b101,  0b0010000),
-        ('or',     'R',  0b0110011,  0b110,  0b0000000),
-        ('and',    'R',  0b0110011,  0b111,  0b0000000),
-        ('ebreak', 'y',  0b1110011,  0b000,  0b0000000),
-        ('ecall',  'y',  0b1110011,  0b000,  0b0000000),
-    ]
+        # (name, kind, op, f3, f7, doc)
+        ('lui',    'U', 0b0110111, 0b000, 0b0000000, ''),
+        ('auipc',  'U', 0b0010111, 0b000, 0b0000000, ''),
+        ('jal',    'J', 0b1101111, 0b000, 0b0000000, ''),
+        ('jalr',   'I', 0b1100111, 0b000, 0b0000000, ''),
+        ('beq',    'B', 0b1100011, 0b000, 0b0000000, ''),
+        ('bne',    'B', 0b1100011, 0b001, 0b0000000, ''),
+        ('blt',    'B', 0b1100011, 0b100, 0b0000000, ''),
+        ('bge',    'B', 0b1100011, 0b101, 0b0000000, ''),
+        ('bltu',   'B', 0b1100011, 0b110, 0b0000000, ''),
+        ('bgeu',   'B', 0b1100011, 0b111, 0b0000000, ''),
+        ('lb',     'I', 0b0000011, 0b000, 0b0000000, ''),
+        ('lh',     'I', 0b0000011, 0b001, 0b0000000, ''),
+        ('lw',     'I', 0b0000011, 0b010, 0b0000000, ''),
+        ('lbu',    'I', 0b0000011, 0b100, 0b0000000, ''),
+        ('lhu',    'I', 0b0000011, 0b101, 0b0000000, ''),
+        ('sb',     'S', 0b0100011, 0b000, 0b0000000, ''),
+        ('sh',     'S', 0b0100011, 0b001, 0b0000000, ''),
+        ('sw',     'S', 0b0100011, 0b010, 0b0000000, ''),
+        ('addi',   'I', 0b0010011, 0b000, 0b0000000, ''),
+        ('slti',   'I', 0b0010011, 0b010, 0b0000000, ''),
+        ('sltiu',  'I', 0b0010011, 0b011, 0b0000000, ''),
+        ('xori',   'I', 0b0010011, 0b100, 0b0000000, ''),
+        ('ori',    'I', 0b0010011, 0b110, 0b0000000, ''),
+        ('andi',   'I', 0b0010011, 0b111, 0b0000000, ''),
+        ('slli',   'I', 0b0010011, 0b001, 0b0000000, ''),
+        ('srli',   'I', 0b0010011, 0b101, 0b0000000, ''), # 'srli' and 'srai' are encoded the same, but the immediate value differs. Therefore, we only include 'srli' in the table, and the executor and encoder must solve that problem. SEE: https://stackoverflow.com/questions/39489318/risc-v-implementing-slli-srli-and-srai
+        ('srai',   'I', 0b0010011, 0b101, 0b0000000, ''),
+        ('add',    'R', 0b0110011, 0b000, 0b0000000, ''),
+        ('sub',    'R', 0b0110011, 0b000, 0b0100000, ''),
+        ('sll',    'R', 0b0110011, 0b001, 0b0000000, ''),
+        ('slt',    'R', 0b0110011, 0b010, 0b0000000, ''),
+        ('sltu',   'R', 0b0110011, 0b011, 0b0000000, ''),
+        ('xor',    'R', 0b0110011, 0b100, 0b0000000, ''),
+        ('srl',    'R', 0b0110011, 0b101, 0b0000000, ''),
+        ('sra',    'R', 0b0110011, 0b101, 0b0010000, ''),
+        ('or',     'R', 0b0110011, 0b110, 0b0000000, ''),
+        ('and',    'R', 0b0110011, 0b111, 0b0000000, ''),
+        
+        ('ebreak', 'y', 0b1110011, 0b000, 0b0000000, ''),
+        ('ecall',  'y', 0b1110011, 0b000, 0b0000000, ''),
+
+        ('j',      'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('nop',    'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('li',     'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('la',     'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('mv',     'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('not',    'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('neg',    'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('seqz',   'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('snez',   'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('sltz',   'p', 0b0000000, 0b000, 0b0000000, ''),
+        ('sgtz',   'p', 0b0000000, 0b000, 0b0000000, ''),
+    ],
 }
 
-pseudoinstructions = {
-    'RV32I': [
-        'j',
-        'nop',
-        'li',
-        'mv',
-        'not',
-        'neg',
-        'seqz',
-        'snez',
-        'sltz',
-        'sgtz',
-    ]
-}
-
-# List of all instructions
-insts = sum((instructions[k] for k in instructions), [])
-
-# List of all pseudo instructions
-pseudos = sum((pseudoinstructions[k] for k in pseudoinstructions), [])
-
-# List of all extensions
-exts = {i for i in instructions} | {i for i in pseudoinstructions}

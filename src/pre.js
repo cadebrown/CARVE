@@ -1,6 +1,6 @@
-/* pre.js - pre-amble for compiled Emscripten module
+/* pre.js - preamble for compiled Emscripten module
  * 
- * @author: Cade Brown <cade@kscript.org>
+ * @author: Cade Brown <cade@utk.edu>
  */
 
 /* This will be the main module loaded in the website */
@@ -25,6 +25,8 @@ var Module = {
             Module._write_stderr[i](text);
         }
     },
+
+    /* Called just before it is ran */
     preRun: function() {
         function stdin() {
 
@@ -43,6 +45,6 @@ var Module = {
             }
         }
         FS.init(stdin);
-      }
+    }
 
 };

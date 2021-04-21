@@ -1,76 +1,99 @@
 # makefile - build system for CARVE
 #
+# Common targets:
+#
+#   * `make`: Builds 
+#
+#
 #
 # @author: Cade Brown <cade@utk.edu>
 
 
-
 # -*- Programs -*-
 
-# Emscripten compiler
+# Emscripten compiler, assumes you have loaded the Emscripten SDK through
+#   your dotfiles, or via `source /path/to/emsdk/emsdk_env.sh`
 EMCC         := emcc
+
+
+# -*- Checks -*-
+
+# Check for Emscripten (EMCC)
+ifneq ($(shell $(EMCC) --version > /dev/null; echo $$?),0)
+  $(error Emscripten is not installed or loaded ($$(EMCC)=$(EMCC)). Try loading the environment variables, or setting `EMCC` to the Emscripten compiler)
+endif
+
 
 # -*- Options -*-
 
-# Emscripten compiler options
+# Emscripten compiler flags
 EMCC_CFLAGS  := -sASSERTIONS=1 -sSAFE_HEAP=1 -sDEMANGLE_SUPPORT=1
 
-# RISC-V extensions
-RISCV        ?= RV32I
+# Emscripten linker flags (for final compilation)
+EMCC_LDFLAGS := -sWASM=1 -sFORCE_FILESYSTEM=1 \
+				-sEXTRA_EXPORTED_RUNTIME_METHODS=[\"ccall\",\"cwrap\",\"stringToUTF8\",\"UTF8ToString\"] \
+				-sEXPORTED_FUNCTIONS=[\"_malloc\",\"_free\"]
 
-# Defines
-DEFS         += $(foreach x,$(RISCV),-D$(x))
-
+CXXFLAGS += -g
 
 # -*- Files -*-
 
-src_C        := $(filter-out src/execinst.c src/getinst.c,$(wildcard src/*.c)) src/execinst.c src/getinst.c
-src_H        := $(wildcard src/*.h) $(wildcard src/ext/*.h) src/parse_p.h
+src_CC       := $(sort $(wildcard src/*.cc) $(wildcard src/impl/*.cc) src/insts.cc src/exec.cc)
+src_HH       := $(wildcard src/*.hh)
 
-# -*- Outputs -*-
+src_O        := $(patsubst %.cc,build/%.o,$(src_CC))
+src_EMCCO    := $(patsubst %.cc,build/%.emcco,$(src_CC))
 
-src_O        := $(patsubst %.c,build/%.o,$(src_C))
-
-carve_SHARED := build/libcarve.js
+out_LIB_JS   := docs/js/lib/libcarve.js
+out_CLI      := carve
 
 
 # -*- Rules -*-
 
-.PHONY: default all clean update
+.PHONY: default all clean lib bin serve update
 
-default: $(carve_SHARED)
+default: lib bin
 
-all: $(carve_SHARED)
+update: lib bin
+
+all: lib bin
 
 clean:
-	rm -rf $(wildcard $(carve_SHARED) $(src_O))
+	rm -rf $(wildcard $(src_O) $(src_EMCCO) $(out_LIB_JS) $(out_CLI))
 
-update: build/libcarve.js build/libcarve.wasm
-	cp build/libcarve.js docs/js/lib
-	cp build/libcarve.wasm docs/js/lib
+lib: $(out_LIB_JS)
 
-src/execinst.c: tools/genexecinst.py tools/riscvdata.py
+bin: $(out_CLI)
+
+serve:
+	npm run serve
+
+# Generated files
+src/insts.cc: tools/geninsts.py tools/riscvdata.py
+	$< > $@
+src/exec.cc: tools/genexec.py tools/riscvdata.py
 	$< > $@
 
-src/getinst.c: tools/gengetinst.py tools/riscvdata.py
-	$< > $@
-
-src/parse_p.h: tools/genpseudo.py tools/riscvdata.py
-	$< > $@
-
-
-$(carve_SHARED): $(src_O) src/pre.js
+$(out_LIB_JS): $(src_EMCCO) src/pre.js
 	@mkdir -p $(dir $@)
 	$(EMCC) \
-		$(src_O) \
-		--pre-js src/pre.js \
-		-sWASM=1 \
+		$(EMCC_LDFLAGS) \
 		-sMODULARIZE=1 -sEXPORT_NAME='loadlibcarve' \
-		-sFORCE_FILESYSTEM=1 \
-		-sEXTRA_EXPORTED_RUNTIME_METHODS=[\"ccall\",\"cwrap\",\"stringToUTF8\",\"UTF8ToString\"] \
-		-sEXPORTED_FUNCTIONS=[\"_malloc\",\"_free\"] \
+		$(src_EMCCO) \
+		--pre-js src/pre.js \
 		-o $@
 
-build/%.o: %.c $(src_H)
+$(out_CLI): $(src_O) build/src/cli/main.o
 	@mkdir -p $(dir $@)
-	$(EMCC) $(EMCC_CFLAGS) $(DEFS) -Isrc $< -c -fPIC -o $@
+	$(CXX) \
+		$^ \
+		-o $@
+
+build/%.o: %.cc $(src_H)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -Isrc $< -c -fPIC -o $@
+
+build/%.emcco: %.cc $(src_H)
+	@mkdir -p $(dir $@)
+	$(EMCC) $(EMCC_CFLAGS) -Isrc $< -c -fPIC -o $@
+

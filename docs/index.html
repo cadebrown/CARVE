@@ -8,7 +8,17 @@ desc: Main page
     <div class="console_bar vbar"></div>
     <div class="console" id="console"></div>
     <div class="reg_bar hbar"></div>
-    <div class="reg_tab table"></div>
+    <div class="reg_tab table">
+        <div class="table_label">
+            <select id="tab_type_sel">
+                <option value="int">Integer Registers</option>
+                <option value="flt">Float Registers</option>
+                <option value="stack">Stack Explorer</option>
+            </select>
+        </div>
+
+        <div id="reg_table"></div>
+    </div>
     <div class="main_toolbar toolbar">
         <div class="main button" id="menu_file">
             File
@@ -34,13 +44,13 @@ addi t0, zero, 10
         <div class="editor_bar hbar"></div>
         <div class="exe_tab table"></div>
         <div class="exe_toolbar toolbar">
-            <div class="exe button" id="menu_reassemble">
+            <div class="exe button" id="menu_reassemble" onclick="update_program()">
                 Reassemble
             </div>
-            <div class="exe button" id="menu_run">
+            <div class="exe button" id="menu_run" onclick="do_run()">
                 Run
             </div>
-            <div class="exe button" id="menu_step">
+            <div class="exe button" id="menu_step" onclick="do_step()">
                 Step
             </div>
             <div class="exe button" id="menu_speed">

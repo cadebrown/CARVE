@@ -80,6 +80,11 @@ void carve_getrf(State* s, int len, char* data, int reg) {
     snprintf(data, len, "%lf", (double)s->rf[reg]);
 }
 
+void carve_getrfx(State* s, int len, char* data, int reg) {
+    snprintf(data, len, "%lli", *(long long int*)&s->rf[reg]);
+}
+
+
 void carve_state_init(State* self, Program* program) {
     self->init(*program);
 }

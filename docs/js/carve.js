@@ -68,6 +68,13 @@ loadlibcarve().then(function (_libcarve) {
     // Initialize the library before any more calls
     libcarve._carve_init();
 
+    // Allocate temporary buffior
+    tmpbuf = libcarve._malloc(tmpbuf_len)
+
+    // Allocate an empty state
+    state = libcarve._carve_state_new()
+
+    // Create state
     state = libcarve._carve_state_new()
 
     $(document).ready(function () {
@@ -76,7 +83,7 @@ loadlibcarve().then(function (_libcarve) {
         $("#tab_type_sel").change(function() {
 
             // Table of registers, the element that should be modified
-            let elem = $("#reg-table")
+            let elem = $("#reg_table")
             
 
             // What type of registers/view?
@@ -85,14 +92,15 @@ loadlibcarve().then(function (_libcarve) {
             // List of registers of this type
             let regs = REG_TAB[type]
 
-            
-            let out = "<table class='register_table' id='reg_table'>"
+
+            let out = "<table class='regs reg_table'>"
+
         
             // Add header row
-            out += "<tr><td class='register_table reg_id t_head'>REG</td><td class='register_table reg_name t_head'>NAME</td><td class='register_table reg_hex t_head'>HEX</td><td class='register_table reg_dec t_head'>DEC</td></tr>"
-
-            const make_row = (reg, abi, desc, saver) => {
-                return '<tr id="row_' + (type+reg) + '"><td id="reg_' + (type) + 'lab' + (reg) + '"class="register_table reg_' + (type) + 'id">' + (reg) + '</td><td id="reg_name' + (reg) + '"class="register_table reg_name">' + (abi) + '</td><td class="register_table reg_hex" id="reg_' + (type+reg) + '_hex">0</td><td class="register_table reg_dec" id="reg_' + (type+reg) + '_dec">0</td></tr>'
+            out += "<tr class='regs'><td class='regs reg_head reg_id'>REG</td><td class='regs reg_head reg_name'>NAME</td><td class='regs reg_head reg_hex'>HEX</td><td class='regs reg_head reg_dec'>DEC</td></tr>"
+            
+            const make_row = (id, name, desc, save) => {
+                return "<tr class='regs' id='reg_" + (id) + "'><td class='regs' id='reg_" + (id) + "_id'>" + (id) + "</td><td class='regs' id='reg_" + (id) + "_name'>" + (name) + "</td><td class='regs' id='reg_" + (id) + "_hex'></td><td class='regs' id='reg_" + (id) + "_dec'></td></tr>"
             }
 
             for (let i = 0; i < regs.length; ++i) {
@@ -100,10 +108,8 @@ loadlibcarve().then(function (_libcarve) {
             }
 
             out += "</table>"
-
             elem[0].innerHTML = out
 
-        
             for (let i = 0; i < regs.length; i++) {
                 let content = regs[i][2];
         
@@ -111,13 +117,12 @@ loadlibcarve().then(function (_libcarve) {
                     content += "; " + regs[i][3] + " saved"
                 }
         
-                tippy('#row_'+type+regs[i][0], {
+                tippy('#row_' + type + regs[i][0], {
                     content: content,
                     placement: 'left',
                     allowHTML: true,
                     interactive: true,
                 });
-                out += make_row(...regs[i]);
             }
 
             // Update the graphical interface
@@ -241,11 +246,22 @@ function update_program() {
 // Updates the UI elements for the engine's current register values
 function update_ui() {
     for (let i = 0; i < 32; ++i) {
+        let base = 'reg_' + "x" + i.toString()
+
         libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 16)
-        $('#reg_' + "intx" + i.toString() + '_hex').text(libcarve.UTF8ToString(tmpbuf))
+        $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
 
         libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 10)
-        $('#reg_' + "intx" + i.toString() + '_dec').text(libcarve.UTF8ToString(tmpbuf))
+        $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
+    }
+    for (let i = 0; i < 32; ++i) {
+        let base = 'reg_' + "f" + i.toString()
+
+        libcarve._carve_getrf(state, tmpbuf_len, tmpbuf, i)
+        $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
+
+        libcarve._carve_getrfx(state, tmpbuf_len, tmpbuf, i)
+        $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
     }
 }
 

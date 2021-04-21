@@ -4918,6 +4918,9 @@ var _carve_getrx = Module["_carve_getrx"] = createExportWrapper("carve_getrx");
 var _carve_getrf = Module["_carve_getrf"] = createExportWrapper("carve_getrf");
 
 /** @type {function(...*):?} */
+var _carve_getrfx = Module["_carve_getrfx"] = createExportWrapper("carve_getrfx");
+
+/** @type {function(...*):?} */
 var _carve_state_init = Module["_carve_state_init"] = createExportWrapper("carve_state_init");
 
 /** @type {function(...*):?} */

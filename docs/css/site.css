@@ -75,6 +75,65 @@ html, body {
     cursor: pointer;
 }
 
+
+/* Table formatting */
+
+.reg_table {
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+    overflow-y: scroll;
+    background-color: var(--dark-panel-color);
+    flex: auto;
+    color: var(--body-text);
+}
+
+.regs {
+    border: 2px solid var(--light-1);
+    border-collapse: collapse;
+    padding: 2px 2px 2px 2px;
+    font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
+    background-color: var(--base-panel-color);
+}
+
+.reg_id {
+    width: 4em;
+    color: var(--reg);
+}
+
+.reg_name {
+    width: 4em;
+    color: var(--reg);
+}
+
+.reg_intid {
+    color: var(--reg);
+}
+
+
+.reg_fltid {
+    color: var(--reg);
+}
+
+.reg_hex {
+    width: 4em;
+    color: var(--num);
+}
+
+.reg_dec {
+    color: var(--num);
+}
+
+.t_head {
+    text-align: center;
+    color: var(--body-text);
+}
+
+.table_label {
+    text-align: center;
+    font-size: larger;
+}
+
 /* special elements */
 
 .file-select-hidden {

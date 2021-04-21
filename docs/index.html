@@ -4,85 +4,51 @@ title: CARVE
 desc: Main page
 ---
 
-<div class="menu" id="menu_bar">
-  <div id="menu_file" class="menu_item">File</div>
-  <div id="menu_options" class="menu_item">Options</div>
-  <div id="menu_assembler" class="menu_item">Assembler</div>
-  <div id="menu_help" class="menu_item">Help</div>
-</div>
-
-
-
-
-<div id="main" class="main row">
-    <div class="col" id="editor-container">
-        <div id="editor"># example RISC-V code
+<div class="grid-container">
+    <div class="console_bar vbar"></div>
+    <div class="console" id="console"></div>
+    <div class="reg_bar hbar"></div>
+    <div class="reg_tab table"></div>
+    <div class="main_toolbar toolbar">
+        <div class="main button" id="menu_file">
+            File
+        </div>
+        <div class="main button" id="menu_options">
+            Options
+        </div>
+        <div class="main button" id="menu_assembler">
+            Assembler
+        </div>
+        <div class="main button" id="menu_help">
+            Help
+        </div>
+    </div>
+    <div class="editor_container">
+        <div class="editor">
+            <div id="ace_editor"># example RISC-V code
 
 # t0 = 10
 addi t0, zero, 10
 # done</div>
-            <div class="menu" id="exe_controls">
-                <div class="exe_button">Reassemble</div>
-                <div class="exe_button" onclick="compile()">Run</div>
-                <div class="exe_button">Step</div>
-                <div class="exe_button">Stop</div>
-                <div class="exe_button">Speed</div>
-                <div class="exe_button">PC</div>
-            </div>
-    </div>
-    <div class="col resize" id="resize-tabedit"></div>
-    <div class="col" id="registers">
-        <div class="table_label">
-            <select id="tab_type_sel">
-                <option value="int">Integer Registers</option>
-                <option value="flt">Float Registers</option>
-                <option value="stack">Stack Explorer</option>
-            </select>
         </div>
-
-        <div id="reg-table"></div>
+        <div class="editor_bar hbar"></div>
+        <div class="exe_tab table"></div>
+        <div class="exe_toolbar toolbar">
+            <div class="exe button" id="menu_reassemble">
+                Reassemble
+            </div>
+            <div class="exe button" id="menu_run">
+                Run
+            </div>
+            <div class="exe button" id="menu_step">
+                Step
+            </div>
+            <div class="exe button" id="menu_speed">
+                Speed
+            </div>
+            <div class="exe button" id="menu_stop">
+                Stop
+            </div>
+        </div>
     </div>
 </div>
-
-<div class="resize" id="resize-console"></div>
-
-<div id="console">
-</div>
-
-
-<input type="file" class="file-select-hidden" id="file-select">
-
-<script>
-
-let tree = {
-    'file': ['open', 'save', 'new'],
-    'options': [['autocomplete', 'autocomplete <input type="checkbox" id="autocomplete_sel">']],
-    'assembler': ['ASSEMBLER INFORMATION (extensions, compilation date, etc.)'],
-    'help': ['CARVE Documentation', 'Syscall reference', 'RISC-V Spec']
-}
-
-for (let k in tree) {
-    let content = ''
-    for (let i = 0; i < tree[k].length; ++i) {
-        let name, elm;
-        if (Array.isArray(tree[k][i])) {
-            name = [tree[k][i][0]];
-            elm = [tree[k][i][1]];
-        } else {
-            name = tree[k][i];
-            elm = '<div class="menu-dropdown" onclick="do_' + k + '_' + name + '()">' + name + '</div>'
-        }
-        content += elm;
-    }
-
-
-    tippy('#menu_' + k, {
-        content: content,
-        allowHTML: true,
-        interactive: true,
-    });
-}
-
-</script>
-
-

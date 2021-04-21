@@ -1,0 +1,107 @@
+---
+layout: default
+title: CARVE
+desc: Main page
+---
+
+<div class="menu" id="menu_bar">
+  <div id="menu_file" class="menu_item">File</div>
+  <div id="menu_options" class="menu_item">Options</div>
+  <div id="menu_assembler" class="menu_item">Assembler</div>
+  <div id="menu_help" class="menu_item">Help</div>
+</div>
+
+
+
+
+<div id="main" class="main row">
+    <div class="col" id="editor-container">
+        <div id="editor"># example RISC-V code
+
+# t0 = 10
+addi t0, zero, 10
+# done</div>
+    <div id="exec_table">woot woot</div>
+            <div class="menu" id="exe_controls">
+                <div class="exe_button">Reassemble</div>
+                <div class="exe_button" onclick="compile()">Run</div>
+                <div class="exe_button">Step</div>
+                <div class="exe_button">Stop</div>
+                <div class="exe_button">Speed</div>
+                <div class="exe_button">PC</div>
+            </div>
+    </div>
+    <!--<div class="col resize" id="resize-tabedit"></div>-->
+    <div class="col" id="registers">
+        <div class="table_label">
+            <select id="tab_type_sel">
+                <option value="int">Integer Registers</option>
+                <option value="flt">Float Registers</option>
+                <option value="stack">Stack Explorer</option>
+            </select>
+        </div>
+
+        <div id="reg-table"></div>
+    </div>
+</div>
+
+<div id="console">
+</div>
+
+
+<input type="file" class="file-select-hidden" id="file-select">
+
+<!-- Execution of UI Libraries -->
+<script>
+
+let tree = {
+    'file': ['open', 'save', 'new'],
+    'options': [['autocomplete', 'autocomplete <input type="checkbox" id="autocomplete_sel">']],
+    'assembler': ['ASSEMBLER INFORMATION (extensions, compilation date, etc.)'],
+    'help': ['CARVE Documentation', 'Syscall reference', 'RISC-V Spec']
+}
+
+for (let k in tree) {
+    let content = ''
+    for (let i = 0; i < tree[k].length; ++i) {
+        let name, elm;
+        if (Array.isArray(tree[k][i])) {
+            name = [tree[k][i][0]];
+            elm = [tree[k][i][1]];
+        } else {
+            name = tree[k][i];
+            elm = '<div class="menu-dropdown" onclick="do_' + k + '_' + name + '()">' + name + '</div>'
+        }
+        content += elm;
+    }
+
+
+    tippy('#menu_' + k, {
+        content: content,
+        allowHTML: true,
+        interactive: true,
+    });
+}
+
+const UPDATE_EDITOR = () => {editor.resize(); editor.renderer.updateFull();}
+
+Split(['#editor-container', '#registers'], {
+    sizes: [75, 15],
+    direction: 'horizontal',
+    onDragEnd: UPDATE_EDITOR,
+})
+
+Split(['#editor', '#exec_table'], {
+    sizes: [75, 15],
+    direction: 'horizontal',
+    onDragEnd: UPDATE_EDITOR,
+})
+
+Split(['#main', '#console'], {
+    sizes: [75, 25],
+    direction: 'vertical',
+    onDragEnd: UPDATE_EDITOR,
+})
+</script>
+
+

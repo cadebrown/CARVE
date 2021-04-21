@@ -2,10 +2,12 @@ var libcarve = null;
 var editor = null;
 var state = null;
 var reg_table = null;
+var console = null;
 
 loadlibcarve().then(function (_libcarve) {
     libcarve = _libcarve;
-
+    $(document).ready(() => {load_ui();})
+    /*
     // Initialize the editor
     editor = ace.edit("editor", {
         selectionStyle: "text"
@@ -52,11 +54,6 @@ loadlibcarve().then(function (_libcarve) {
     state = libcarve._carve_state_new()
     
     $(document).ready(function () {
-        // Now, we are updating the state
-        hori_drag($("#resize-tabedit"), $("#editor-container"), $("#registers"));
-
-        vert_drag($("#resize-console"), $("#main"), $("#console"));
-
         reg_table = $("#reg-table");
 
         $("#tab_type_sel").change(
@@ -70,6 +67,7 @@ loadlibcarve().then(function (_libcarve) {
 
         update_registers(state);
     })
+    */
 })
 
 
@@ -131,87 +129,6 @@ function doeasteregg(num) {
         audio.play();
     }
 
-}
-
-/* Inspired by w3 schools lesson                          */
-/* https://www.w3schools.com/howto/howto_js_draggable.asp */
-
-function hori_drag(drag, left, right) {
-    var old_x;
-    
-    left["size"] = 100 * left.width() / window.innerWidth;
-
-    drag[0].onmousedown = dragMouseDown;
-
-    function dragMouseDown(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // get the mouse cursor position at startup:
-        old_x = e.clientX;
-        document.onmouseup = closeDragElement;
-        // call a function whenever the cursor moves:
-        document.onmousemove = elementDrag;
-    }
-
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-
-        var ww = window.innerWidth;
-        left["size"] = 100 * Math.min(ww - 256, Math.max(0.20 * ww, 460, (e.clientX))) / ww
-
-        //left.css('width', "calc(50vw + " + left["adjust"] + "px)");
-        left.css('width', left["size"].toString() + 'vw')
-        old_x = e.clientX;
-      }
-
-    function closeDragElement() {
-        // stop moving when mouse button is released:
-        document.onmouseup = null;
-        document.onmousemove = null;
-        
-        editor.resize();
-        editor.renderer.updateFull();
-    }
-}
-
-function vert_drag(drag, top, bottom) {
-    var old_y;
-
-    top["size"] = 100 * top.height() / window.innerHeight;
-
-    drag[0].onmousedown = dragMouseDown;
-
-    function dragMouseDown(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // get the mouse cursor position at startup:
-        old_y = e.clientY;
-        document.onmouseup = closeDragElement;
-        // call a function whenever the cursor moves:
-        document.onmousemove = elementDrag;
-    }
-
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-
-        var wh = window.innerHeight;
-        top["size"] = 100 * Math.min(0.85 * wh, Math.max(0.15 * wh, top["size"] * wh / 100 + (e.clientY - old_y))) / wh
-
-        top.css('height', top["size"].toString() + 'vh')
-        bottom.css('height', (100 - top["size"] - 100 * (22 + 8) / wh).toString() + 'vh')
-        old_y = e.clientY;
-      }
-
-    function closeDragElement() {
-        // stop moving when mouse button is released:
-        document.onmouseup = null;
-        document.onmousemove = null;
-
-        editor.resize();
-        editor.renderer.updateFull();
-    }
 }
 
 /* Compile text box */

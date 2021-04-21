@@ -51,7 +51,7 @@ html, body {
 }
 
 .console, .editor {
-    background-color: red;
+    background-color: var(--light-2);
 }
 
 .table {
@@ -90,7 +90,7 @@ html, body {
 }
 
 #ace_editor { 
-    height: 500px;
+    height: 100%;
 }
 
 /* grid specifiers */
@@ -163,16 +163,4 @@ html, body {
 
 .exe_toolbar {
     grid-area: exe_toolbar;
-}
-
-/* For presentation only, no need to copy the code below */
-.grid-container * {
-    position: relative;
-}
-
-.grid-container *:after {
-    /*content:attr(class);*/
-    position: absolute;
-    top: 0;
-    left: 0;
 }

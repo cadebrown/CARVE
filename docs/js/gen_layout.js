@@ -1,4 +1,5 @@
 function load_ui() {
+    const update_ace = () => {editor.resize(); editor.renderer.updateFull();};
     /* SPLIT (SPLITPANEL LIBRARY) */
     Split({ // gutters specified in options
         columnGutters: [{
@@ -12,16 +13,16 @@ function load_ui() {
             track: 2,
             element: $('.console_bar')[0],
         }],
-        onDragEnd: () => {console.log("cade stoopid")},
+        onDragEnd: () => {update_ace();},
         columnMinSize: $(window).width() / 10,
         rowMinSize: $(window).height() / 10,
     });
     Split({ // gutters specified in options
-        columnGutters: [    {
+        columnGutters: [{
             track: 1,
             element: $('.reg_bar')[0],
         }],
-        onDragEnd: () => {console.log("cade stoopid")},
+        onDragEnd: () => {update_ace();},
         rowMinSize: $(window).height() / 10,
         columnMinSize: ($(window).width() / 10) * 2 + 16,
     });
@@ -96,5 +97,5 @@ function load_ui() {
         fontSize: '13pt',
     })
     editor.getSession().setMode('ace/mode/riscv')
-    editor.setAutoScrollEditorIntoView(true);
+    //editor.setAutoScrollEditorIntoView(true);
 }

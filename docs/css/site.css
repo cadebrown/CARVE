@@ -77,6 +77,20 @@ html, body {
     cursor: pointer;
 }
 
+.menu-dropdown {
+    cursor: pointer;
+    font-size: 20px;
+    color: white;
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
+
+.menu-dropdown:hover {
+    cursor: pointer;
+    color: var(--light-2);
+}
 
 /* Table formatting */
 

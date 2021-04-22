@@ -66,7 +66,7 @@ lib: $(out_LIB_JS)
 bin: $(out_CLI)
 
 serve:
-	npm run serve
+	bundle exec jekyll serve
 
 # Generated files
 src/insts.cc: tools/geninsts.py tools/riscvdata.py

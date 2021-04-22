@@ -16,6 +16,8 @@
 
     --button-color: #70705f;
 
+    --icon-color: #d6d6cd;
+
     --reg: #ffc98a;
     --num: #e7e4f5;
     --reg-light: #ffdcb3;
@@ -84,7 +86,6 @@ html, body {
     display: inline-block;
     background-color: var(--button-color);
     font-size: 26px;
-    margin-left: 4px;
     padding: 2px;
     -webkit-user-select: none; /* Safari */        
     -moz-user-select: none; /* Firefox */
@@ -94,21 +95,26 @@ html, body {
 
 .icon {
     display: inline-block;
-    background-color: var(--button-color);
-    margin-left: 4px;
     padding: 2px;
+    width: 30px;
+    margin: auto;
+    height: 30px;
     -webkit-user-select: none; /* Safari */        
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */      
 }
 
-
 .icon:hover {
     background-color: var(--light-1);
     cursor: pointer;
 }
 
+/* Google icons */
+.material-icons, .material-icons-outlined {
+    font-size: 28px !important;
+    color: var(--icon-color);
+}
 
 
 #menu_speed {

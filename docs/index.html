@@ -49,7 +49,9 @@ addi t0, zero, 10
         <div class="editor_bar hbar"></div>
         <div class="exe_tab table"></div>
         <div class="exe_toolbar toolbar">
+            
             <div class="exe icon" id="menu_build" onclick="do_build()">
+                <!-- Build -->
                 <span class="material-icons">
                     build
                 </span>
@@ -61,20 +63,31 @@ addi t0, zero, 10
             </div>
             -->
 
-            <div class="exe button" id="menu_play" onclick="do_play()">
-                Play
+            <div class="exe icon" id="menu_play" onclick="do_play()">
+                <!-- Play -->
+                <span class="material-icons-outlined">
+                    play_circle
+                </span>
             </div>
-            <div class="exe button" id="menu_pause" onclick="do_pause()">
-                Pause
+            <div class="exe icon" id="menu_pause" onclick="do_pause()">
+                <!-- Pause -->
+                <span class="material-icons-outlined">
+                    pause_circle
+                </span>
             </div>
-            <div class="exe button" id="menu_step" onclick="do_step()">
-                Step
+            <div class="exe icon" id="menu_step" onclick="do_step()">
+                <!-- Step -->
+                <span class="material-icons-outlined">
+                    skip_next
+                </span>
             </div>
 
 
 
             <div class="exe slider">
-                Speed <input type="range" min="0.0" max="1.0" step="0.001" value="0.5" class="slider" id="menu_speed"> <span id="menu_speed_text">100.0</span>
+                <!-- Speed -->
+                
+                <input type="range" min="0.0" max="1.0" step="0.001" value="0.5" class="slider" id="menu_speed"> <span id="menu_speed_text">100.0</span>
             </div>
 
         </div>

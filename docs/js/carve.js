@@ -6,6 +6,12 @@ let state = null
 // carve::Program object, the current program being compiled
 let program = null
 
+// Whether the worker is active
+let worker_active = false
+
+// The delay (in seconds) between each instruction, or < 0 if the worker
+//   is inactive
+let worker_delay = 0.000
 
 // Ace editor
 let editor = null
@@ -27,7 +33,7 @@ loadlibcarve().then(function (_libcarve) {
     // Initialize the editor
     editor = ace.edit("ace_editor", {
         selectionStyle: "text"
-    });
+    })
     ace.config.set('basePath', '/js')
     editor.setTheme('ace/theme/monokai')
     editor.setOptions({
@@ -79,6 +85,24 @@ loadlibcarve().then(function (_libcarve) {
 
     $(document).ready(function () {
 
+        function update_menu_speed() {
+            // Raw value, from 0-1
+            let raw = Number($("#menu_speed")[0].value)
+
+            let hz = Math.pow(raw, 2.5) * 99 + 1
+            $("#menu_speed_text").text(hz.toFixed(1) + "hz")
+
+            let amt = 1 / hz
+            worker_delay = amt
+
+        }
+        // Handle when the menu speed changes
+        $("#menu_speed").on("input", function() {
+            update_menu_speed()
+        })
+
+        update_menu_speed()
+
         // Set the callback for when the selector is changed
         $("#tab_type_sel").change(function() {
 
@@ -116,8 +140,8 @@ loadlibcarve().then(function (_libcarve) {
                 if (regs[i][3] != "--") {
                     content += "; " + regs[i][3] + " saved"
                 }
-        
-                tippy('#row_' + type + regs[i][0], {
+                
+                tippy('#reg_' + regs[i][0], {
                     content: content,
                     placement: 'left',
                     allowHTML: true,
@@ -193,6 +217,7 @@ loadlibcarve().then(function (_libcarve) {
                 content: content,
                 allowHTML: true,
                 interactive: true,
+                hideOnClick: false,
                 arrow: false,
                 offset: [0, 4],
             });
@@ -207,8 +232,66 @@ loadlibcarve().then(function (_libcarve) {
 
 /** Engine Functions **/
 
+
+// Updates the UI elements for the engine's current register values
+function update_ui() {
+    for (let i = 0; i < 32; ++i) {
+        let base = 'reg_' + "x" + i.toString()
+
+        libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 16)
+        $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
+
+        libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 10)
+        $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
+    }
+    for (let i = 0; i < 32; ++i) {
+        let base = 'reg_' + "f" + i.toString()
+
+        libcarve._carve_getrf(state, tmpbuf_len, tmpbuf, i)
+        $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
+
+        libcarve._carve_getrfx(state, tmpbuf_len, tmpbuf, i)
+        $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
+    }
+}
+
+
+
+/** UI Functions **/
+
+
+// Run a single instruction
+function _worker_single() {
+    do_step()
+
+    if (worker_active) {
+        // Read the speed, turn it into a delay
+        setTimeout(_worker_single, worker_delay * 1000)
+    }
+}
+
+// Start the engine working
+function worker_start() {
+    if (worker_active) {
+        // Do nothing
+    } else {
+        worker_active = true
+        _worker_single()
+    }
+}
+
+// Stop the engine working
+function worker_stop() {
+    worker_active = false
+}
+
+
+
+
 // Re-compiles and updates the program
-function update_program() {
+function do_build() {
+    worker_stop()
+
     // Filename string
     let fname = "<>"
     // Source string
@@ -243,38 +326,20 @@ function update_program() {
     update_ui()
 }
 
-// Updates the UI elements for the engine's current register values
-function update_ui() {
-    for (let i = 0; i < 32; ++i) {
-        let base = 'reg_' + "x" + i.toString()
-
-        libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 16)
-        $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
-
-        libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 10)
-        $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
-    }
-    for (let i = 0; i < 32; ++i) {
-        let base = 'reg_' + "f" + i.toString()
-
-        libcarve._carve_getrf(state, tmpbuf_len, tmpbuf, i)
-        $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
-
-        libcarve._carve_getrfx(state, tmpbuf_len, tmpbuf, i)
-        $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
-    }
-}
-
-
-
-/** UI Functions **/
-
-
 // Run the entire program
 function do_run() {
-    update_program()
-    libcarve._carve_exec_all(state)
-    update_ui()
+    do_build()
+    worker_start()
+}
+
+// Continue executing
+function do_play() {
+    worker_start()
+}
+
+// Stop executing
+function do_pause() {
+    worker_stop()
 }
 
 // Run a single step
@@ -284,9 +349,11 @@ function do_step() {
 }
 
 
+
 // Do the 'File / Open' dialogue, which lets the user select a file and uses that as the source code
 function do_file_open() {
     let elem = $("#file-select")
+    console.log(elem)
     
     elem.trigger('click')
     elem.on('change', function() {

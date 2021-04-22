@@ -72,7 +72,7 @@ void carve_getrx(State* s, int len, char* data, int reg, int base) {
     if (base == 10) {
         snprintf(data, len, "%lli", (long long int)s->rx[reg]);
     } else {
-        snprintf(data, len, "%llx", (long long int)s->rx[reg]);
+        snprintf(data, len, "%016llx", (long long int)s->rx[reg]);
     }
 }
 
@@ -81,7 +81,7 @@ void carve_getrf(State* s, int len, char* data, int reg) {
 }
 
 void carve_getrfx(State* s, int len, char* data, int reg) {
-    snprintf(data, len, "%lli", *(long long int*)&s->rf[reg]);
+    snprintf(data, len, "%016lli", *(long long int*)&s->rf[reg]);
 }
 
 

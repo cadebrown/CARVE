@@ -4,6 +4,11 @@ title: CARVE
 desc: Main page
 ---
 
+<!-- Hidden element for file selection -->
+<input type="file" style="opacity: 0; position: absolute; width: 0px; height: 0px;" id="file-select">
+
+
+
 <div class="grid-container">
     <div class="console_bar vbar"></div>
     <div class="console" id="console"></div>
@@ -44,21 +49,34 @@ addi t0, zero, 10
         <div class="editor_bar hbar"></div>
         <div class="exe_tab table"></div>
         <div class="exe_toolbar toolbar">
-            <div class="exe button" id="menu_reassemble" onclick="update_program()">
-                Reassemble
+            <div class="exe icon" id="menu_build" onclick="do_build()">
+                <span class="material-icons">
+                    build
+                </span>
             </div>
+
+            <!--
             <div class="exe button" id="menu_run" onclick="do_run()">
                 Run
+            </div>
+            -->
+
+            <div class="exe button" id="menu_play" onclick="do_play()">
+                Play
+            </div>
+            <div class="exe button" id="menu_pause" onclick="do_pause()">
+                Pause
             </div>
             <div class="exe button" id="menu_step" onclick="do_step()">
                 Step
             </div>
-            <div class="exe button" id="menu_speed">
-                Speed
+
+
+
+            <div class="exe slider">
+                Speed <input type="range" min="0.0" max="1.0" step="0.001" value="0.5" class="slider" id="menu_speed"> <span id="menu_speed_text">100.0</span>
             </div>
-            <div class="exe button" id="menu_stop">
-                Stop
-            </div>
+
         </div>
     </div>
 </div>

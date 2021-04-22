@@ -6,6 +6,7 @@
 .section text
 
 la x5, msg
+la x6, 0(x5)
 
 ecall
 
@@ -13,5 +14,5 @@ ecall
 .section rodata
 
 msg:
-.asciz "XXXXXXXXXXXXXXXXXXXXXXXX"
+.asciz "ABCD"
 

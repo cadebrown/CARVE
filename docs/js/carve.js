@@ -266,9 +266,9 @@ function update_ui() {
 
 // Run a single instruction
 function _worker_single() {
-    do_step()
-
     if (worker_active) {
+        do_step()
+
         // Read the speed, turn it into a delay
         setTimeout(_worker_single, worker_delay * 1000)
     }

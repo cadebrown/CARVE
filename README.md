@@ -25,7 +25,7 @@ $ make
 
 You'll need Jekyll/Ruby installed. You can google how to do that.
 
-To serve, run `make serve` (or `bundle exec jekyll serve`)
+To serve, run `bundle exec jekyll serve` (in the `docs` folder)
 
 ## Adding an Instruction
 

@@ -50,7 +50,7 @@ out_CLI      := carve
 
 # -*- Rules -*-
 
-.PHONY: default all clean lib bin serve update
+.PHONY: default all clean lib bin update
 
 default: lib bin
 
@@ -65,8 +65,6 @@ lib: $(out_LIB_JS)
 
 bin: $(out_CLI)
 
-serve:
-	npm run serve
 
 # Generated files
 src/insts.cc: tools/geninsts.py tools/riscvdata.py

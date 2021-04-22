@@ -15,7 +15,7 @@ $ source "/path/to/emsdk/emsdk_env.sh"
 
 (replacing `/path/to` with the path to your Emscripten SDK)
 
-Now, to build `libcarve`, which is the C bindings and emulator, you can run:
+Now, to build everything, run:
 
 ```shell
 $ make
@@ -23,11 +23,9 @@ $ make
 
 ## Running
 
-You'll need to install NodeJS/npm to run the web app.
+You'll need Jekyll/Ruby installed. You can google how to do that.
 
-You'll need to install with `npm install`
-
-Then, to serve, run `npm run serve`
+To serve, run `bundle exec jekyll serve` (in the `docs` folder)
 
 ## Adding an Instruction
 

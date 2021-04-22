@@ -100,7 +100,7 @@ loadlibcarve().then(function (_libcarve) {
             out += "<tr class='regs'><td class='regs reg_head reg_id'>REG</td><td class='regs reg_head reg_name'>NAME</td><td class='regs reg_head reg_hex'>HEX</td><td class='regs reg_head reg_dec'>DEC</td></tr>"
             
             const make_row = (id, name, desc, save) => {
-                return "<tr class='regs' id='reg_" + (id) + "'><td class='regs' id='reg_" + (id) + "_id'>" + (id) + "</td><td class='regs' id='reg_" + (id) + "_name'>" + (name) + "</td><td class='regs' id='reg_" + (id) + "_hex'></td><td class='regs' id='reg_" + (id) + "_dec'></td></tr>"
+                return "<tr class='regs' id='reg_" + (id) + "'><td class='regs reg_id' id='reg_" + (id) + "_id'>" + (id) + "</td><td class='regs reg_name' id='reg_" + (id) + "_name'>" + (name) + "</td><td class='regs reg_hex' id='reg_" + (id) + "_hex'></td><td class='regs reg_dec' id='reg_" + (id) + "_dec'></td></tr>"
             }
 
             for (let i = 0; i < regs.length; ++i) {

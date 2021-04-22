@@ -34,7 +34,6 @@ html, body {
     margin: 0;
     overflow: hidden;
     font-family: "Ubuntu Mono", monospace;
-
 }
 
 
@@ -42,6 +41,7 @@ html, body {
 
 .hbar, .vbar {
     background-color: var(--light-1);
+	z-index: 10;
 }
 
 .vbar {

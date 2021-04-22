@@ -24,6 +24,8 @@ let tmpbuf = null
 let tmpbuf_len = 1024
 
 
+// Color for meta
+let COL_META = '#e3cb17'
 
 loadlibcarve().then(function (_libcarve) {
     libcarve = _libcarve;
@@ -72,7 +74,9 @@ loadlibcarve().then(function (_libcarve) {
     })
 
     // Initialize the library before any more calls
+    term.echo("[[;" + COL_META + ";]CARVE: Initializing...]")
     libcarve._carve_init();
+
 
     // Allocate temporary buffior
     tmpbuf = libcarve._malloc(tmpbuf_len)
@@ -291,6 +295,7 @@ function worker_stop() {
 // Re-compiles and updates the program
 function do_build() {
     worker_stop()
+    term.echo("[[;#e3cb17;]CARVE: Building...]")
 
     // Filename string
     let fname = "<>"

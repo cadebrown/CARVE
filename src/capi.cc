@@ -9,7 +9,6 @@
 namespace carve {
 
 void carve_init() {
-    cout << "CARVE initialized" << endl;
 }
 
 

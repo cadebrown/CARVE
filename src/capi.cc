@@ -4,7 +4,7 @@
  */
 
 #include "carve.hh"
-
+#include <sstream>
 
 namespace carve {
 
@@ -91,6 +91,18 @@ void carve_state_init(State* self, Program* program) {
 
 bool carve_is_halted(State* s) {
     return s->is_halted;
+}
+
+char* carve_get_debug(Program* p) {
+    ostringstream out;
+    for (int i = 0; i < p->debug.size(); i++) {
+        if (i > 0) out << "!";
+        char tmp[256];
+        inst code = *((inst*) &p->vmem[0][p->debug[i].pos]);
+        snprintf(tmp, sizeof(tmp) - 2, "%08llx", (long long int)code);
+        out << tmp << ";" << disassemble(code) << ";" << p->debug[i].ln + 1;
+    }
+    return strdup(out.str().c_str());
 }
 
 }

@@ -19,6 +19,9 @@ let editor = null
 // Terminal/console output
 let term = null
 
+// debug table
+let debug_table = null
+
 // last time editor was altered / program built
 let update_time = null
 let build_time = null
@@ -54,6 +57,8 @@ loadlibcarve().then(function (_libcarve) {
         update_time = Date.now();
     });
 
+    /* Debug Table */
+    debug_table = $("#debug_table");
 
     /* JQUERY TERMINAL */
     // Creates a terminal with a callback for some text
@@ -272,7 +277,16 @@ function update_ui() {
     }
 }
 
+function update_debug(str) {
+    let rows = str.split("!");
+    let out = `<tr><th>Code</th><th>Inst</th><th>Line</th></tr>`;
+    for (r in rows) {
+        const data = rows[r].split(";");
+        out += `<tr><td>${data[0]}</td><td>${data[1]}</td><td>${data[2]}</td></tr>`;
+    }
 
+    debug_table[0].innerHTML = out;
+}
 
 /** UI Functions **/
 
@@ -337,6 +351,11 @@ function do_build() {
 
     // Update the state for the program
     libcarve._carve_state_init(state, program)
+
+    // Update execution table
+    let debug = libcarve._carve_get_debug(program)
+    update_debug(libcarve.UTF8ToString(debug))
+    libcarve._free(debug);
 
     if (verbosity > 0) send_meta("Built!")
     update_ui()

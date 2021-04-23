@@ -45,7 +45,20 @@ addi t0, zero, 10
 # done</div>
         </div>
         <div class="editor_bar hbar"></div>
-        <div class="exe_tab table"></div>
+        <div class="exe_tab table">
+            <table id="debug_table">
+                <tr>
+                    <th>Code</th>
+                    <th>Inst</th>
+                    <th>Line</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
         <div class="exe_toolbar toolbar">
             
             <div class="exe icon" id="menu_build" onclick="do_build()">
@@ -61,12 +74,6 @@ addi t0, zero, 10
                     restart_alt
                 </span>
             </div>
-
-            <!--
-            <div class="exe button" id="menu_run" onclick="do_run()">
-                Run
-            </div>
-            -->
 
             <div class="exe icon" id="menu_play" onclick="do_play()">
                 <!-- Play -->

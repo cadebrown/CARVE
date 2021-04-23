@@ -5004,7 +5004,13 @@ var _carve_state_init = Module["_carve_state_init"] = createExportWrapper("carve
 var _carve_is_halted = Module["_carve_is_halted"] = createExportWrapper("carve_is_halted");
 
 /** @type {function(...*):?} */
+var _carve_get_debug = Module["_carve_get_debug"] = createExportWrapper("carve_get_debug");
+
+/** @type {function(...*):?} */
 var ___errno_location = Module["___errno_location"] = createExportWrapper("__errno_location");
+
+/** @type {function(...*):?} */
+var _malloc = Module["_malloc"] = createExportWrapper("malloc");
 
 /** @type {function(...*):?} */
 var _fflush = Module["_fflush"] = createExportWrapper("fflush");
@@ -5040,13 +5046,10 @@ var _setThrew = Module["_setThrew"] = createExportWrapper("setThrew");
 var _free = Module["_free"] = createExportWrapper("free");
 
 /** @type {function(...*):?} */
-var _malloc = Module["_malloc"] = createExportWrapper("malloc");
+var dynCall_viijii = Module["dynCall_viijii"] = createExportWrapper("dynCall_viijii");
 
 /** @type {function(...*):?} */
 var dynCall_jiji = Module["dynCall_jiji"] = createExportWrapper("dynCall_jiji");
-
-/** @type {function(...*):?} */
-var dynCall_viijii = Module["dynCall_viijii"] = createExportWrapper("dynCall_viijii");
 
 /** @type {function(...*):?} */
 var dynCall_iiiiij = Module["dynCall_iiiiij"] = createExportWrapper("dynCall_iiiiij");

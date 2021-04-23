@@ -188,6 +188,12 @@ struct Token {
 // Map of all instructions, keyed by name 
 extern unordered_map<string, instdesc> insts;
 
+// Debug table entry
+struct debug_entry {
+    u64 pos;  // position in program memory
+    u64 ln;   // line number
+};
+
 // RISC-V program
 struct Program {
 
@@ -201,6 +207,8 @@ struct Program {
     //   3: bss
     vector<u8> vmem[4];
 
+    // exe table for ui
+    vector<debug_entry> debug;
 };
 
 // Virtual RISC-V machine state, capable of holding all relevant parts of
@@ -244,7 +252,7 @@ struct State {
     // Return index into 'vmem' from an address
     s64 real(s64 idx) {
         return idx;
-       // return idx - 0x1000;
+        // return idx - 0x1000;
     }
 
     // Return fake address from 'vmem' index
@@ -264,6 +272,9 @@ struct State {
     }
 
 };
+
+// Disassemble an instruction
+string disassemble(inst v);
 
 // Sign-extend a value, where 'bit' is the index of the bit
 s64 sext(u64 val, int bit);
@@ -400,6 +411,9 @@ CARVE_API void carve_getrfx(State* s, int len, char* data, int reg);
 
 // Determines if a state is halted
 CARVE_API bool carve_is_halted(State* s);
+
+// Returns the data required for debug table
+CARVE_API char* carve_get_debug(Program* p);
 }
 
 

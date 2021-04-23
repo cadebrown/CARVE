@@ -1000,6 +1000,9 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
             } else {
                 // Instruction
 
+                u64 ln = t.line;
+                u64 startpos = res->vmem[0].size();
+
                 // Look up instruction
                 unordered_map<string, instdesc>::iterator it = insts.find(t.get(src));
                 if (it == insts.end()) {
@@ -1011,7 +1014,7 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
 
                 // Now, parse the instruction
                 instdesc& id = it->second;
-
+                
                 // Parse depending on the specific kind of instruction
                 if (id.kind == "R") {
                     if (!parse_R(res, back, toks, toki, id, seg)) {
@@ -1065,7 +1068,12 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
                     // SEE: https://stackoverflow.com/questions/39489318/risc-v-implementing-slli-srli-and-srai
                     *(inst*)&(res->vmem[seg][res->vmem[seg].size() - 4]) |= 1ULL << 30;
                 }
-
+                // add debug information
+                if (seg == 0) {
+                    for (u64 j = startpos; j < res->vmem[0].size(); j += sizeof(inst)) {
+                        res->debug.push_back({j, ln});
+                    }
+                }
             }
         } else if (t.kind == Token::Kind::DOT) {
             // Directive

@@ -144,7 +144,7 @@ html, body {
     color: white;
 }
 
-/* Table formatting */
+/* Regtable formatting */
 
 .reg_table {
     min-height: 300px;
@@ -223,6 +223,40 @@ html, body {
     font-size: larger;
 }
 
+/* exetable formatting */
+
+.exe_tab {
+    overflow: auto;
+    min-height: 0;
+    min-width: 0;
+    padding: 2px;
+}
+
+.exe_tab table {
+    font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
+    background-color: var(--base-panel-color);
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+    min-width: 0;
+    border-collapse: collapse;
+
+}
+
+.exe_tab th {
+    border: 2px solid var(--light-1);
+    color: var(--body-text);
+}
+
+.exe_tab td {
+    border: 2px solid var(--light-1);
+    color: var(--light-0);
+}
+
+.exe_tab tr {
+    border: 2px solid var(--light-1);
+}
+
 /* special elements */
 
 .file-select-hidden {
@@ -289,8 +323,7 @@ html, body {
     grid-area: reg_tab;
     min-width: 0;
     min-height: 0;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow: auto;
     padding: 4px;
 }
 

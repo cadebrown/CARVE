@@ -47,6 +47,7 @@ void carve_program_free(Program* self) {
 void carve_exec_single(State* s) {
     // TODO: How to handle halted program
     if (s->is_halted) {
+        fprintf(stderr, "CANNOT EXECUTE -- STATE IS HALTED\n");
         return;
     }
 
@@ -88,5 +89,8 @@ void carve_state_init(State* self, Program* program) {
     self->init(*program);
 }
 
+bool carve_is_halted(State* s) {
+    return s->is_halted;
+}
 
 }

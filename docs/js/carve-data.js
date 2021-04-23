@@ -71,3 +71,12 @@ const REG_TAB = {
         ["pancakes", "pancakes", "pancakes", "pancakes"]
     ]
 }
+
+const EXE_DESC = {
+    "menu_build": "Build: Assembles the program",
+    "menu_play": "Play: Runs the program at the specified speed",
+    "menu_pause": "Pause: Pauses execution of the program",
+    "menu_step": "Step: Executes a single instruction",
+    "menu_slider": "Speed: How fast the program should run",
+    "menu_restart": "Restart: Resets PC to the top of .text and resets memory/registers",
+}

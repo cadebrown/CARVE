@@ -7,8 +7,6 @@ desc: Main page
 <!-- Hidden element for file selection -->
 <input type="file" style="opacity: 0; position: absolute; width: 0px; height: 0px;" id="file-select">
 
-
-
 <div class="grid-container">
     <div class="console_bar vbar"></div>
     <div class="console" id="console"></div>
@@ -57,6 +55,13 @@ addi t0, zero, 10
                 </span>
             </div>
 
+            <div class="exe icon" id="menu_restart" onclick="do_restart()">
+                <!-- Restart -->
+                <span class="material-icons">
+                    restart_alt
+                </span>
+            </div>
+
             <!--
             <div class="exe button" id="menu_run" onclick="do_run()">
                 Run
@@ -84,9 +89,8 @@ addi t0, zero, 10
 
 
 
-            <span class="exe slider_container">
+            <span class="exe slider_container" id="menu_slider">
                 <!-- Speed -->
-                
                 <input type="range" min="0.0" max="1.0" step="0.001" value="0.5" class="slider" id="menu_speed"> <span id="menu_speed_text">100.0</span>
             </span>
 

@@ -136,7 +136,12 @@ html, body {
 
 .menu-dropdown:hover {
     cursor: pointer;
-    color: var(--light-2);
+    color: var(--light-1);
+}
+
+.menu-dropdown.nohov:hover {
+    cursor: default;
+    color: white;
 }
 
 /* Table formatting */

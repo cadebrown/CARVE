@@ -19,13 +19,21 @@ let editor = null
 // Terminal/console output
 let term = null
 
+// last time editor was altered / program built
+let update_time = null
+let build_time = null
+
 // Temporary buffer for register strings
 let tmpbuf = null
 let tmpbuf_len = 1024
 
+// menu setting for console verbosity
+var verbosity = 1;
 
 // Color for meta
-let COL_META = '#e3cb17'
+const COL_META = '#e3cb17'
+const COL_WARN = '#ffa500'
+const COL_ERR  = '#ff0000'
 
 loadlibcarve().then(function (_libcarve) {
     libcarve = _libcarve;
@@ -42,6 +50,9 @@ loadlibcarve().then(function (_libcarve) {
         fontSize: '13pt',
     })
     editor.getSession().setMode('ace/mode/riscv')
+    editor.getSession().on('change', function() {
+        update_time = Date.now();
+    });
 
 
     /* JQUERY TERMINAL */
@@ -54,7 +65,6 @@ loadlibcarve().then(function (_libcarve) {
         greetings: '',
         prompt: '',
     })
-
 
     // Write to stdout
     libcarve._write_stdout.push(function (text) {
@@ -74,9 +84,9 @@ loadlibcarve().then(function (_libcarve) {
     })
 
     // Initialize the library before any more calls
-    term.echo("[[;" + COL_META + ";]CARVE: Initializing...]")
+    if (verbosity > 0) send_meta("Initializing...")
     libcarve._carve_init();
-
+    if (verbosity > 0) send_meta("Initialized!")
 
     // Allocate temporary buffior
     tmpbuf = libcarve._malloc(tmpbuf_len)
@@ -84,11 +94,7 @@ loadlibcarve().then(function (_libcarve) {
     // Allocate an empty state
     state = libcarve._carve_state_new()
 
-    // Create state
-    state = libcarve._carve_state_new()
-
     $(document).ready(function () {
-
         function update_menu_speed() {
             // Raw value, from 0-1
             let raw = Number($("#menu_speed")[0].value)
@@ -104,15 +110,22 @@ loadlibcarve().then(function (_libcarve) {
         $("#menu_speed").on("input", function() {
             update_menu_speed()
         })
-
         update_menu_speed()
+
+        // Give execution bar buttons descriptions
+        $(".exe").each(element => {
+            const e = $(".exe")[element]
+            tippy(`#${e.id}`, {
+                content: EXE_DESC[e.id],
+                placement: 'top',
+            });
+        });
 
         // Set the callback for when the selector is changed
         $("#tab_type_sel").change(function() {
 
             // Table of registers, the element that should be modified
             let elem = $("#reg_table")
-            
 
             // What type of registers/view?
             let type = this.value
@@ -198,7 +211,8 @@ loadlibcarve().then(function (_libcarve) {
         // tippy
         let tree = {
             'file': ['open', 'save', 'new'],
-            'options': [['autocomplete', 'autocomplete <input type="checkbox" id="autocomplete_sel">']],
+            'options': [['verbosity', `<span class="menu-dropdown nohov">Verbosity</span> \
+                <input oninput="verbosity = parseInt($('#verbosity')[0].value)" type="number" id="verbosity" name="verbosity" min="0" max="3" style="width: 32px;" value=${verbosity}>`]],
             'assembler': ['ASSEMBLER INFORMATION (extensions, compilation date, etc.)'],
             'help': ['CARVE Documentation', 'Syscall reference', 'RISC-V Spec']
         }
@@ -236,7 +250,6 @@ loadlibcarve().then(function (_libcarve) {
 
 /** Engine Functions **/
 
-
 // Updates the UI elements for the engine's current register values
 function update_ui() {
     for (let i = 0; i < 32; ++i) {
@@ -263,11 +276,10 @@ function update_ui() {
 
 /** UI Functions **/
 
-
 // Run a single instruction
 function _worker_single() {
     if (worker_active) {
-        do_step()
+        if (do_step() < 0) {send_err("Error stepping, execution ended!"); return;}
 
         // Read the speed, turn it into a delay
         setTimeout(_worker_single, worker_delay * 1000)
@@ -289,13 +301,11 @@ function worker_stop() {
     worker_active = false
 }
 
-
-
-
 // Re-compiles and updates the program
 function do_build() {
     worker_stop()
-    term.echo("[[;#e3cb17;]CARVE: Building...]")
+    build_time = Date.now()
+    if (verbosity > 0) send_meta("Building...")
 
     // Filename string
     let fname = "<>"
@@ -328,32 +338,38 @@ function do_build() {
     // Update the state for the program
     libcarve._carve_state_init(state, program)
 
+    if (verbosity > 0) send_meta("Built!")
     update_ui()
 }
 
 // Run the entire program
-function do_run() {
-    do_build()
-    worker_start()
+function do_restart() {
+    send_err("Not implemented")
 }
 
 // Continue executing
 function do_play() {
+    if (verbosity > 0 && (update_time > build_time)) send_warn("Running, but build not updated!")
+    if (verbosity > 0) send_meta("Running...")
     worker_start()
 }
 
 // Stop executing
 function do_pause() {
+    if (verbosity > 0) send_meta("Paused execution")
     worker_stop()
 }
 
 // Run a single step
 function do_step() {
+    if (build_time === null) {send_err("Cannot step, not built!"); return -1;}
+    if (libcarve._carve_is_halted(state) == 1) {send_err("Cannot step, state is halted!"); return -1;}
+    if (verbosity > 0 && (update_time > build_time)) send_warn("Stepping, but build not updated!")
+    if (verbosity > 2) send_meta("Performed step")
     libcarve._carve_exec_single(state)
     update_ui()
+    return 0;
 }
-
-
 
 // Do the 'File / Open' dialogue, which lets the user select a file and uses that as the source code
 function do_file_open() {
@@ -390,4 +406,23 @@ function do_file_save() {
 // Do the 'File / New' dialogue, which lets the user reset the current contents
 function do_file_new() {
     editor.setValue("")
+}
+
+// send messages to console
+function send_meta(msg, do_head=true) {
+    let head = ""
+    if (do_head) head = "CARVE: "
+    term.echo(`[[;${COL_META};]${head}${msg}]`)
+}
+
+function send_warn(msg, do_head=true) {
+    let head = ""
+    if (do_head) head = "CARVE_WARN: "
+    term.echo(`[[;${COL_WARN};]${head}${msg}]`)
+}
+
+function send_err(msg, do_head=true) {
+    let head = ""
+    if (do_head) head = "CARVE_ERR: "
+    term.echo(`[[;${COL_ERR};]${head}${msg}]`)
 }

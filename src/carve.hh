@@ -398,7 +398,8 @@ CARVE_API void carve_getrf(State* s, int len, char* data, int reg);
 // Get a floating point register (F-register) and store as a hex string
 CARVE_API void carve_getrfx(State* s, int len, char* data, int reg);
 
-
+// Determines if a state is halted
+CARVE_API bool carve_is_halted(State* s);
 }
 
 

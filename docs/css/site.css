@@ -33,7 +33,7 @@ html, body {
     height: 100%;
     margin: 0;
     overflow: hidden;
-    font-family: "Ubuntu Mono", monospace;
+    font-family: "Inconsolata", "Ubuntu Mono", monospace;
 }
 
 
@@ -54,7 +54,7 @@ html, body {
 
 .toolbar {
     background-color: var(--base-panel-color);
-    padding-top: 4px;
+    padding: 4px;
 }
 
 .console, .editor {
@@ -83,21 +83,24 @@ html, body {
 }
 
 .slider {
-    display: inline-block;
+    margin: auto;
+}
+
+.slider_container {
     background-color: var(--button-color);
-    font-size: 26px;
-    padding: 2px;
+    font-size: 30px;
+    padding: 8px;
     -webkit-user-select: none; /* Safari */        
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+/Edge */
-    user-select: none; /* Standard */    
+    user-select: none; /* Standard */ 
 }
 
 .icon {
     display: inline-block;
     padding: 2px;
     width: 30px;
-    margin: auto;
+    margin-left: 4px;
     height: 30px;
     -webkit-user-select: none; /* Safari */        
     -moz-user-select: none; /* Firefox */
@@ -222,11 +225,11 @@ html, body {
 }
 
 .tippy-content {
-    background-color: var(--light-1);
+    background-color: var(--light-2);
 }
 
 .tippy-arrow {
-    color: var(--light-1);
+    color: var(--light-2);
 }
 
 #ace_editor { 

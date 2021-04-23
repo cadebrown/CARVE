@@ -236,6 +236,12 @@ struct State {
     //   must be unhalted
     bool is_halted;
 
+    // Whether the program has hard exited
+    bool is_exited;
+
+    // The exit code, only valid if 'is_exited'
+    int exit_code;
+
     // Template for loading a given typename from an index (bytewise) into 'vmem'
     template<typename T>
     T& load(u64 idx) {

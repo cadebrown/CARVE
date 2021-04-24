@@ -420,7 +420,18 @@ CARVE_API bool carve_is_halted(State* s);
 
 // Returns the data required for debug table
 CARVE_API char* carve_get_debug(Program* p);
+
+// Get memory, returns a pointer to it
+CARVE_API u8* carve_getmem(State* s);
+
+// Returns the total size of the memory in the state
+CARVE_API u64 carve_getmemsize(State* s);
+
+// Returns a single byte from memory
+CARVE_API u8 carve_getbyte(State* s, int idx);
+
 }
+
 
 
 

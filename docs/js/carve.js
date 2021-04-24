@@ -139,6 +139,7 @@ loadlibcarve().then(function (_libcarve) {
             });
         });
 
+
         // Set the callback for when the selector is changed
         $("#tab_type_sel").change(function() {
 
@@ -191,15 +192,25 @@ loadlibcarve().then(function (_libcarve) {
 
                 for (let i = 0; i < memtab_size[0]; ++i) {
                     out += "<tr class='regs' id='reg_" + (i) + "'>"
-                    out += "<td class='regs reg_mem_addr' id='mem_row_" + (i) + "'></td>"
+                    if (i == 0) {
+                        out += "<td class='regs reg_mem_addr'><input id='mem_row_" + (i) + "'></input></td>"
+                    } else {
+                        out += "<td class='regs reg_mem_addr' id='mem_row_" + (i) + "'></td>"
+                    }
                     for (let j = 0; j < memtab_size[1]; ++j) {
                         out += "<td class='regs reg_mem' id='mem_" + (i * memtab_size[1] + j) + "'></td>"
                     }
                     out += "</tr>"
                 }
 
+
                 out += "</table>"
                 elem[0].innerHTML = out
+
+                $("#mem_row_0").change(function() {
+                    memtab_addr = parseInt($("#mem_row_0").val(), 16)
+                    update_ui()
+                })
             }
 
             // Update the graphical interface
@@ -312,9 +323,16 @@ function update_ui() {
         // Address of start of memory explorer
         let addr = memtab_addr
         for (let i = 0; i < memtab_size[0]; ++i) {
-            $('#mem_row_' + (i)).text('' + ("00000000" + (addr + i * memtab_size[1]).toString(16)).substr(-8))
+            if (i == 0) {
+                $('#mem_row_' + (i))[0].value = '' + ("00000000" + (addr + i * memtab_size[1]).toString(16)).substr(-8)
+            } else {
+                $('#mem_row_' + (i)).text('' + ("00000000" + (addr + i * memtab_size[1]).toString(16)).substr(-8))
+            }
             for (let j = 0; j < memtab_size[1]; ++j) {
-                $('#mem_' + (i * memtab_size[1] + j)).text('FF')
+                let ij = (i * memtab_size[1] + j)
+             
+                let b = libcarve._carve_getbyte(state, addr + ij)
+                $('#mem_' + (ij)).text(("00" + b.toString(16)).substr(-2))
             }
         }
     }

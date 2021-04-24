@@ -41,7 +41,7 @@ html, body {
 
 .hbar, .vbar {
     background-color: var(--light-1);
-	z-index: 10;
+	z-index: 2;
 }
 
 .vbar {
@@ -302,6 +302,8 @@ html, body {
         "exe_toolbar exe_toolbar exe_toolbar";
     min-width: 30%;
     width: 100%;
+    min-height: calc(20vh + 42px);
+    min-width: calc(20vw + 16px);
 }
 
 .console_bar {
@@ -325,6 +327,7 @@ html, body {
     min-height: 0;
     overflow: auto;
     padding: 4px;
+    z-index: 3;
 }
 
 .main_toolbar {
@@ -345,8 +348,12 @@ html, body {
     grid-area: exe_tab;
     min-height: 10vh;
     min-width: 10vw;
+    width: 100%;
+    overflow: auto;
 }
 
 .exe_toolbar {
     grid-area: exe_toolbar;
+    white-space:nowrap;
+    z-index: 1;
 }

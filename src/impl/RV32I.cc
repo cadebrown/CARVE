@@ -166,19 +166,31 @@ void _and    (State& s, int rd, int rs1, int rs2) {
 
 // Syscalls
 void _ebreak (State& s, int rd, int rs1, u64 imm) {
+    #define a(n) s.rx[4 + n]
     switch (imm)
     {
     case 0: {
-        // ecall
-        u8* dp = &s.vmem[s.rx[5]];
-        break;
+        // ecall (syscall)
 
-    }
+        // Which syscall?
+        switch (a(7))
+        {
+        case 0:
+            // exit(a0)
+            s.is_exited = true;
+            s.exit_code = a(0);
+            break;
+        }
+
+        break;
+    } 
     case 1: {
         // ebreak
         s.is_halted = true;
         break;
     }
+
+
     default:
         break;
     }

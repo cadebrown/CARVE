@@ -14,10 +14,13 @@
     --light-2: #5b5c58;
     --light-3: #404238;
 
+    --cur-code: #926a3d;
+
     --button-color: #70705f;
 
     --icon-color: #d6d6cd;
 
+    --reg-dark: #ffa740;
     --reg: #ffc98a;
     --num: #e7e4f5;
     --reg-light: #ffdcb3;
@@ -41,15 +44,16 @@ html, body {
 
 .hbar, .vbar {
     background-color: var(--light-1);
-	z-index: 2;
 }
 
 .vbar {
     cursor: row-resize;
+    z-index: 7;
 }
 
 .hbar {
     cursor: col-resize;
+    z-index: 2;
 }
 
 .toolbar {
@@ -94,6 +98,8 @@ html, body {
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */ 
+    z-index: 3;
+    position: relative;
 }
 
 .icon {
@@ -173,6 +179,7 @@ html, body {
     margin: 0px;
     border-style: none;
     font-size: 16px;
+    width: 100%;
 }
 
 .reg_mem {
@@ -333,6 +340,7 @@ html, body {
     grid-area: console;
     min-height: 10vh;
     min-width: 10vw;
+    z-index: 4;
 }
 
 .reg_bar {
@@ -345,17 +353,19 @@ html, body {
     min-height: 0;
     overflow: auto;
     padding: 4px;
-    z-index: 3;
+    z-index: 6;
 }
 
 .main_toolbar {
     grid-area: main_toolbar;
+    z-index: 4;
 }
 
 .editor {
     grid-area: editor;
     min-height: 10vh;
     min-width: 10vw;
+    z-index: 1;
 }
 
 .editor_bar {
@@ -373,5 +383,9 @@ html, body {
 .exe_toolbar {
     grid-area: exe_toolbar;
     white-space:nowrap;
-    z-index: 1;
+    z-index: 5;
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */   
 }

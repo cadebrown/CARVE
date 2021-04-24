@@ -31,7 +31,6 @@ let memtab_size = [24, 8]
 //   mem: Memory
 let memtab_type = 'rx'
 
-
 // Address of the memory tab
 let memtab_addr = 0x0
 
@@ -42,6 +41,11 @@ let build_time = null
 // Temporary buffer for register strings
 let tmpbuf = null
 let tmpbuf_len = 1024
+
+// pc and utility elements
+let pc = null
+let pc_prev = null
+let pc_tippy = null
 
 // menu setting for console verbosity
 var verbosity = 1;
@@ -182,8 +186,6 @@ loadlibcarve().then(function (_libcarve) {
                     tippy('#reg_' + regs[i][0], {
                         content: content,
                         placement: 'left',
-                        allowHTML: true,
-                        interactive: true,
                     });
                 }
 
@@ -336,6 +338,23 @@ function update_ui() {
             }
         }
     }
+
+    let e = $(`#debug_addr${pc}`)
+    let e_prev = $(`#debug_addr${pc_prev}`)
+    if (pc_tippy != null) {pc_tippy.destroy(); pc_tippy = null;}
+    if (pc != null && e.length != 0) {
+        pc_tippy = tippy("#" + e[0].id, {
+            content: `PC: ${int_to_hex(pc, 8)}`,
+            placement: 'left',
+            sticky: true,
+            onHide: () => {return false;},
+            duration: 0,
+            zIndex: 3,
+        })[0];
+        if (e_prev.length != 0) e_prev.css("background-color", "var(--light-3)");
+        e.css("background-color", "var(--cur-code)");
+        pc_tippy.show();
+    }
 }
 
 function update_debug(str) {
@@ -343,7 +362,7 @@ function update_debug(str) {
     let out = `<tr><th>Code</th><th>Inst</th><th>Line</th></tr>`;
     for (r in rows) {
         const data = rows[r].split(";");
-        out += `<tr><td>${data[0]}</td><td>${data[1]}</td><td>${data[2]}</td></tr>`;
+        out += `<tr id="debug_addr${r * 4}"><td>${data[0]}</td><td>${data[1]}</td><td>${data[2]}</td></tr>`;
     }
 
     debug_table[0].innerHTML = out;
@@ -419,8 +438,9 @@ function do_build() {
     libcarve._free(debug);
 
     if (verbosity > 0) send_meta("Built!")
+    pc_prev = null
+    pc = 0
     update_ui()
-
 }
 
 // Run the entire program
@@ -447,8 +467,11 @@ function do_step() {
     if (libcarve._carve_is_halted(state) == 1) {send_err("Cannot step, state is halted!"); return -1;}
     if (verbosity > 0 && (update_time > build_time)) send_warn("Stepping, but build not updated!")
     if (verbosity > 2) send_meta("Performed step")
+    pc_prev = pc
     pc = libcarve._carve_exec_single(state)
     update_ui()
+    let e = $(`#debug_addr${pc}`)
+    if (e.length != 0) e[0].scrollIntoView({behavior: "auto", block: "center", inline: "nearest"});
     return 0;
 }
 
@@ -506,4 +529,8 @@ function send_err(msg, do_head=true) {
     let head = ""
     if (do_head) head = "CARVE_ERR: "
     term.echo(`[[;${COL_ERR};]${head}${msg}]`)
+}
+
+function int_to_hex(i, len=2) {
+    return ("0".repeat(len) + i.toString(16)).substr(-len)
 }

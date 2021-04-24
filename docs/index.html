@@ -14,9 +14,9 @@ desc: Main page
     <div class="reg_tab table">
         <div class="table_label">
             <select id="tab_type_sel">
-                <option value="int">Integer Registers</option>
-                <option value="flt">Float Registers</option>
-                <option value="stack">Stack Explorer</option>
+                <option value="rx">Int Registers</option>
+                <option value="rf">Float Registers</option>
+                <option value="mem">Memory</option>
             </select>
         </div>
 
@@ -93,8 +93,6 @@ addi t0, zero, 10
                     skip_next
                 </span>
             </div>
-
-
 
             <span class="exe slider_container" id="menu_slider">
                 <!-- Speed -->

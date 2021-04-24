@@ -1,5 +1,5 @@
 const REG_TAB = {
-    "int": [
+    "rx": [
         ["x0",  "zero",  "Hard-wired zero",                   "--"    ],
         ["x1",  "ra",    "Return address",                    "Caller"],
         ["x2",  "sp",    "Stack pointer",                     "Callee"],
@@ -33,7 +33,7 @@ const REG_TAB = {
         ["x30", "t5",    "Temporary register",                "Caller"],
         ["x31", "t6",    "Temporary register",                "Caller"],
     ],
-    "flt": [
+    "rf": [
         ["f0",  "ft0",  "FP temporary",               "Caller"],
         ["f1",  "ft1",  "FP temporary",               "Caller"],
         ["f2",  "ft2",  "FP temporary",               "Caller"],
@@ -66,9 +66,6 @@ const REG_TAB = {
         ["f29", "ft9",  "FP temporary",               "Caller"],
         ["f30", "ft10", "FP temporary",               "Caller"],
         ["f31", "ft11", "FP temporary",               "Caller"],
-    ],
-    "stack": [
-        ["pancakes", "pancakes", "pancakes", "pancakes"]
     ]
 }
 

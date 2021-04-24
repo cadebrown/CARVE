@@ -22,6 +22,19 @@ let term = null
 // debug table
 let debug_table = null
 
+// Memory table size (rows, cols)
+let memtab_size = [24, 8]
+
+// What type of memory pane explorer?
+//   rx: Int registres
+//   rf: Float registers
+//   mem: Memory
+let memtab_type = 'rx'
+
+
+// Address of the memory tab
+let memtab_addr = 0x0
+
 // last time editor was altered / program built
 let update_time = null
 let build_time = null
@@ -133,42 +146,60 @@ loadlibcarve().then(function (_libcarve) {
             let elem = $("#reg_table")
 
             // What type of registers/view?
-            let type = this.value
+            memtab_type = this.value
 
-            // List of registers of this type
-            let regs = REG_TAB[type]
+            if (memtab_type == "rx" || memtab_type == "rf") {
+
+                // List of registers of this type
+                let regs = REG_TAB[memtab_type]
 
 
-            let out = "<table class='regs reg_table'>"
+                let out = "<table class='regs reg_table'>"
 
-        
-            // Add header row
-            out += "<tr class='regs'><td class='regs reg_head reg_id'>REG</td><td class='regs reg_head reg_name'>NAME</td><td class='regs reg_head reg_hex'>HEX</td><td class='regs reg_head reg_dec'>DEC</td></tr>"
             
-            const make_row = (id, name, desc, save) => {
-                return "<tr class='regs' id='reg_" + (id) + "'><td class='regs reg_id' id='reg_" + (id) + "_id'>" + (id) + "</td><td class='regs reg_name' id='reg_" + (id) + "_name'>" + (name) + "</td><td class='regs reg_hex' id='reg_" + (id) + "_hex'></td><td class='regs reg_dec' id='reg_" + (id) + "_dec'></td></tr>"
-            }
-
-            for (let i = 0; i < regs.length; ++i) {
-                out += make_row(...regs[i])
-            }
-
-            out += "</table>"
-            elem[0].innerHTML = out
-
-            for (let i = 0; i < regs.length; i++) {
-                let content = regs[i][2];
-        
-                if (regs[i][3] != "--") {
-                    content += "; " + regs[i][3] + " saved"
-                }
+                // Add header row
+                out += "<tr class='regs'><td class='regs reg_head reg_id'>REG</td><td class='regs reg_head reg_name'>NAME</td><td class='regs reg_head reg_hex'>HEX</td><td class='regs reg_head reg_dec'>DEC</td></tr>"
                 
-                tippy('#reg_' + regs[i][0], {
-                    content: content,
-                    placement: 'left',
-                    allowHTML: true,
-                    interactive: true,
-                });
+                const make_row = (id, name, desc, save) => {
+                    return "<tr class='regs' id='reg_" + (id) + "'><td class='regs reg_id' id='reg_" + (id) + "_id'>" + (id) + "</td><td class='regs reg_name' id='reg_" + (id) + "_name'>" + (name) + "</td><td class='regs reg_hex' id='reg_" + (id) + "_hex'></td><td class='regs reg_dec' id='reg_" + (id) + "_dec'></td></tr>"
+                }
+
+                for (let i = 0; i < regs.length; ++i) {
+                    out += make_row(...regs[i])
+                }
+
+                out += "</table>"
+                elem[0].innerHTML = out
+
+                for (let i = 0; i < regs.length; i++) {
+                    let content = regs[i][2];
+            
+                    if (regs[i][3] != "--") {
+                        content += "; " + regs[i][3] + " saved"
+                    }
+                    
+                    tippy('#reg_' + regs[i][0], {
+                        content: content,
+                        placement: 'left',
+                        allowHTML: true,
+                        interactive: true,
+                    });
+                }
+
+            } else {
+                let out = "<table class='regs reg_table'>"
+
+                for (let i = 0; i < memtab_size[0]; ++i) {
+                    out += "<tr class='regs' id='reg_" + (i) + "'>"
+                    out += "<td class='regs reg_mem_addr' id='mem_row_" + (i) + "'></td>"
+                    for (let j = 0; j < memtab_size[1]; ++j) {
+                        out += "<td class='regs reg_mem' id='mem_" + (i * memtab_size[1] + j) + "'></td>"
+                    }
+                    out += "</tr>"
+                }
+
+                out += "</table>"
+                elem[0].innerHTML = out
             }
 
             // Update the graphical interface
@@ -257,23 +288,35 @@ loadlibcarve().then(function (_libcarve) {
 
 // Updates the UI elements for the engine's current register values
 function update_ui() {
-    for (let i = 0; i < 32; ++i) {
-        let base = 'reg_' + "x" + i.toString()
-
-        libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 16)
-        $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
-
-        libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 10)
-        $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
-    }
-    for (let i = 0; i < 32; ++i) {
-        let base = 'reg_' + "f" + i.toString()
-
-        libcarve._carve_getrf(state, tmpbuf_len, tmpbuf, i)
-        $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
-
-        libcarve._carve_getrfx(state, tmpbuf_len, tmpbuf, i)
-        $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
+    if (memtab_type == 'rx') {
+        for (let i = 0; i < 32; ++i) {
+            let base = 'reg_' + "x" + i.toString()
+    
+            libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 16)
+            $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
+    
+            libcarve._carve_getrx(state, tmpbuf_len, tmpbuf, i, 10)
+            $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
+        }
+    } else if (memtab_type == 'rf') {
+        for (let i = 0; i < 32; ++i) {
+            let base = 'reg_' + "f" + i.toString()
+    
+            libcarve._carve_getrf(state, tmpbuf_len, tmpbuf, i)
+            $('#' + base + '_dec').text(libcarve.UTF8ToString(tmpbuf))
+    
+            libcarve._carve_getrfx(state, tmpbuf_len, tmpbuf, i)
+            $('#' + base + '_hex').text(libcarve.UTF8ToString(tmpbuf))
+        }
+    } else {
+        // Address of start of memory explorer
+        let addr = memtab_addr
+        for (let i = 0; i < memtab_size[0]; ++i) {
+            $('#mem_row_' + (i)).text('' + ("00000000" + (addr + i * memtab_size[1]).toString(16)).substr(-8))
+            for (let j = 0; j < memtab_size[1]; ++j) {
+                $('#mem_' + (i * memtab_size[1] + j)).text('FF')
+            }
+        }
     }
 }
 
@@ -359,6 +402,7 @@ function do_build() {
 
     if (verbosity > 0) send_meta("Built!")
     update_ui()
+
 }
 
 // Run the entire program

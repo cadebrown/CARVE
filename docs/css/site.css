@@ -165,6 +165,14 @@ html, body {
     background-color: var(--base-panel-color);
 }
 
+.reg_mem {
+    color: var(--num);
+}
+
+.reg_mem_addr {
+    color: var(--reg);
+}
+
 .reg_id.reg_head {
     width: 4em;
     color: var(--reg);

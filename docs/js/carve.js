@@ -230,7 +230,7 @@ loadlibcarve().then(function (_libcarve) {
                 update_ace()
             },
             columnMinSize: $(window).width() / 10,
-            rowMinSize: $(window).height() / 10,
+            rowMinSize: $(window).height() / 10 + 42,
         });
         Split({ // gutters specified in options
             columnGutters: [{

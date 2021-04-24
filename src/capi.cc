@@ -105,4 +105,17 @@ char* carve_get_debug(Program* p) {
     return strdup(out.str().c_str());
 }
 
+u8 carve_getbyte(State* s, int idx) {
+    return s->vmem[idx];
+}
+
+
+u8* carve_getmem(State* s) {
+    return &s->vmem[0];
+}
+
+u64 carve_getmemsize(State* s) {
+    return s->vmem.size();
+}
+
 }

@@ -165,6 +165,16 @@ html, body {
     background-color: var(--base-panel-color);
 }
 
+#mem_row_0 {
+    background-color: var(--light-2);
+    font-family: "SFMono-Regular", Menlo, Consolas, Monospace;
+    color: var(--reg);
+    padding: 0px;
+    margin: 0px;
+    border-style: none;
+    font-size: 16px;
+}
+
 .reg_mem {
     color: var(--num);
 }

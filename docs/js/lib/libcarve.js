@@ -5007,6 +5007,15 @@ var _carve_is_halted = Module["_carve_is_halted"] = createExportWrapper("carve_i
 var _carve_get_debug = Module["_carve_get_debug"] = createExportWrapper("carve_get_debug");
 
 /** @type {function(...*):?} */
+var _carve_getbyte = Module["_carve_getbyte"] = createExportWrapper("carve_getbyte");
+
+/** @type {function(...*):?} */
+var _carve_getmem = Module["_carve_getmem"] = createExportWrapper("carve_getmem");
+
+/** @type {function(...*):?} */
+var _carve_getmemsize = Module["_carve_getmemsize"] = createExportWrapper("carve_getmemsize");
+
+/** @type {function(...*):?} */
 var ___errno_location = Module["___errno_location"] = createExportWrapper("__errno_location");
 
 /** @type {function(...*):?} */

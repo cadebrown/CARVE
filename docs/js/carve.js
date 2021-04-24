@@ -429,7 +429,7 @@ function do_step() {
     if (libcarve._carve_is_halted(state) == 1) {send_err("Cannot step, state is halted!"); return -1;}
     if (verbosity > 0 && (update_time > build_time)) send_warn("Stepping, but build not updated!")
     if (verbosity > 2) send_meta("Performed step")
-    libcarve._carve_exec_single(state)
+    pc = libcarve._carve_exec_single(state)
     update_ui()
     return 0;
 }

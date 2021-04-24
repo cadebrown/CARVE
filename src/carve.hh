@@ -401,7 +401,7 @@ CARVE_API Program* carve_program_new(const char* fname, const char* src);
 CARVE_API void carve_program_free(Program* self);
 
 // Execute a single instruction on 's'
-CARVE_API void carve_exec_single(State* s);
+CARVE_API u64 carve_exec_single(State* s);
 
 // Execute until its done
 CARVE_API void carve_exec_all(State* s);

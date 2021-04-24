@@ -44,11 +44,11 @@ void carve_program_free(Program* self) {
     delete self;
 }
 
-void carve_exec_single(State* s) {
+u64 carve_exec_single(State* s) {
     // TODO: How to handle halted program
     if (s->is_halted) {
         fprintf(stderr, "CANNOT EXECUTE -- STATE IS HALTED\n");
-        return;
+        return -1;
     }
 
     // Now, first, we need to get the current instruction
@@ -58,7 +58,7 @@ void carve_exec_single(State* s) {
     s->exec(v);
 
     // Increment to next instruction
-    s->pc += 4;
+    return s->pc += 4;
 }
 
 void carve_exec_all(State* s) {

@@ -414,11 +414,14 @@ function do_build() {
     // Convert to NUL-terminated buffers
     let buf_fname = libcarve._malloc(fname.length + 2)
     let buf_src = libcarve._malloc(src.length + 2)
+
     libcarve.stringToUTF8(fname, buf_fname, fname.length + 1)
     libcarve.stringToUTF8(src, buf_src, src.length + 1)
 
     // Create program
     program = libcarve._carve_program_new(buf_fname, buf_src)
+ 
+    console.log("TEST")
     
     // Free temporary buffers
     libcarve._free(buf_fname)

@@ -21,11 +21,11 @@ void _auipc  (State& s, int rd, u64 imm) {
 
 void _jal    (State& s, int rd, u64 imm) {
     if (rd != 0) s.rx[rd] = s.pc;
-    s.pc += sext(imm, 20) - 4;
+    s.pc += sext(imm, 20);
 }
 void _jalr   (State& s, int rd, int rs1, u64 imm) {
     u64 rr = s.pc;
-    s.pc = s.rx[rs1] + sext(imm, 19) - 4;
+    s.pc = s.rx[rs1] + sext(imm, 19);
     if (rd != 0) s.rx[rd] = rr;
 
 }

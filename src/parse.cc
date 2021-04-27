@@ -183,11 +183,18 @@ vector<Token> lex(const string& fname, const string& src) {
 
 // Parse and skip a token kind
 static bool parse_skip(Program* res, const vector<Token>& toks, int& toki, Token::Kind kind) {
+    if (toki >= toks.size()) {
+
+        cerr << "Unexpected EOF" << endl;
+        cerr << toks[toki - 1].context(res->fname, res->src);
+        return false;
+    }
     Token t = toks[toki];
     if (t.kind == kind) {
         toki++;
         return true;
     } else {
+
         cerr << "Unexpected token" << endl;
         cerr << t.context(res->fname, res->src);
         return false;
@@ -828,8 +835,15 @@ static bool do_dir(Program* res, const string& dir, unordered_map< pair<int, int
         res->vmem[seg].push_back(0);
 
         return true;
+    } else if (dir == "global") {
+        // just skip, as we don't use global
+        toki++;
+        return true;
 
     } else if (dir == "section") {
+        if (toks[toki].kind == Token::Kind::DOT) {
+            toki++;
+        }
         string sec = toks[toki++].get(res->src);
         int ss = 0;
         if (sec == "text") {
@@ -989,7 +1003,7 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
     int toki = 0;
     while (toki < toks.size()) {
         Token t = toks[toki++];
-        if (t.kind == Token::Kind::IDENT) {
+        if (t.kind == Token::Kind::IDENT || (t.kind == Token::Kind::INT && toks[toki].kind == Token::Kind::COL)) {
             if (toks[toki].kind == Token::Kind::COL) {
                 // Label
                 toki++;

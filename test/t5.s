@@ -1,1 +1,3 @@
-jalr ra
+
+addiw t0, zero, 2
+

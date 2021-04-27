@@ -197,6 +197,56 @@ void State::exec(inst v) {
                     break;
             }
             break;
+        case 0x1b:
+            dec_I(v, op, f3, rd, rs1, imm);
+            switch (f3) {
+                case 0x0:
+                    impl::_addiw(*this, rd, rs1, imm);
+                    break;
+                case 0x1:
+                    impl::_slliw(*this, rd, rs1, imm);
+                    break;
+                case 0x5:
+                    impl::_srliw(*this, rd, rs1, imm);
+                    break;
+            }
+            break;
+        case 0x3b:
+            dec_R(v, op, f3, f7, rd, rs1, rs2);
+            switch (f3) {
+                case 0x0:
+                    switch (f7) {
+                        case 0x0:
+                            impl::_addw(*this, rd, rs1, rs2);
+                            break;
+                        case 0x20:
+                            impl::_subw(*this, rd, rs1, rs2);
+                            break;
+                    }
+                    break;
+                case 0x1:
+                    switch (f7) {
+                        case 0x0:
+                            impl::_sllw(*this, rd, rs1, rs2);
+                            break;
+                    }
+                    break;
+                case 0x2:
+                    switch (f7) {
+                        case 0x0:
+                            impl::_srlw(*this, rd, rs1, rs2);
+                            break;
+                    }
+                    break;
+                case 0x5:
+                    switch (f7) {
+                        case 0x10:
+                            impl::_sraw(*this, rd, rs1, rs2);
+                            break;
+                    }
+                    break;
+            }
+            break;
 
     }
 }

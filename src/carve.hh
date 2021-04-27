@@ -374,6 +374,16 @@ void _or     (State& s, int rd, int rs1, int rs2);
 void _and    (State& s, int rd, int rs1, int rs2);
 void _ebreak (State& s, int rd, int rs1, u64 imm);
 
+// RV64I, implemented in 'impl/RV64I.cc'
+void _addiw  (State& s, int rd, int rs1, u64 imm);
+void _slliw  (State& s, int rd, int rs1, u64 imm);
+void _srliw  (State& s, int rd, int rs1, u64 imm);
+void _addw   (State& s, int rd, int rs1, int rs2);
+void _subw   (State& s, int rd, int rs1, int rs2);
+void _sllw   (State& s, int rd, int rs1, int rs2);
+void _srlw   (State& s, int rd, int rs1, int rs2);
+void _sraw   (State& s, int rd, int rs1, int rs2);
+
 }
 
 

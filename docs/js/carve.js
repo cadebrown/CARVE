@@ -448,7 +448,7 @@ function do_build() {
 
 // Run the entire program
 function do_restart() {
-    send_err("Not implemented")
+    do_build()
 }
 
 // Continue executing

@@ -1,0 +1,32 @@
+:root {
+    --base-panel-color: #2f3029;
+    --dark-panel-color: #282923;
+    --derk-panel-color: #1c1c18;
+    --light-0: #c3c4bb;
+    --light-1: #8F908A;
+    --light-2: #5b5c58;
+    --light-3: #404238;
+
+    --cur-code: #926a3d;
+
+    --button-color: #70705f;
+
+    --icon-color: #d6d6cd;
+
+    --reg-dark: #ffa740;
+    --reg: #ffc98a;
+    --num: #e7e4f5;
+    --reg-light: #ffdcb3;
+    --num-light: #e7e4f5;
+
+    --body-text: #F8F8F2;
+    --button-text: #eeeeee;
+}
+
+/* layout classes */
+
+body {
+    height: 100%;
+    margin: 32px;
+    font-family: "Inconsolata", "Ubuntu Mono", monospace;
+}

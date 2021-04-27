@@ -1,13 +1,13 @@
 ---
-layout: extra
+layout: doc
 title: CARVE
-desc: Help Page
-permalink: /help
+desc: Development Guide
+permalink: /dev
 ---
 
 # CARVE Help Page
 
-This is the help page for [CARVE](..).
+This is the help page for [CARVE](..), the _Cade And greg Risc-V Emulator_.
 
 (WIP: We need to take screenshots of the final layout to help people understand)
 

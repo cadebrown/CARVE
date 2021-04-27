@@ -70,10 +70,10 @@ const REG_TAB = {
 }
 
 const EXE_DESC = {
-    "menu_build": "Build: Assembles the program",
+    "menu_build": "Build: Assembles the program and resets all memory.",
     "menu_play": "Play: Runs the program at the specified speed",
     "menu_pause": "Pause: Pauses execution of the program",
     "menu_step": "Step: Executes a single instruction",
     "menu_slider": "Speed: How fast the program should run",
-    "menu_restart": "Restart: Resets PC to the top of .text and resets memory/registers",
+    "menu_restart": "Restart: Resets PC to the top of .text and resets memory/registers. This is currently an alias for rebuilding.",
 }

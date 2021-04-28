@@ -263,7 +263,10 @@ loadlibcarve().then(function (_libcarve) {
             'options': [['verbosity', `<span class="menu-dropdown nohov">Verbosity</span> \
                 <input oninput="verbosity = parseInt($('#verbosity')[0].value)" type="number" id="verbosity" name="verbosity" min="0" max="3" style="width: 32px;" value=${verbosity}>`]],
             'assembler': ['ASSEMBLER INFORMATION (extensions, compilation date, etc.)'],
-            'help': ['CARVE Documentation', 'Syscall reference', 'RISC-V Spec']
+            'help': [`<a target='_blank' rel='noopener noreferrer' href='help'>CARVE Documentation</a>`,
+            `<a target='_blank' rel='noopener noreferrer' href='syscalls'>Syscall reference</a>`,
+            `<a target='_blank' rel='noopener noreferrer' href='dev'>Development Guide</a>`,
+            `<a target='_blank' rel='noopener noreferrer' href='https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf'>RISC-V Spec</a>`]
         }
         
         for (let k in tree) {

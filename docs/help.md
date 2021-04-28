@@ -1,15 +1,17 @@
 ---
 layout: doc
 title: CARVE
-desc: Development Guide
-permalink: /dev
+desc: Emulator Help
+permalink: /help
 ---
 
 # CARVE Help Page
 
-This is the help page for [CARVE](..), the _Cade And greg Risc-V Emulator_.
+This is the help page for [CARVE](..), the _**C**ade **A**nd greg **R**isc-**V** **E**mulator_. The source code is available [for free on GitHub](https://github.com/ChemicalDevelopment/CARVE).
 
-(WIP: We need to take screenshots of the final layout to help people understand)
+## Basic Layout
+
+![Basic layout of CARVE](assets/layout.png "Basic Layout")
 
 ## Text Editor
 
@@ -28,5 +30,4 @@ You can view the output of the assembling process, as well as the execution proc
 
 You can view registers in the register view
 
-
-
+_Last updated 4/27/2021_

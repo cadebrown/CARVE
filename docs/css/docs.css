@@ -28,5 +28,21 @@
 body {
     height: 100%;
     margin: 32px;
-    font-family: "Inconsolata", "Ubuntu Mono", monospace;
+    font-family: "Merriweather", "Inconsolata", "Ubuntu Mono", monospace;
+    background-color: var(--derk-panel-color);
+    color: var(--light-0);
+}
+
+a, a:visited {
+    color: var(--reg);
+    text-decoration: none;
+}
+
+.doc_container {
+    background-color: var(--light-3);
+    padding: 16px;
+}
+
+img {
+    width: 100%;
 }

@@ -300,6 +300,11 @@ html, body {
     height: 100%;
 }
 
+.menu-dropdown a, .menu-dropdown a:visited {
+    color: inherit;
+    text-decoration: none;
+}
+
 /* grid specifiers */
 
 .grid-container {

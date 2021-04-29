@@ -53,3 +53,8 @@ img {
     max-width: 87%;
     max-height: 28em;
 }
+
+pre {
+    color: var(--body-text);
+    background-color: var(--light-2);
+}

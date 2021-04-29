@@ -234,6 +234,56 @@ string disassemble(inst v) {
                     break;
             }
             break;
+        case 0x1b:
+            dec_I(v, op, f3, rd, rs1, imm);
+            switch (f3) {
+                case 0x0:
+                            out << "addiw" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << imm;
+                    break;
+                case 0x1:
+                            out << "slliw" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << imm;
+                    break;
+                case 0x5:
+                            out << "srliw" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << imm;
+                    break;
+            }
+            break;
+        case 0x3b:
+            dec_R(v, op, f3, f7, rd, rs1, rs2);
+            switch (f3) {
+                case 0x0:
+                    switch (f7) {
+                        case 0x0:
+                            out << "addw" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << rs2;
+                            break;
+                        case 0x20:
+                            out << "subw" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << rs2;
+                            break;
+                    }
+                    break;
+                case 0x1:
+                    switch (f7) {
+                        case 0x0:
+                            out << "sllw" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << rs2;
+                            break;
+                    }
+                    break;
+                case 0x2:
+                    switch (f7) {
+                        case 0x0:
+                            out << "srlw" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << rs2;
+                            break;
+                    }
+                    break;
+                case 0x5:
+                    switch (f7) {
+                        case 0x10:
+                            out << "sraw" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << rs2;
+                            break;
+                    }
+                    break;
+            }
+            break;
 
     }
     return out.str();

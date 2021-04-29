@@ -71,6 +71,8 @@ src/insts.cc: tools/geninsts.py tools/riscvdata.py
 	$< > $@
 src/exec.cc: tools/genexec.py tools/riscvdata.py
 	$< > $@
+src/dsmblr.cc: tools/gendsmblr.py tools/riscvdata.py
+	$< > $@
 
 $(out_LIB_JS): $(src_EMCCO) src/pre.js
 	@mkdir -p $(dir $@)

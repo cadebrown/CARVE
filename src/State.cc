@@ -35,6 +35,9 @@ void State::init(const Program& prog, u64 extra) {
     // Set stack pointer register (sp) to the top of the vmem space
     rx[2] = fake(vmem.size());
 
+    // Set global pointer (gp) to after text section
+    rx[3] = fake(prog.vmem[0].size());
+
     // Unhalt / unexit program
     is_halted = false;
     is_exited = false;

@@ -44,5 +44,7 @@ a, a:visited {
 }
 
 img {
-    width: 100%;
+    max-width: max-content;
+    width: 50%;
+    margin: auto;
 }

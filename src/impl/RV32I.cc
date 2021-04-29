@@ -166,7 +166,7 @@ void _and    (State& s, int rd, int rs1, int rs2) {
 
 // Syscalls
 void _ebreak (State& s, int rd, int rs1, u64 imm) {
-    #define a(n) s.rx[4 + n]
+    #define a(n) s.rx[10 + n]
     switch (imm)
     {
     case 0: {
@@ -175,11 +175,19 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
         // Which syscall?
         switch (a(7))
         {
-        case 0:
-            // exit(a0)
-            s.is_exited = true;
-            s.exit_code = a(0);
-            break;
+            case 0: {
+                // exit(0)
+                s.is_exited = true;
+                s.exit_code = 0;
+                break;
+            }
+            case 1: {
+                // exit(a0)
+                s.is_exited = true;
+                s.exit_code = a(0);
+                fprintf(stderr, "we exited woot woot");
+                break;
+            }
         }
 
         break;

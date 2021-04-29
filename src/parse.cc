@@ -983,7 +983,7 @@ static bool do_dir(Program* res, const string& dir, unordered_map< pair<int, int
     }
 }
 
-Program* parse(const string& fname, const string& src, const vector<Token>& toks) {
+Program* parse(const string& fname, const string& src, const vector<Token>& toks, bool addexit) {
     Program* res = new Program();
     res->fname = fname;
     res->src = src;
@@ -1107,8 +1107,16 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
             return NULL;
         }
     }    
-    // Add ebreak
-    addbytes<inst>(res->vmem[seg], enc_I(0x73, 0, 0, 0, 1 /* = ebreak */));
+    // Add exit
+    if (addexit) {
+        u64 addi_inst = enc_I(0x13, 0, 17, 0, 0 /* a7 = 0 */);
+        u64 ecall_inst = enc_I(0x73, 0, 0, 0, 0  /* ecall  */);
+        addbytes<inst>(res->vmem[seg], addi_inst);
+        addbytes<inst>(res->vmem[seg], ecall_inst);
+        res->debug.push_back({addi_inst, (u64) -1});
+        res->debug.push_back({ecall_inst, (u64) -1});
+    }
+
 
     // Now, link up references
     for (unordered_map< pair<int, int>, pair<string, string> >::iterator it = back.begin(); it != back.end(); ++it) {

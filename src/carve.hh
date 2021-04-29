@@ -290,7 +290,7 @@ s64 sext(u64 val, int bit);
 vector<Token> lex(const string& fname, const string& src);
 
 // Parse a program from source code, and return a pointer to it
-Program* parse(const string& fname, const string& src, const vector<Token>& toks);
+Program* parse(const string& fname, const string& src, const vector<Token>& toks, bool addexit=false);
 
 // Add bytes to a bytes array
 template<typename T>
@@ -405,7 +405,7 @@ CARVE_API void carve_state_init(State* self, Program* program);
 
 // Create a new program, from the given filename and source
 // NOTE: Free this with 'carve_program_free()'
-CARVE_API Program* carve_program_new(const char* fname, const char* src);
+CARVE_API Program* carve_program_new(const char* fname, const char* src, bool addexit);
 
 // Free a program allocated with 'carve_program_new()'
 CARVE_API void carve_program_free(Program* self);
@@ -427,6 +427,15 @@ CARVE_API void carve_getrfx(State* s, int len, char* data, int reg);
 
 // Determines if a state is halted
 CARVE_API bool carve_is_halted(State* s);
+
+// Unhaults a state
+CARVE_API void carve_unhalt(State* s);
+
+// Determines if a state is exited
+CARVE_API bool carve_is_exited(State* s);
+
+// Finds exit status
+CARVE_API int carve_exit_status(State* s);
 
 // Returns the data required for debug table
 CARVE_API char* carve_get_debug(Program* p);

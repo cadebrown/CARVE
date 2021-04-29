@@ -50,6 +50,8 @@ let pc_tippy = null
 // menu setting for console verbosity
 var verbosity = 1;
 
+let addexit = 1;
+
 // Color for meta
 const COL_META = '#e3cb17'
 const COL_WARN = '#ffa500'
@@ -260,8 +262,12 @@ loadlibcarve().then(function (_libcarve) {
         // tippy
         let tree = {
             'file': ['open', 'save', 'new'],
-            'options': [['verbosity', `<span class="menu-dropdown nohov">Verbosity</span> \
-                <input oninput="verbosity = parseInt($('#verbosity')[0].value)" type="number" id="verbosity" name="verbosity" min="0" max="3" style="width: 32px;" value=${verbosity}>`]],
+            'options': [
+                ['verbosity', `<span class="menu-dropdown nohov">Verbosity</span> \
+                <input oninput="verbosity = parseInt($('#verbosity')[0].value)" type="number" id="verbosity" name="verbosity" min="0" max="3" style="width: 32px;" value=${verbosity}><br>`],
+                ['addexit', `<span class="menu-dropdown nohov">Add Exit At Bottom</span> \
+                <input oninput="addexit = $('#addexit').prop('checked')" type="checkbox" id="addexit" name="addexit" style="width: 32px;" ${(addexit) ? 'checked' : ''}>`]
+            ],
             'assembler': ['ASSEMBLER INFORMATION (extensions, compilation date, etc.)'],
             'help': [`<a target='_blank' rel='noopener noreferrer' href='help'>CARVE Documentation</a>`,
             `<a target='_blank' rel='noopener noreferrer' href='syscalls'>Syscall reference</a>`,
@@ -376,7 +382,22 @@ function update_debug(str) {
 // Run a single instruction
 function _worker_single() {
     if (worker_active) {
-        if (do_step() < 0) {send_err("Error stepping, execution ended!"); return;}
+        if (do_step() < 0) {
+            send_err("Error stepping, execution ended!");
+            worker_active = false;
+            return;
+        }
+
+        if (libcarve._carve_is_exited(state)) {
+            worker_active = false;
+            return;
+        }
+
+        if (libcarve._carve_is_halted(state)) {
+            libcarve._carve_unhalt(state);
+            worker_active = false;
+            return;
+        }
 
         // Read the speed, turn it into a delay
         setTimeout(_worker_single, worker_delay * 1000)
@@ -422,10 +443,8 @@ function do_build() {
     libcarve.stringToUTF8(src, buf_src, src.length + 1)
 
     // Create program
-    program = libcarve._carve_program_new(buf_fname, buf_src)
- 
-    console.log("TEST")
-    
+    program = libcarve._carve_program_new(buf_fname, buf_src, addexit)
+     
     // Free temporary buffers
     libcarve._free(buf_fname)
     libcarve._free(buf_src)
@@ -470,7 +489,7 @@ function do_pause() {
 // Run a single step
 function do_step() {
     if (build_time === null) {send_err("Cannot step, not built!"); return -1;}
-    if (libcarve._carve_is_halted(state) == 1) {send_err("Cannot step, state is halted!"); return -1;}
+    if (libcarve._carve_is_exited(state)) {send_err("Cannot step, state is exited!"); return -1;}
     if (verbosity > 0 && (update_time > build_time)) send_warn("Stepping, but build not updated!")
     if (verbosity > 2) send_meta("Performed step")
     pc_prev = pc
@@ -478,6 +497,7 @@ function do_step() {
     update_ui()
     let e = $(`#debug_addr${pc}`)
     if (e.length != 0) e[0].scrollIntoView({behavior: "auto", block: "center", inline: "nearest"});
+    if (libcarve._carve_is_exited(state)) {send_meta(`Program exited with code ${libcarve._carve_exit_status(state)}`);}
     return 0;
 }
 

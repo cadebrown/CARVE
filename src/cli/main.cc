@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
     }
 
     // Parse 
-    Program* p = parse(fname, src, toks);
+    Program* p = parse(fname, src, toks, true);
     if (!p) {
         return 1;
     }

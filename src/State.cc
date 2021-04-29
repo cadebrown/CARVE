@@ -35,8 +35,10 @@ void State::init(const Program& prog, u64 extra) {
     // Set stack pointer register (sp) to the top of the vmem space
     rx[2] = fake(vmem.size());
 
-    // Unhalt program
+    // Unhalt / unexit program
     is_halted = false;
+    is_exited = false;
+    exit_code = -1;
 }
 
 

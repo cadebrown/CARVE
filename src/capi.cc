@@ -20,7 +20,7 @@ void carve_state_free(State* self) {
     delete self;
 }
 
-Program* carve_program_new(const char* fname, const char* src) {
+Program* carve_program_new(const char* fname, const char* src, bool addexit) {
     string fname_s = fname;
     string src_s = src;
    
@@ -31,7 +31,7 @@ Program* carve_program_new(const char* fname, const char* src) {
     }
 
     // Parse source code
-    Program* res = parse(fname_s, src_s, toks);
+    Program* res = parse(fname_s, src_s, toks, addexit);
     if (!res) {
         return NULL;
     }
@@ -46,8 +46,8 @@ void carve_program_free(Program* self) {
 
 u64 carve_exec_single(State* s) {
     // TODO: How to handle halted program
-    if (s->is_halted) {
-        fprintf(stderr, "CANNOT EXECUTE -- STATE IS HALTED\n");
+    if (s->is_exited) {
+        fprintf(stderr, "INERNAL ERROR: CANNOT EXECUTE -- STATE IS EXITED\n");
         return -1;
     }
 
@@ -58,11 +58,11 @@ u64 carve_exec_single(State* s) {
     s->exec(v);
 
     // Increment to next instruction
-    return s->pc += 4;
+    return s->pc += sizeof(inst);
 }
 
 void carve_exec_all(State* s) {
-    while (!s->is_halted) {
+    while (!s->is_halted && !s->is_exited) {
         carve_exec_single(s);
     }
 }
@@ -91,6 +91,18 @@ void carve_state_init(State* self, Program* program) {
 
 bool carve_is_halted(State* s) {
     return s->is_halted;
+}
+
+void carve_unhalt(State* s) {
+    s->is_halted = false;
+}
+
+bool carve_is_exited(State* s) {
+    return s->is_exited;
+}
+
+int carve_exit_status(State* s) {
+    return s->exit_code;
 }
 
 char* carve_get_debug(Program* p) {

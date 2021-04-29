@@ -121,7 +121,6 @@ u8 carve_getbyte(State* s, int idx) {
     return s->vmem[idx];
 }
 
-
 u8* carve_getmem(State* s) {
     return &s->vmem[0];
 }
@@ -130,4 +129,27 @@ u64 carve_getmemsize(State* s) {
     return s->vmem.size();
 }
 
+char* carve_dissassemble(inst i) {
+    return strdup(disassemble(i).c_str());
+}
+
+void carve_set_pc(State* s, u64 i) {
+    s->pc = i;
+}
+
+int carve_get_pc(State* s){
+    return s->pc;
+}
+
+void carve_set_ireg(State* s, u64 r, uint8_t v) {
+    s->rx[r] = v;
+}
+
+void carve_set_freg(State* s, u64 r, double v) {
+    s->rf[r] = v;
+}
+
+void carve_set_byte(State* s, u64 loc, uint8_t v) {
+    s->vmem[loc] = v;
+}
 }

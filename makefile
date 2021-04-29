@@ -27,7 +27,7 @@ endif
 # -*- Options -*-
 
 # Emscripten compiler flags
-EMCC_CFLAGS  := -sASSERTIONS=1 -sSAFE_HEAP=1 -sDEMANGLE_SUPPORT=1
+EMCC_CFLAGS  := -sASSERTIONS=1 -sSAFE_HEAP=1 -sDEMANGLE_SUPPORT=1 -sNO_EXIT_RUNTIME=0
 
 # Emscripten linker flags (for final compilation)
 EMCC_LDFLAGS := -sWASM=1 -sFORCE_FILESYSTEM=1 \

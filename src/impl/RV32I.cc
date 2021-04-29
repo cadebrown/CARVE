@@ -171,7 +171,7 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
     {
     case 0: {
         // ecall (syscall)
-
+        printf("Howdy -- I'm doing a syscall $%d\n", (int) a(7));
         // Which syscall?
         switch (a(7))
         {
@@ -190,28 +190,28 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
             case 10: {
                 // readchar
                 char tmp;
-                scanf("%c", &tmp);
+                scanf("%c", (char*) &tmp);
                 a(0) = tmp;
                 break;
             }
             case 11: {
                 // readint
                 uint32_t tmp;
-                scanf("%d", &tmp);
+                scanf("%d", (int*) &tmp);
                 a(0) = tmp;
                 break;
             }
             case 12: {
                 // readflt
                 double tmp;
-                scanf("%lf", &tmp);
+                scanf("%lf", (double*) &tmp);
                 a(0) = tmp;
                 break;
             }
             case 13: {
                 // readlong
                 uint64_t tmp;
-                scanf("%ld", &tmp);
+                scanf("%ld", (long*) &tmp);
                 a(0) = tmp;
                 break;
             }
@@ -225,23 +225,30 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
             }
             case 20: {
                 // writechar
-                printf("%c", a(0));
+                printf("%c", (char) a(0));
+                fflush(stdout);
                 break;
             }
             case 21: {
                 // writeint
-                printf("%d", a(0));
+                printf("%d", (int) a(0));
+                fflush(stdout);
                 break;
             }
             case 22: {
                 // writeflt
-                printf("%lf", a(0));
+                printf("%lf", (double) a(0));
+                fflush(stdout);
                 break;
             }
             case 23: {
                 // writestr
-                snprintf("%s", a(1), ((char*) s.vmem.data()) + a(0));
+                printf("%.*s", (int) a(1), ((char*) s.vmem.data()) + a(0));
+                fflush(stdout);
                 break;
+            }
+            default: {
+                fprintf(stderr, "Unknown syscall number %d\n", (int) a(7));
             }
         }
 

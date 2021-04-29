@@ -1109,12 +1109,13 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
     }    
     // Add exit
     if (addexit) {
+        seg = 0;
         u64 addi_inst = enc_I(0x13, 0, 17, 0, 0 /* a7 = 0 */);
         u64 ecall_inst = enc_I(0x73, 0, 0, 0, 0  /* ecall  */);
+        res->debug.push_back({res->vmem[seg].size(), (u64) -1});
         addbytes<inst>(res->vmem[seg], addi_inst);
+        res->debug.push_back({res->vmem[seg].size(), (u64) -1});
         addbytes<inst>(res->vmem[seg], ecall_inst);
-        res->debug.push_back({addi_inst, (u64) -1});
-        res->debug.push_back({ecall_inst, (u64) -1});
     }
 
 

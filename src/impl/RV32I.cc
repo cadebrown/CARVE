@@ -185,7 +185,62 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
                 // exit(a0)
                 s.is_exited = true;
                 s.exit_code = a(0);
-                fprintf(stderr, "we exited woot woot");
+                break;
+            }
+            case 10: {
+                // readchar
+                char tmp;
+                scanf("%c", &tmp);
+                a(0) = tmp;
+                break;
+            }
+            case 11: {
+                // readint
+                uint32_t tmp;
+                scanf("%d", &tmp);
+                a(0) = tmp;
+                break;
+            }
+            case 12: {
+                // readflt
+                double tmp;
+                scanf("%lf", &tmp);
+                a(0) = tmp;
+                break;
+            }
+            case 13: {
+                // readlong
+                uint64_t tmp;
+                scanf("%ld", &tmp);
+                a(0) = tmp;
+                break;
+            }
+            case 14: {
+                // readstr
+                char buff[a(1)];
+                fgets(buff, a(1), stdin);
+
+                memcpy(((char*) s.vmem.data()) + a(0), buff, a(1));
+                break;
+            }
+            case 20: {
+                // writechar
+                printf("%c", a(0));
+                break;
+            }
+            case 21: {
+                // writeint
+                printf("%d", a(0));
+                break;
+            }
+            case 22: {
+                // writeflt
+                printf("%lf", a(0));
+                break;
+            }
+            case 23: {
+                // writestr
+                snprintf("%s", a(1), ((char*) s.vmem.data()) + a(0));
                 break;
             }
         }

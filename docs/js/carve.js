@@ -364,6 +364,8 @@ function update_ui() {
         e.css("background-color", "var(--cur-code)");
         pc_tippy.show();
     }
+
+    if (e.length != 0) e[0].scrollIntoView({behavior: "auto", block: "center", inline: "nearest"});
 }
 
 function update_debug(str) {
@@ -498,8 +500,6 @@ function do_step() {
     pc_prev = pc
     pc = libcarve._carve_exec_single(state)
     update_ui()
-    let e = $(`#debug_addr${pc}`)
-    if (e.length != 0) e[0].scrollIntoView({behavior: "auto", block: "center", inline: "nearest"});
     if (libcarve._carve_is_exited(state)) {send_meta(`Program exited with code ${libcarve._carve_exit_status(state)}`);}
     return 0;
 }

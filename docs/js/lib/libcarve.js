@@ -4948,6 +4948,21 @@ var _carve_getmem = Module["_carve_getmem"] = createExportWrapper("carve_getmem"
 var _carve_getmemsize = Module["_carve_getmemsize"] = createExportWrapper("carve_getmemsize");
 
 /** @type {function(...*):?} */
+var _carve_dissassemble = Module["_carve_dissassemble"] = createExportWrapper("carve_dissassemble");
+
+/** @type {function(...*):?} */
+var _carve_set_pc = Module["_carve_set_pc"] = createExportWrapper("carve_set_pc");
+
+/** @type {function(...*):?} */
+var _carve_get_pc = Module["_carve_get_pc"] = createExportWrapper("carve_get_pc");
+
+/** @type {function(...*):?} */
+var _carve_set_freg = Module["_carve_set_freg"] = createExportWrapper("carve_set_freg");
+
+/** @type {function(...*):?} */
+var _carve_set_byte = Module["_carve_set_byte"] = createExportWrapper("carve_set_byte");
+
+/** @type {function(...*):?} */
 var ___errno_location = Module["___errno_location"] = createExportWrapper("__errno_location");
 
 /** @type {function(...*):?} */

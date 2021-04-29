@@ -449,6 +449,23 @@ CARVE_API u64 carve_getmemsize(State* s);
 // Returns a single byte from memory
 CARVE_API u8 carve_getbyte(State* s, int idx);
 
+// Disassembles a single instruction and returns char* from heap
+CARVE_API char* carve_dissassemble(inst i);
+
+// Sets the pc of a state
+CARVE_API void carve_set_pc(State* s, u64 i);
+
+// Gets the pc of a state
+CARVE_API int carve_get_pc(State* s);
+
+// sets an integer register
+CARVE_API void carve_set_xreg(State* s, u64 r, uint8_t v);
+
+// sets a float register
+CARVE_API void carve_set_freg(State* s, u64 r, double v);
+
+// sets a memory address
+CARVE_API void carve_set_byte(State* s, u64 loc, uint8_t v);
 }
 
 

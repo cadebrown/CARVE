@@ -41,10 +41,15 @@ a, a:visited {
 .doc_container {
     background-color: var(--light-3);
     padding: 16px;
+    max-width: 1200px;
+    margin: auto;
 }
 
 img {
-    max-width: max-content;
-    width: 50%;
-    margin: auto;
+
+    display: block;
+    margin: 0 auto;
+    border: 1px solid black;
+    max-width: 87%;
+    max-height: 28em;
 }

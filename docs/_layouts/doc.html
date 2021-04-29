@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 
+{%- assign date_format = site.minima.date_format | default: '%b %-d, %Y' -%}
+
+
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -14,7 +17,6 @@
 {% if page.desc %}
     <meta name="Description" content="{{ page.desc }}">
 {% endif %}
-
 <!-- Google FONT -->
 <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">

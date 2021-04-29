@@ -424,6 +424,9 @@ function do_build() {
     worker_stop()
     build_time = Date.now()
     if (verbosity > 0) send_meta("Building...")
+    if (verbosity > 0 && addexit == false) {
+        send_warn("addexit is false -- make sure you handle the execution at the bottom!")
+    }
 
     // Filename string
     let fname = "<>"

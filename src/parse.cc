@@ -163,6 +163,28 @@ vector<Token> lex(const string& fname, const string& src) {
 
             ADD(Token::Kind::STR);
 
+        } else if (c == '\'') {
+            char sc = c;
+
+            do {
+                if (s[pos] == '\\') {
+                    ADV();
+                }
+                ADV();
+
+            } while (pos < sl && s[pos] != sc);
+
+            if (s[pos] != sc) {
+                cerr << "Expected an end to the char literal" << endl;
+                ADD(Token::Kind::IDENT);
+                cerr << res[res.size() - 1].context(fname, src);
+                res.clear();
+                return res;
+            }
+            ADV();
+
+            ADD(Token::Kind::CHR);
+
         } else {
             // Unknown character
             cerr << "Unexpected character: '" << c << "'" << endl;
@@ -292,6 +314,34 @@ static bool parse_rx(Program* res, const vector<Token>& toks, int& toki, int& ou
     }
 }
 
+
+// Takes a single character (accepts strings/character literal strings)
+// Returns the character and number of bytes to skip in source code 
+static char take_char(const char* src, int& num) {
+    num = 0;
+    char c = src[0];
+    if (c == '\\') {
+        // Escape sequence
+        num++;
+        c = src[num];
+        if (c == 'n') {
+            return '\n';
+        } else if (c == 't') {
+            return '\t';
+        } else if (c == 'a') {
+            return '\a';
+        } else if (c == 'b') {
+            return '\b';
+        } else {
+            return '\\';
+        }
+    }
+
+    // Default to just the character
+    num++;
+    return c;
+}
+
 // Parse immediate
 static bool parse_imm(Program* res, unordered_map< pair<int, int>, pair<string, string> >& back, const vector<Token>& toks, int& toki, instdesc& id, int seg, int& out) {
     bool is_neg = false;
@@ -336,6 +386,14 @@ static bool parse_imm(Program* res, unordered_map< pair<int, int>, pair<string, 
 
         out = is_neg ? -rv : rv;
         return true;
+    } else if (toks[toki].kind == Token::Kind::CHR) {
+        // Character literal
+        Token t = toks[toki++];
+        string st = t.get(res->src);
+        int num;
+        out = take_char(&res->src[t.pos + 1], num);
+        return true;
+
     } else if (toks[toki].kind == Token::Kind::IDENT) {
         // Label reference
         Token t = toks[toki++];
@@ -352,6 +410,8 @@ static bool parse_imm(Program* res, unordered_map< pair<int, int>, pair<string, 
         return false;
     }
 }
+
+
 
 
 // Parse integer
@@ -398,6 +458,13 @@ static bool parse_int(Program* res, const vector<Token>& toks, int& toki, s64& o
 
         out = is_neg ? -rv : rv;
         return true;
+    } else if (toks[toki].kind == Token::Kind::CHR) {
+        Token t = toks[toki++];
+        int num;
+        s64 rv = take_char(&res->src[t.pos + 1], num);
+
+        out = is_neg ? -rv : rv;
+        return true;
     } else {
         cerr << "Unexpected token, expected integer" << endl;
         cerr << toks[toki].context(res->fname, res->src);
@@ -436,26 +503,11 @@ static bool parse_str(Program* res, const string& dir, unordered_map< pair<int, 
         string st = t.get(res->src);
         val = "";
 
-        for (size_t i = 1; i < st.size() - 1; ++i) {
-            char c = st[i];
-            if (c == '\\') {
-                // Escape sequence
-                i++;
-                c = st[i];
-                if (c == 'n') {
-                    val.push_back('\n');
-                } else if (c == 't') {
-                    val.push_back('\t');
-                } else if (c == 'a') {
-                    val.push_back('\a');
-                } else if (c == 'b') {
-                    val.push_back('\b');
-                } else {
-                    val.push_back('\\');
-                }
-            } else {
-                val.push_back(c);
-            }
+        for (size_t i = 1; i < st.size() - 1;) {
+            int num;
+            char r = take_char(&st[i], num);
+            i += num;
+            val.push_back(r);
         }
 
         return true;

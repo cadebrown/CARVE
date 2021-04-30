@@ -25,6 +25,27 @@ ecall
 
 Each syscall does something different, and this page has a list of them:
 
+Here's a short table (the names are links):
+
+| Name                       | Number |
+|----------------------------|--------|
+| [exit](#exit-0)            |      0 |
+| [exit_code](#exit_code-1)  |      1 |
+| [readchar](#readchar-10)   |     10 |
+| [readint](#readint-11)     |     11 |
+| [readflt](#readflt-12)     |     12 |
+| [readlong](#readlong-13)   |     13 |
+| [readstr](#readstr-14)     |     14 |
+| [writechar](#writechar-20) |     20 |
+| [wrriteint](#wrriteint-21) |     21 |
+| [writelong](#writelong-22) |     22 |
+| [writeflt](#writeflt-23)   |     23 |
+| [writestr](#writestr-24)   |     24 |
+| [time](#time-30)           |     30 |
+| [randint](#randint-41)     |     41 |
+| [randflt](#randflt-43)     |     43 |
+| [seed](#seed-45)           |     45 |
+
 # PROC SYSCALLS
 
 ## exit (`0`)
@@ -141,19 +162,39 @@ NOTE: Like other I/O, this is somewhat buggy with Emscripten. For best results, 
 
 ## readstr (`14`)
 
-Reads a string from stdin until either a newline or `a1` characters are read, storing the characters at the address in `a0` (null terminated)
+Reads a string from stdin until either a newline or `a1` characters are read, storing the characters at the address in `a0` (null terminated).
 
 ```
-
 # sycall: readstr (14)
+# assume text "greg" is in buffer
+
+.section .data
+dest: .asciz "cade is cool"
+
+.section .text
 li a7, 14
 
-# somehow, set `a0` to address of memory
+# set `a0` to address of memory
+la a0, dest
 
-# maximum size
-li a1, 25
+# set `a1` to maximum size
+li a1, 5
 
 # Do syscall
+ecall
+
+# replace null with space
+li t0, ' '
+sb t0, 4(a0)
+
+# Print result
+li a7, 24
+la a0, test
+li a1, 512
+ecall
+# flush buffer
+li a7, 20
+li a0, '\n'
 ecall
 
 ```
@@ -218,7 +259,7 @@ Writes a single long (value from `a0`) to standard out
 li a7, 22
 
 # long to be printed
-li a0, 0xDEAD_CADE
+li a0, 142434245
 
 # Do syscall
 ecall
@@ -239,7 +280,7 @@ Writes a single float (value from `fa0`) to standard out
 # sycall: writeflt (23)
 li a7, 23
 
-# get float register into fa0
+# get float into fa0
 
 # Do syscall
 ecall
@@ -259,13 +300,16 @@ Writes a string (address from `a0`, max chars from `a1`) to standard out -- can 
 # sycall: writestr (24)
 
 .section .rodata
-test: "Marz, not Mars."
+test: .asciz "Marz, not Mars."
 
 .section .text
 li a7, 24
 
 # load address
 la a0, test
+
+# load max characters
+li a1, 512
 
 # Do syscall
 ecall
@@ -289,6 +333,14 @@ Sets `a0` to the current time since epoch in seconds
 li a7, 30
 ecall
 
+# print result
+li a7, 21
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
 ```
 
 # RANDOM SYSCALLS
@@ -298,9 +350,18 @@ ecall
 Generates a random integer between 0 and C's RAND_MAX and stores to `a0`
 
 ```
-# sycall: time (41)
+# sycall: randint (41)
 
 li a7, 41
+ecall
+
+# print result
+li a7, 21
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
 ecall
 ```
 
@@ -313,6 +374,15 @@ Generates a random float between 0 and 1 and stores to `fa0`
 
 li a7, 43
 ecall
+
+# print result
+li a7, 23
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
 ```
 
 
@@ -323,7 +393,24 @@ Seeds the random number generator using the value in `a0`
 ```
 # sycall: seed (45)
 
+# set loop params
+li t0, 0
+li t1, 3
+
+loop:
+# set seed
 li a0, 0xDEAD_CADE
 li a7, 45
 ecall
+
+# print random int
+li a7, 41
+ecall
+li a7, 21
+ecall
+li a7, 20
+li a0, '\n'
+ecall
+addi t0, t0, 1
+blt t0, t1, loop
 ```

@@ -58,3 +58,7 @@ pre {
     color: var(--body-text);
     background-color: var(--light-2);
 }
+
+table, th, td {
+    border: 1px solid black;
+  }

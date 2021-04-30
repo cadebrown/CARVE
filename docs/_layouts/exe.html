@@ -18,22 +18,22 @@
 {% endif %}
 
 <!-- Google FONT -->
-<link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
+<link href="{{ '/css/googlefonts.css' | relative_url }}" rel="stylesheet">
+<link href="{{ '/css/googlefonts-inconsolata.css' | relative_url }}" rel="stylesheet">
 
 <!-- ACE text editor -->
-<script src="https://pagecdn.io/lib/ace/1.4.12/ace.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ '/js/ace-1.4.12.min.js' | relative_url }}" type="text/javascript" charset="utf-8"></script>
 
 <!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="{{ '/js/jquery-3.3.1.min.js' | relative_url }}"></script>
 
 <!-- jQuery terminal -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.21.0/js/jquery.terminal.min.js" integrity="sha512-FVbk1C5egfxd/ITZoZz8mdU4BkyFGT2ZqdtblVcHxz1CsuaU9u4TyOKVpggcmA8siURKvW8EdJ19r5WBOUWGsg==" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="{{ '/css/jquery.terminal.css' | relative_url }}">
+<script src="{{ '/js/jquery.terminal-2.21.0.min.js' | relative_url }}"></script>
+<link href="{{ '/css/jquery.terminal.css' | relative_url }}" rel="stylesheet" >
 
 <!-- Tippy -->
-<script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/tippy.js@6"></script>
+<script src="{{ '/js/popper.js' | relative_url }}"></script>
+<script src="{{ '/js/tippy.js' | relative_url }}"></script>
 
 <!-- register and instruction info -->
 <script src="/js/carve-data.js"></script>
@@ -48,10 +48,7 @@
 <script src="/js/api-calls.js"></script>
 
 <!-- split tabs library -->
-<script src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
-
-<!-- split tabs library -->
-<script src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
+<script src="{{ '/js/split-grid.js' | relative_url }}"></script>
 
 </head>
 <body>

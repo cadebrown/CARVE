@@ -27,6 +27,11 @@ You'll need Jekyll/Ruby installed. You can google how to do that.
 
 To serve, run `bundle exec jekyll serve` (in the `docs` folder)
 
+## Building Static Site
+
+Inside the `docs` folder, run `bundle exec jekyll build`, which will populate `_site` with the full static site
+
+
 ## Adding an Instruction
 
 To add an instruction, you need to do these steps:
@@ -36,3 +41,4 @@ To add an instruction, you need to do these steps:
   * Now, re-run `make update` (or whatever `make` command you wish). The relevant files will be updated if the data changes, or their generator scripts change
 
 If you want to add an instruction of a new type, you will have to implement that type on your own
+

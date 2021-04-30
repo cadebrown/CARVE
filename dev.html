@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <title> CARVE </title>
+
+    <link rel="stylesheet" href="/css/docs.css">
+
+
+    <meta name="Description" content="Developer Guide">
+
+<!-- Google FONT -->
+<link href="/css/googlefonts.css" rel="stylesheet">
+<link href="/css/googlefonts-inconsolata.css" rel="stylesheet">
+<link href="/css/googlefonts-merriweather.css" rel="stylesheet">
+
+</head>
+<body>
+    <div class="doc_container">
+        <h1 id="carve-development-guide">CARVE Development Guide</h1>
+
+<p>This is the developer’s guide to CARVE, walking through how to contribute and build CARVE. The source code and development for CARVE are located on the GitHub: <a href="https://github.com/chemicaldevelopment/carve">https://github.com/chemicaldevelopment/carve</a>. Within that repository, the code is commented so you can see how it works and what you need to change (also, check <code>README.md</code> in that repository for more information). This is a higher level overview of the development process</p>
+
+<h2 id="hosting-specific-version">Hosting Specific Version</h2>
+
+<p>If all you want to do is host a specific version of CARVE, you can download the self-contained static site from our <a href="https://github.com/ChemicalDevelopment/CARVE/releases">GitHub releases page</a>. You can host with any file server, and vital dependencies are bundled (so it can be ran offline, as well)</p>
+
+<h2 id="building">Building</h2>
+
+<p>Once you’ve cloned the repository, you can use <code>make</code> to run various targets. For example, running <code>make update</code> will recompile the <code>./carve</code> binary (which runs on your local machine) as well as the JS/WASM package in <code>docs/js/lib</code>. You should re-run this every time the code has changed.</p>
+
+<p>The build process (internally) has a few stages:</p>
+
+<ul>
+  <li>Code generators (located in <code>tools/gen*.py</code>), which generate C++ code, mainly for encoding/decoding instructions (so that new instructions can be added)
+    <ul>
+      <li>To change the data used to generate code, edit the file <code>tools/riscvdata.py</code>. There are comments explaining what to do to add extensions/instructions</li>
+    </ul>
+  </li>
+  <li>Native C++ compiling, which compiles object files for your computer</li>
+  <li>WASM compiling with Emscripten, which compiles JS/WASM for C++ code
+    <ul>
+      <li>You may get an error related to <code>emcc not found</code>. In which case, you will need to google how to install and use Emscripten on your computer</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="running-binary">Running Binary</h2>
+
+<p>You can run the main binary with <code>./carve</code> (once it is built). Right now, it just runs the program and dumps the registers afterwards. Eventually, we aim to add a way to control it for automated grading</p>
+
+<h2 id="interfacing-through-jswasm">Interfacing Through JS/WASM</h2>
+
+<p>The CARVE API can be accessed through JS/WASM. See <code>src/js/carve.js</code> for examples on how to do this. Basically, the idea is to create a very simple C-style API which just accepts pointers (i.e. no C++ STL containers, or normal objects), so the API is as resiliant as possible. Then, on the JS side, you keep pointers to the state, program, and so forth, and use the API to manipulate them</p>
+
+<h2 id="serving-with-jekyll">Serving With Jekyll</h2>
+
+<p>We use Jekyll (a static site generator) to build the web IDE for CARVE (the main usage of the project). Within the <code>docs/</code> directory, first run <code>bundle install</code> (assuming you have installed Jekyll), and then run <code>bundle exec jekyll serve</code>. It should print the local URL that you can access it on your computer.</p>
+
+<p>It is designed to work with GitHub pages, which we use to deploy it at the main URL: <a href="https://carve.chemicaldevelopment.us/">https://carve.chemicaldevelopment.us/</a></p>
+
+<h2 id="changing-code">Changing Code</h2>
+
+<p>In the case that you want to change code, there are a few locations to check:</p>
+
+<ul>
+  <li>The core library is located in <code>src/*.cc</code></li>
+  <li>The C-API is located in <code>src/capi.cc</code></li>
+  <li>The actual implementations of instructions are located in <code>src/impl/*.cc</code>
+    <ul>
+      <li>For syscalls, edit <code>src/impl/RV32I.cc</code> (there are comments towards the end of the file, in the <code>ebreak</code> instruction which describe syscalls)</li>
+    </ul>
+  </li>
+  <li>The code generators are located in <code>src/gen*.py</code></li>
+  <li>The website (i.e. the web IDE) is located in <code>docs/</code></li>
+</ul>
+
+    </div>
+</body>

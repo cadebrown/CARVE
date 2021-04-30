@@ -1,0 +1,470 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <title> CARVE </title>
+
+    <link rel="stylesheet" href="/css/docs.css">
+
+
+    <meta name="Description" content="Syscall Referece">
+
+<!-- Google FONT -->
+<link href="/css/googlefonts.css" rel="stylesheet">
+<link href="/css/googlefonts-inconsolata.css" rel="stylesheet">
+<link href="/css/googlefonts-merriweather.css" rel="stylesheet">
+
+</head>
+<body>
+    <div class="doc_container">
+        <h1 id="carve-syscall-reference">CARVE Syscall Reference</h1>
+
+<p>To perform a syscall, here is the basic format:</p>
+
+<pre><code>
+# syscall number goes into a7
+li a7, 0
+
+# syscall arguments go in a0, a1, ...
+li a0, 1
+li a1, 43
+
+# Actually performs syscall
+ecall
+
+</code></pre>
+
+<p>Each syscall does something different, and this page has a list of them:</p>
+
+<p>Here’s a short table (the names are links):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Number</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#exit-0">exit</a></td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td><a href="#exit_code-1">exit_code</a></td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td><a href="#readchar-10">readchar</a></td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td><a href="#readint-11">readint</a></td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <td><a href="#readflt-12">readflt</a></td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td><a href="#readlong-13">readlong</a></td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <td><a href="#readstr-14">readstr</a></td>
+      <td>14</td>
+    </tr>
+    <tr>
+      <td><a href="#writechar-20">writechar</a></td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td><a href="#wrriteint-21">wrriteint</a></td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <td><a href="#writelong-22">writelong</a></td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <td><a href="#writeflt-23">writeflt</a></td>
+      <td>23</td>
+    </tr>
+    <tr>
+      <td><a href="#writestr-24">writestr</a></td>
+      <td>24</td>
+    </tr>
+    <tr>
+      <td><a href="#time-30">time</a></td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <td><a href="#randint-41">randint</a></td>
+      <td>41</td>
+    </tr>
+    <tr>
+      <td><a href="#randflt-43">randflt</a></td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <td><a href="#seed-45">seed</a></td>
+      <td>45</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="proc-syscalls">PROC SYSCALLS</h1>
+
+<h2 id="exit-0">exit (<code>0</code>)</h2>
+
+<p>The exit syscall (number <code>0</code>) causes the program to cease executing. It uses an exit code of <code>0</code> (see <code>exit_code</code>, down below)</p>
+
+<p>Example:</p>
+
+<pre><code># syscall: exit (0)
+li a7, 0
+
+# Do syscall
+ecall
+
+</code></pre>
+<h2 id="exit_code-1">exit_code (<code>1</code>)</h2>
+
+<p>The exit syscall (number <code>1</code>) causes the program to cease executing. It uses an exit code of whatever is in <code>a0</code></p>
+
+<p>Example:</p>
+
+<pre><code># syscall: exit_code (1)
+li a7, 1
+
+# exit code goes in 
+li a0, 5
+
+# Do syscall
+ecall
+
+</code></pre>
+
+<h1 id="read-syscalls">READ SYSCALLS</h1>
+<p>NOTE: These syscalls rely on the emcc buffer which has some known issues with flushing.
+Sometimes, you have to give all of the input for the program execution before building for the first time.</p>
+
+<h2 id="readchar-10">readchar (<code>10</code>)</h2>
+
+<p>This syscall reads a single character from standard input, and stores in <code>a0</code></p>
+
+<pre><code>
+# sycall: readchar (10)
+li a7, 10
+
+# Do syscall
+ecall
+
+# Now, the character code is in `a0`
+
+</code></pre>
+
+<p>NOTE: Like other I/O, this is somewhat buggy with Emscripten. For best results, enter the text before you run the program</p>
+
+<h2 id="readint-11">readint (<code>11</code>)</h2>
+
+<p>This syscall reads a base-10 integer from standard input, and stores in <code>a0</code></p>
+
+<pre><code>
+# sycall: readint (11)
+li a7, 11
+
+# Do syscall
+ecall
+
+# Now, the integer value is in `a0`
+
+</code></pre>
+
+<p>NOTE: Like other I/O, this is somewhat buggy with Emscripten. For best results, enter the text before you run the program</p>
+
+<h2 id="readflt-12">readflt (<code>12</code>)</h2>
+
+<p>This syscall reads a base-10 floating point number from standard input, and stores in <code>fa0</code></p>
+
+<pre><code>
+# sycall: readflt (12)
+li a7, 12
+
+# Do syscall
+ecall
+
+# Now, the integer value is in `fa0`
+
+</code></pre>
+
+<p>NOTE: Like other I/O, this is somewhat buggy with Emscripten. For best results, enter the text before you run the program</p>
+
+<h2 id="readlong-13">readlong (<code>13</code>)</h2>
+
+<p>This syscall reads a base-10 integer number from standard input, and stores in <code>a0</code></p>
+
+<pre><code>
+# sycall: readlong (13)
+li a7, 13
+
+# Do syscall
+ecall
+
+# Now, the integer value is in `a0`
+
+</code></pre>
+
+<p>NOTE: Like other I/O, this is somewhat buggy with Emscripten. For best results, enter the text before you run the program</p>
+
+<h2 id="readstr-14">readstr (<code>14</code>)</h2>
+
+<p>Reads a string from stdin until either a newline or <code>a1</code> characters are read, storing the characters at the address in <code>a0</code> (null terminated).</p>
+
+<pre><code># sycall: readstr (14)
+# assume text "greg" is in buffer
+
+.section .data
+dest: .asciz "cade is cool"
+
+.section .text
+li a7, 14
+
+# set `a0` to address of memory
+la a0, dest
+
+# set `a1` to maximum size
+li a1, 5
+
+# Do syscall
+ecall
+
+# replace null with space
+li t0, ' '
+sb t0, 4(a0)
+
+# Print result
+li a7, 24
+la a0, test
+li a1, 512
+ecall
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+</code></pre>
+
+<p>NOTE: Like other I/O, this is somewhat buggy with Emscripten. For best results, enter the text before you run the program</p>
+
+<h1 id="write-syscalls">WRITE SYSCALLS</h1>
+
+<p>NOTE: Output syscalls are more stable than input syscalls, but you may have to manually flush the buffer by printing the newline character.</p>
+
+<h2 id="writechar-20">writechar (<code>20</code>)</h2>
+
+<p>Writes a single character (value from <code>a0</code>) to standard out</p>
+
+<pre><code>
+# sycall: writechar (20)
+li a7, 20
+
+# char to be printed
+li a0, '!'
+
+# Do syscall
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+</code></pre>
+
+<h2 id="writeint-21">writeint (<code>21</code>)</h2>
+
+<p>Writes a single integer (value from <code>a0</code>) to standard out</p>
+
+<pre><code>
+# sycall: writeint (21)
+li a7, 21
+
+# int to be printed
+li a0, 420
+
+# Do syscall
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+</code></pre>
+
+<h2 id="writelong-22">writelong (<code>22</code>)</h2>
+
+<p>Writes a single long (value from <code>a0</code>) to standard out</p>
+
+<pre><code>
+# sycall: writelong (22)
+li a7, 22
+
+# long to be printed
+li a0, 142434245
+
+# Do syscall
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+</code></pre>
+
+<h2 id="writeflt-23">writeflt (<code>23</code>)</h2>
+
+<p>Writes a single float (value from <code>fa0</code>) to standard out</p>
+
+<pre><code>
+# sycall: writeflt (23)
+li a7, 23
+
+# get float into fa0
+
+# Do syscall
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+</code></pre>
+
+<h2 id="writestr-24">writestr (<code>24</code>)</h2>
+
+<p>Writes a string (address from <code>a0</code>, max chars from <code>a1</code>) to standard out – can be null-terminated or terminated by <code>a1</code></p>
+
+<pre><code># sycall: writestr (24)
+
+.section .rodata
+test: .asciz "Marz, not Mars."
+
+.section .text
+li a7, 24
+
+# load address
+la a0, test
+
+# load max characters
+li a1, 512
+
+# Do syscall
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+</code></pre>
+
+<h1 id="time-syscalls">TIME SYSCALLS</h1>
+
+<h2 id="time-30">time (<code>30</code>)</h2>
+
+<p>Sets <code>a0</code> to the current time since epoch in seconds</p>
+
+<pre><code># sycall: time (30)
+
+li a7, 30
+ecall
+
+# print result
+li a7, 21
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+</code></pre>
+
+<h1 id="random-syscalls">RANDOM SYSCALLS</h1>
+
+<h2 id="randint-41">randint (<code>41</code>)</h2>
+
+<p>Generates a random integer between 0 and C’s RAND_MAX and stores to <code>a0</code></p>
+
+<pre><code># sycall: randint (41)
+
+li a7, 41
+ecall
+
+# print result
+li a7, 21
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+</code></pre>
+
+<h2 id="randflt-43">randflt (<code>43</code>)</h2>
+
+<p>Generates a random float between 0 and 1 and stores to <code>fa0</code></p>
+
+<pre><code># sycall: randflt (43)
+
+li a7, 43
+ecall
+
+# print result
+li a7, 23
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+</code></pre>
+
+<h2 id="seed-45">seed (<code>45</code>)</h2>
+
+<p>Seeds the random number generator using the value in <code>a0</code></p>
+
+<pre><code># sycall: seed (45)
+
+# set loop params
+li t0, 0
+li t1, 3
+
+loop:
+# set seed
+li a0, 0xDEAD_CADE
+li a7, 45
+ecall
+
+# print random int
+li a7, 41
+ecall
+li a7, 21
+ecall
+li a7, 20
+li a0, '\n'
+ecall
+addi t0, t0, 1
+blt t0, t1, loop
+</code></pre>
+
+<p><em>Last updated 2021-04-30</em></p>
+
+    </div>
+</body>

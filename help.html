@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <title> CARVE </title>
+
+    <link rel="stylesheet" href="/css/docs.css">
+
+
+    <meta name="Description" content="Emulator Help">
+
+<!-- Google FONT -->
+<link href="/css/googlefonts.css" rel="stylesheet">
+<link href="/css/googlefonts-inconsolata.css" rel="stylesheet">
+<link href="/css/googlefonts-merriweather.css" rel="stylesheet">
+
+</head>
+<body>
+    <div class="doc_container">
+        <h1 id="carve-help-page">CARVE Help Page</h1>
+
+<p>This is the help page for <a href="..">CARVE</a>, the <em><strong>C</strong>ade <strong>A</strong>nd-greg <strong>R</strong>isc-<strong>V</strong> <strong>E</strong>mulator</em>. The source code is available <a href="https://github.com/ChemicalDevelopment/CARVE">for free on GitHub</a>.</p>
+
+<p>Many elements on the web IDE can be overed over with a mouse to display a helpful tooltip, describing what the button/control does.</p>
+
+<h2 id="saving-and-loading">Saving And Loading</h2>
+
+<p>To save a file to your computer (the contents are the editor contents), you can use the <code>File &gt; save</code> dialogue. You can then load and restore your editor to a file on your computer via the <code>File &gt; open</code> dialogue</p>
+
+<p>You can also empty the editor with the <code>File &gt; new</code> dialogue.</p>
+
+<h2 id="basic-layout">Basic Layout</h2>
+
+<p><img src="assets/layout.png" alt="Basic layout of CARVE" title="Basic Layout" /></p>
+
+<h2 id="text-editor">Text Editor</h2>
+
+<p>You can edit text in the text editor. Write RISC-V assembly, then click the ‘run’ button below the text editor to assemble and run the program.</p>
+
+<h2 id="output-console">Output Console</h2>
+
+<p>You can view the output of the assembling process, as well as the execution process in the output console, which is located underneath the text input. You can click the output console to activate the block cursor, at which point you can type on your keyboard to input text.</p>
+
+<ul>
+  <li>Normal white text is standard output</li>
+  <li>Red-tinted text is standard error</li>
+  <li>Blue-tinted text is standard input</li>
+  <li>Orange-tinted text is debug messages</li>
+</ul>
+
+<h2 id="register-view">Register View</h2>
+
+<p>You can view registers in the register view, which has a few columns (and 1 row per register):</p>
+
+<ul>
+  <li><code>REG</code>: The base ID of the register. For integer registers, this is <code>x</code> and then the number</li>
+  <li><code>NAME</code>: The typical human-readable name used for the register</li>
+  <li><code>HEX</code>: The value of the register in hex (base-16), zero padded. This way you can inspect all bytes</li>
+  <li><code>DEC</code>: The value of the register in decimal (base-10)</li>
+</ul>
+
+<h2 id="memory-explorer">Memory Explorer</h2>
+
+<p>You can change the register view tab to a memory explorer by changing the dropdown selection at the top (which defaults to <code>Int Registers</code>) to <code>Memory</code>. This will show a table of the memory of your program:</p>
+
+<p><img src="assets/memory_0.png" alt="Memory Explorer" /></p>
+
+<p>The first column is the address, and all other columns on the right are the byte values that come at and after that address. Both the addresses and the byte values are in hex, and each row has 8 bytes (thus, each row’s starting address increases by 8).</p>
+
+<p>The first column in the first row (defaulting to <code>00000000</code>) is the start address. That field is editable, so just click on that table cell and edit it to whatever hex address you’d like. When you hit <code>Enter</code>/<code>Submit</code>, the memory table will refresh with the memory starting at the address you entered. For example:</p>
+
+<p><img src="assets/memory_1.png" alt="Memory Explorer" /></p>
+
+<h2 id="engine-controls">Engine Controls</h2>
+
+<p><img src="assets/controls.png" alt="Controls" /></p>
+
+<p>Each of the buttons (the wrench through the <code>&gt;|</code> button) have tooltips that explain what they are and what they do when you hover over them.</p>
+
+<p><span class="material-icons">build</span> BUILD: Assembles the program and resets the memory.</p>
+
+<p><span class="material-icons">restart_alt</span> RESET: Assembles the program and resets the memory. (Currently just an alias for the previous button)</p>
+
+<p><span class="material-icons">play_circle</span> PLAY: Executes the assembled instructions in sequence at a specified speed.</p>
+
+<p><span class="material-icons">pause_circle</span> PAUSE: Pauses execution of the program.</p>
+
+<p><span class="material-icons">skip_next</span> STEP: Performs a single instruction.</p>
+
+<p>The last input, the slider with a value in <code>hz</code> gives the emulation speed. <code>hz</code> (meaning per second) is the number of clock cycles that the virtual CPU runs. For example, at the default (<code>18.5hz</code>), 18.5 instructions are executed each second (or, once about every 54 milliseconds). The slider can be adjusted to make the emulation faster or slower, which helps with debugging. Or, you can use the skip button to go one instruction at a time (i.e. no automatic speed)</p>
+
+<p><em>Last updated 2021-04-30</em></p>
+
+    </div>
+</body>

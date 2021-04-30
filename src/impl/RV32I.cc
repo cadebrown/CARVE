@@ -2,9 +2,12 @@
  *
  * 
  * @author: Cade Brown <cade@utk.edu>
+ * @author: Gregory Croisdale <gcroisda@vols.utk.edu>
  */
 
 #include <carve.hh>
+#include <time.h>
+#include <stdlib.h>
 
 namespace carve {
 namespace impl {
@@ -166,15 +169,16 @@ void _and    (State& s, int rd, int rs1, int rs2) {
 
 // Syscalls
 void _ebreak (State& s, int rd, int rs1, u64 imm) {
-    #define a(n) s.rx[10 + n]
+    #define a(n)  s.rx[10 + n]
+    #define fa(n) s.rf[10 + n]
     switch (imm)
     {
     case 0: {
         // ecall (syscall)
-        printf("Howdy -- I'm doing a syscall $%d\n", (int) a(7));
         // Which syscall?
         switch (a(7))
         {
+            // basic proc calls
             case 0: {
                 // exit(0)
                 s.is_exited = true;
@@ -187,42 +191,70 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
                 s.exit_code = a(0);
                 break;
             }
+
+            // I/O
+            // Input
             case 10: {
                 // readchar
                 char tmp;
-                scanf("%c", (char*) &tmp);
+                int ret;
+
+                if ((ret = scanf("%c", (char*) &tmp)) != 1) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                }
+
                 a(0) = tmp;
                 break;
             }
             case 11: {
                 // readint
                 uint32_t tmp;
-                scanf("%d", (int*) &tmp);
+                int ret;
+
+                if ((ret = scanf("%d", (int*) &tmp)) != 1) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                }
+
                 a(0) = tmp;
                 break;
             }
             case 12: {
                 // readflt
                 double tmp;
-                scanf("%lf", (double*) &tmp);
-                a(0) = tmp;
+                int ret;
+
+                if ((ret = scanf("%lf", (double*) &tmp)) != 1) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                }
+
+                fa(0) = tmp;
                 break;
             }
             case 13: {
                 // readlong
                 uint64_t tmp;
-                scanf("%ld", (long*) &tmp);
+                int ret;
+
+                if ((ret = scanf("%ld", (long*) &tmp)) != 1) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                }
+
                 a(0) = tmp;
                 break;
             }
             case 14: {
                 // readstr
                 char buff[a(1)];
-                fgets(buff, a(1), stdin);
+                int ret;
+
+                if ((ret = scanf("%.*s", a(1), buff)) != 1) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                }
 
                 memcpy(((char*) s.vmem.data()) + a(0), buff, a(1));
                 break;
             }
+            // Output
             case 20: {
                 // writechar
                 printf("%c", (char) a(0));
@@ -236,16 +268,46 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
                 break;
             }
             case 22: {
-                // writeflt
-                printf("%lf", (double) a(0));
+                // writelong
+                printf("%ld", (long) a(0));
                 fflush(stdout);
                 break;
             }
             case 23: {
+                // writeflt
+                printf("%lf", (double) fa(0));
+                fflush(stdout);
+                break;
+            }
+            case 24: {
                 // writestr
+                // printf("Printing the string at %d; vmem starts at %p; string starts at %p\n", (int) a(0), &s.vmem[0], ((char*) &s.vmem[0]) + a(0));
                 printf("%.*s", (int) a(1), ((char*) s.vmem.data()) + a(0));
                 fflush(stdout);
                 break;
+            }
+
+            // Time operations
+            case 30: {
+                // time
+                a(0) = (u64) time(NULL);
+                break;
+            }
+
+            // Random
+            case 41: {
+                // randint
+                a(0) = (u64) rand();
+                break;
+            }
+            case 43: {
+                // randflt
+                fa(0) = ((double) rand()) / RAND_MAX;
+                break;
+            }
+            case 45: {
+                // seed random
+                srand((int) a(0));
             }
             default: {
                 fprintf(stderr, "Unknown syscall number %d\n", (int) a(7));

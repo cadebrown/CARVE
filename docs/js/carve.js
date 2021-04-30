@@ -74,7 +74,18 @@ loadlibcarve().then(function (_libcarve) {
     editor.getSession().setMode('ace/mode/riscv')
     editor.getSession().on('change', function() {
         update_time = Date.now();
-    });
+    
+        // Save to local storage
+        window.localStorage.setItem('src', editor.getValue())
+    })
+
+
+    // Get source code
+    let last_src = window.localStorage.getItem('src')
+    if (last_src != '' && last_src != null) {
+        editor.setValue(last_src, 1)
+    }
+
 
     /* Debug Table */
     debug_table = $("#debug_table");

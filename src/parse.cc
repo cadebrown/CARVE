@@ -742,8 +742,11 @@ static bool parse_p(Program* res, unordered_map< pair<int, int>, pair<string, st
         }
 
         oid = insts.find("addi")->second;
-        v = enc_I(oid.op, oid.f3, rd, rd, imm);
+
         if (t.kind == Token::Kind::IDENT) {
+            imm = res->vmem[0].size();
+            v = enc_I(oid.op, oid.f3, rd, rd, imm);
+
             // We need to link both instructions to be backpatched
             if (dou) {
                 back.erase({seg, res->vmem[seg].size() - 4});
@@ -752,8 +755,11 @@ static bool parse_p(Program* res, unordered_map< pair<int, int>, pair<string, st
                 back.erase({seg, res->vmem[seg].size()});
             }
             back[{seg, res->vmem[seg].size()}] = { oid.kind, t.get(res->src) };
+        } else {
+            v = enc_I(oid.op, oid.f3, rd, rd, imm);
         }
         addbytes<inst>(res->vmem[seg], v);
+
         return true;
 
     } else if (id.name == "mv") {
@@ -1197,21 +1203,27 @@ Program* parse(const string& fname, const string& src, const vector<Token>& toks
         // Make sure to add back the immediate that was already there!
         if (kind == "I") {
             dec_I(v, op, f3, rd, rs1, imm);
+            newimm += imm;
             v = enc_I(op, f3, rd, rs1, newimm);
         } else if (kind == "U") {
             dec_U(v, op, rd, imm);
+            newimm += imm;
             v = enc_U(op, rd, newimm);
         } else if (kind == "J") {
             dec_J(v, op, rd, imm);
+            newimm += imm;
             v = enc_J(op, rd, newimm);
         } else if (kind == "S") {
             dec_S(v, op, f3, rs1, rs2, imm);
+            newimm += imm;
             v = enc_S(op, f3, rs1, rs2, newimm);
         } else if (kind == "B") {
             dec_B(v, op, f3, rs1, rs2, imm);
+            newimm += imm;
             v = enc_B(op, f3, rs1, rs2, newimm);
         } else if (kind == "U") {
             dec_U(v, op, rd, imm);
+            newimm += imm;
             v = enc_U(op, rd, imm);
         } else {
             assert(false);

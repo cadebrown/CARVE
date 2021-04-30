@@ -197,10 +197,9 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
             case 10: {
                 // readchar
                 char tmp;
-                int ret;
 
-                if ((ret = scanf("%c", (char*) &tmp)) != 1) {
-                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                if ((scanf("%c", (char*) &tmp)) != 1) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", errno);
                 }
 
                 a(0) = tmp;
@@ -209,10 +208,9 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
             case 11: {
                 // readint
                 uint32_t tmp;
-                int ret;
 
-                if ((ret = scanf("%d", (int*) &tmp)) != 1) {
-                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                if ((scanf("%d", (int*) &tmp)) != 1) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", errno);
                 }
 
                 a(0) = tmp;
@@ -221,10 +219,9 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
             case 12: {
                 // readflt
                 double tmp;
-                int ret;
 
-                if ((ret = scanf("%lf", (double*) &tmp)) != 1) {
-                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                if ((scanf("%lf", (double*) &tmp)) != 1) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", errno);
                 }
 
                 fa(0) = tmp;
@@ -233,10 +230,9 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
             case 13: {
                 // readlong
                 uint64_t tmp;
-                int ret;
 
-                if ((ret = scanf("%ld", (long*) &tmp)) != 1) {
-                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                if ((scanf("%ld", (long*) &tmp)) != 1) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", errno);
                 }
 
                 a(0) = tmp;
@@ -245,10 +241,9 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
             case 14: {
                 // readstr
                 char buff[a(1)];
-                int ret;
 
-                if ((ret = scanf("%.*s", a(1), buff)) != 1) {
-                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", ret);
+                if (fgets(buff, a(1), stdin) == nullptr) {
+                    fprintf(stderr, "(KNOWN ISSUE WITH EMCC) Syscall failed -- got errno %d\n", errno);
                 }
 
                 memcpy(((char*) s.vmem.data()) + a(0), buff, a(1));
@@ -281,7 +276,6 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
             }
             case 24: {
                 // writestr
-                // printf("Printing the string at %d; vmem starts at %p; string starts at %p\n", (int) a(0), &s.vmem[0], ((char*) &s.vmem[0]) + a(0));
                 printf("%.*s", (int) a(1), ((char*) s.vmem.data()) + a(0));
                 fflush(stdout);
                 break;
@@ -308,6 +302,7 @@ void _ebreak (State& s, int rd, int rs1, u64 imm) {
             case 45: {
                 // seed random
                 srand((int) a(0));
+                break;
             }
             default: {
                 fprintf(stderr, "Unknown syscall number %d\n", (int) a(7));

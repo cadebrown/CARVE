@@ -9,6 +9,10 @@ permalink: /dev
 
 This is the developer's guide to CARVE, walking through how to contribute and build CARVE. The source code and development for CARVE are located on the GitHub: [https://github.com/chemicaldevelopment/carve](https://github.com/chemicaldevelopment/carve). Within that repository, the code is commented so you can see how it works and what you need to change (also, check `README.md` in that repository for more information). This is a higher level overview of the development process
 
+## Hosting Specific Version
+
+If all you want to do is host a specific version of CARVE, you can download the self-contained static site from our [GitHub releases page](https://github.com/ChemicalDevelopment/CARVE/releases). You can host with any file server, and vital dependencies are bundled (so it can be ran offline, as well)
+
 ## Building
 
 Once you've cloned the repository, you can use `make` to run various targets. For example, running `make update` will recompile the `./carve` binary (which runs on your local machine) as well as the JS/WASM package in `docs/js/lib`. You should re-run this every time the code has changed.

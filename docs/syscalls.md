@@ -25,6 +25,8 @@ ecall
 
 Each syscall does something different, and this page has a list of them:
 
+# PROC SYSCALLS
+
 ## exit (`0`)
 
 The exit syscall (number `0`) causes the program to cease executing. It uses an exit code of `0` (see `exit_code`, down below)
@@ -56,6 +58,10 @@ li a0, 5
 ecall
 
 ```
+
+# READ SYSCALLS
+NOTE: These syscalls rely on the emcc buffer which has some known issues with flushing.
+Sometimes, you have to give all of the input for the program execution before building for the first time.
 
 ## readchar (`10`)
 
@@ -154,7 +160,9 @@ ecall
 
 NOTE: Like other I/O, this is somewhat buggy with Emscripten. For best results, enter the text before you run the program
 
+# WRITE SYSCALLS
 
+NOTE: Output syscalls are more stable than input syscalls, but you may have to manually flush the buffer by printing the newline character.
 
 ## writechar (`20`)
 
@@ -165,18 +173,157 @@ Writes a single character (value from `a0`) to standard out
 # sycall: writechar (20)
 li a7, 20
 
-# somehow, set `a0` to address of memory
-
-# maximum size
-li a1, 25
+# char to be printed
+li a0, '!'
 
 # Do syscall
 ecall
 
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+```
+
+## writeint (`21`)
+
+Writes a single integer (value from `a0`) to standard out
+
+```
+
+# sycall: writeint (21)
+li a7, 21
+
+# int to be printed
+li a0, 420
+
+# Do syscall
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+```
+
+## writelong (`22`)
+
+Writes a single long (value from `a0`) to standard out
+
+```
+
+# sycall: writelong (22)
+li a7, 22
+
+# long to be printed
+li a0, 0xDEAD_CADE
+
+# Do syscall
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+```
+
+## writeflt (`23`)
+
+Writes a single float (value from `fa0`) to standard out
+
+```
+
+# sycall: writeflt (23)
+li a7, 23
+
+# get float register into fa0
+
+# Do syscall
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+```
+
+## writestr (`24`)
+
+Writes a string (address from `a0`, max chars from `a1`) to standard out -- can be null-terminated or terminated by `a1`
+
+```
+# sycall: writestr (24)
+
+.section .rodata
+test: "Marz, not Mars."
+
+.section .text
+li a7, 24
+
+# load address
+la a0, test
+
+# Do syscall
+ecall
+
+# flush buffer
+li a7, 20
+li a0, '\n'
+ecall
+
+```
+
+# TIME SYSCALLS
+
+## time (`30`)
+
+Sets `a0` to the current time since epoch in seconds
+
+```
+# sycall: time (30)
+
+li a7, 30
+ecall
+
+```
+
+# RANDOM SYSCALLS
+
+## randint (`41`)
+
+Generates a random integer between 0 and C's RAND_MAX and stores to `a0`
+
+```
+# sycall: time (41)
+
+li a7, 41
+ecall
+```
+
+## randflt (`43`)
+
+Generates a random float between 0 and 1 and stores to `fa0`
+
+```
+# sycall: randflt (43)
+
+li a7, 43
+ecall
 ```
 
 
+## seed (`45`)
 
+Seeds the random number generator using the value in `a0`
 
+```
+# sycall: seed (45)
 
-
+li a0, 0xDEAD_CADE
+li a7, 45
+ecall
+```

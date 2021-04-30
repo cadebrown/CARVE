@@ -9,10 +9,18 @@ permalink: /help
 
 This is the help page for [CARVE](..), the _**C**ade **A**nd-greg **R**isc-**V** **E**mulator_. The source code is available [for free on GitHub](https://github.com/ChemicalDevelopment/CARVE).
 
+Many elements on the web IDE can be overed over with a mouse to display a helpful tooltip, describing what the button/control does.
+
+## Saving And Loading
+
+To save a file to your computer (the contents are the editor contents), you can use the `File > save` dialogue. You can then load and restore your editor to a file on your computer via the `File > open` dialogue
+
+You can also empty the editor with the `File > new` dialogue.
+
+
 ## Basic Layout
 
 ![Basic layout of CARVE](assets/layout.png "Basic Layout")
-
 
 ## Text Editor
 
@@ -26,7 +34,6 @@ You can view the output of the assembling process, as well as the execution proc
   * Red-tinted text is standard error
   * Blue-tinted text is standard input
   * Orange-tinted text is debug messages
-
 
 ## Register View
 
@@ -52,7 +59,13 @@ The first column in the first row (defaulting to `00000000`) is the start addres
 ![Memory Explorer](assets/memory_1.png)
 
 
+## Engine Controls
 
+![Controls](assets/controls.png)
+
+Each of the buttons (the wrench through the `>|` button) have tooltips that explain what they are and what they do when you hover over them.
+
+The last input, the slider with a value in `hz` gives the emulation speed. `hz` (meaning per second) is the number of clock cycles that the virtual CPU runs. For example, at the default (`18.5hz`), 18.5 instructions are executed each second (or, once about every 54 milliseconds). The slider can be adjusted to make the emulation faster or slower, which helps with debugging. Or, you can use the skip button to go one instruction at a time (i.e. no automatic speed)
 
 
 _Last updated 2021-04-29_

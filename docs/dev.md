@@ -29,7 +29,6 @@ You can run the main binary with `./carve` (once it is built). Right now, it jus
 
 The CARVE API can be accessed through JS/WASM. See `src/js/carve.js` for examples on how to do this. Basically, the idea is to create a very simple C-style API which just accepts pointers (i.e. no C++ STL containers, or normal objects), so the API is as resiliant as possible. Then, on the JS side, you keep pointers to the state, program, and so forth, and use the API to manipulate them
 
-
 ## Serving With Jekyll
 
 We use Jekyll (a static site generator) to build the web IDE for CARVE (the main usage of the project). Within the `docs/` directory, first run `bundle install` (assuming you have installed Jekyll), and then run `bundle exec jekyll serve`. It should print the local URL that you can access it on your computer.
@@ -43,9 +42,6 @@ In the case that you want to change code, there are a few locations to check:
   * The core library is located in `src/*.cc`
   * The C-API is located in `src/capi.cc`
   * The actual implementations of instructions are located in `src/impl/*.cc`
+    * For syscalls, edit `src/impl/RV32I.cc` (there are comments towards the end of the file, in the `ebreak` instruction which describe syscalls)
   * The code generators are located in `src/gen*.py`
   * The website (i.e. the web IDE) is located in `docs/`
-
-
-
-

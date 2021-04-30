@@ -279,7 +279,6 @@ loadlibcarve().then(function (_libcarve) {
                 ['addexit', `<span class="menu-dropdown nohov">Add Exit At Bottom</span> \
                 <input oninput="addexit = $('#addexit').prop('checked')" type="checkbox" id="addexit" name="addexit" style="width: 32px;" ${(addexit) ? 'checked' : ''}>`]
             ],
-            'assembler': ['ASSEMBLER INFORMATION (extensions, compilation date, etc.)'],
             'help': [`<a target='_blank' rel='noopener noreferrer' href='help'>CARVE Documentation</a>`,
             `<a target='_blank' rel='noopener noreferrer' href='syscalls'>Syscall reference</a>`,
             `<a target='_blank' rel='noopener noreferrer' href='dev'>Development Guide</a>`,

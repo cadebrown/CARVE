@@ -25,6 +25,14 @@ ecall
 
 Each syscall does something different, and this page has a list of them:
 
+Here's a short table:
+
+|----|----|----|
+|Name|Number|Description|
+|[exit](#exit-0)|0|Exits the program|
+|[exit_code](#exit_code-1)|1|Exits the program with a return code|
+
+
 ## exit (`0`)
 
 The exit syscall (number `0`) causes the program to cease executing. It uses an exit code of `0` (see `exit_code`, down below)

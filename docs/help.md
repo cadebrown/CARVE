@@ -65,7 +65,18 @@ The first column in the first row (defaulting to `00000000`) is the start addres
 
 Each of the buttons (the wrench through the `>|` button) have tooltips that explain what they are and what they do when you hover over them.
 
+<span class="material-icons">build</span> BUILD: Assembles the program and resets the memory.
+
+<span class="material-icons">restart_alt</span> RESET: Assembles the program and resets the memory. (Currently just an alias for the previous button)
+
+<span class="material-icons">play_circle</span> PLAY: Executes the assembled instructions in sequence at a specified speed.
+
+<span class="material-icons">pause_circle</span> PAUSE: Pauses execution of the program.
+
+<span class="material-icons">skip_next</span> STEP: Performs a single instruction.
+
+
 The last input, the slider with a value in `hz` gives the emulation speed. `hz` (meaning per second) is the number of clock cycles that the virtual CPU runs. For example, at the default (`18.5hz`), 18.5 instructions are executed each second (or, once about every 54 milliseconds). The slider can be adjusted to make the emulation faster or slower, which helps with debugging. Or, you can use the skip button to go one instruction at a time (i.e. no automatic speed)
 
 
-_Last updated 2021-04-29_
+_Last updated 2021-04-30_

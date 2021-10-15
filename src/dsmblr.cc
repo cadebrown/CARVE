@@ -205,7 +205,7 @@ string disassemble(inst v) {
                         case 0x0:
                             out << "srl" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << rs2;
                             break;
-                        case 0x10:
+                        case 0x20:
                             out << "sra" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << rs2;
                             break;
                     }
@@ -277,7 +277,7 @@ string disassemble(inst v) {
                     break;
                 case 0x5:
                     switch (f7) {
-                        case 0x10:
+                        case 0x20:
                             out << "sraw" << " " << regnames[rd] << ", " << regnames[rs1] << ", " << rs2;
                             break;
                     }

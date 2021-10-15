@@ -168,7 +168,7 @@ void State::exec(inst v) {
                         case 0x0:
                             impl::_srl(*this, rd, rs1, rs2);
                             break;
-                        case 0x10:
+                        case 0x20:
                             impl::_sra(*this, rd, rs1, rs2);
                             break;
                     }
@@ -240,7 +240,7 @@ void State::exec(inst v) {
                     break;
                 case 0x5:
                     switch (f7) {
-                        case 0x10:
+                        case 0x20:
                             impl::_sraw(*this, rd, rs1, rs2);
                             break;
                     }

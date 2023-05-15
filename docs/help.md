@@ -7,7 +7,7 @@ permalink: /help
 
 # CARVE Help Page
 
-This is the help page for [CARVE](..), the _**C**ade **A**nd-greg **R**isc-**V** **E**mulator_. The source code is available [for free on GitHub](https://github.com/ChemicalDevelopment/CARVE).
+This is the help page for [CARVE](..), the _**C**ade **A**nd-greg **R**isc-**V** **E**mulator_. The source code is available for free on GitHub: [github.com/cadebrown/CARVE](https://github.com/cadebrown/CARVE).
 
 Many elements on the web IDE can be overed over with a mouse to display a helpful tooltip, describing what the button/control does.
 

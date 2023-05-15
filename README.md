@@ -1,7 +1,6 @@
+# CARVE (carve.cade.site)
 
-# CARVE
-
-CARVE (Cade Andgreg's Risc-V Emulator) is a project developed under [Dr. Marz](https://www.eecs.utk.edu/people/stephen-marz/). CARVE is deployable as a web application, and is hosted at [carve.chemicaldevelopment.us](https://carve.chemicaldevelopment.us). It has been tested with many platforms, and relies only on a modern web browser with a modern JavaScript engine and [WASM](https://webassembly.org/) support.
+CARVE (Cade Andgreg's Risc-V Emulator, [carve.cade.site](https://carve.cade.site)) is a project developed under [Dr. Marz](https://www.eecs.utk.edu/people/stephen-marz/). CARVE is deployable as a web application, and is hosted at [carve.cade.site](https://carve.cade.site). It has been tested with many platforms, and relies only on a modern web browser with a modern JavaScript engine and [WASM](https://webassembly.org/) support.
 
 ## Building
 

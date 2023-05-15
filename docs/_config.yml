@@ -2,7 +2,7 @@
 title: CARVE
 description: "Cade Andgreg's RISC-V Emulator"
 baseurl: ""
-url: "https://carve.chemicaldevelopment.us"
+url: "https://carve.cade.site"
 
 permalink: pretty
 exclude: ["*.gemspec", "*.gem", "Gemfile", "Gemfile.lock"]

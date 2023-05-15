@@ -7,11 +7,11 @@ permalink: /dev
 
 # CARVE Development Guide
 
-This is the developer's guide to CARVE, walking through how to contribute and build CARVE. The source code and development for CARVE are located on the GitHub: [https://github.com/chemicaldevelopment/carve](https://github.com/chemicaldevelopment/carve). Within that repository, the code is commented so you can see how it works and what you need to change (also, check `README.md` in that repository for more information). This is a higher level overview of the development process
+This is the developer's guide to CARVE, walking through how to contribute and build CARVE. The source code and development for CARVE are located on the GitHub: [https://github.com/cadebrown/CARVE](https://github.com/cadebrown/CARVE). Within that repository, the code is commented so you can see how it works and what you need to change (also, check `README.md` in that repository for more information). This is a higher level overview of the development process
 
 ## Hosting Specific Version
 
-If all you want to do is host a specific version of CARVE, you can download the self-contained static site from our [GitHub releases page](https://github.com/ChemicalDevelopment/CARVE/releases). You can host with any file server, and vital dependencies are bundled (so it can be ran offline, as well)
+If all you want to do is host a specific version of CARVE, you can download the self-contained static site from our [GitHub releases page](https://github.com/cadebrown/CARVE/releases). You can host with any file server, and vital dependencies are bundled (so it can be ran offline, as well)
 
 ## Building
 
@@ -37,7 +37,7 @@ The CARVE API can be accessed through JS/WASM. See `src/js/carve.js` for example
 
 We use Jekyll (a static site generator) to build the web IDE for CARVE (the main usage of the project). Within the `docs/` directory, first run `bundle install` (assuming you have installed Jekyll), and then run `bundle exec jekyll serve`. It should print the local URL that you can access it on your computer.
 
-It is designed to work with GitHub pages, which we use to deploy it at the main URL: [https://carve.chemicaldevelopment.us/](https://carve.chemicaldevelopment.us/)
+It is designed to work with GitHub pages, which we use to deploy it at the main URL: [carve.cade.site](https://carve.cade.site)
 
 ## Changing Code
 
